@@ -1,0 +1,10 @@
+{
+  "name": "node-weibo",
+  "version": "0.1",
+  "description": "Weibo SDK, base on node",
+  "keywords": ["weibo", "sdk"],
+  "repository": "git://github.com/fengmk2/node-weibo.git",
+  "author": "fengmk2<fengmk2@gmail.com> (http://fengmk2.cnblogs.com)",
+  "main": "index",
+  "engines": { "node": ">= 0.4.1" }
+}
