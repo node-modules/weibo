@@ -99,6 +99,17 @@ var tapi = {
 		return this.api_dispatch(data).comments_timeline(data, callback, context);
 	},
 	
+	/* 返回一条原创微博消息的最新n条转发微博消息。本接口无法对非原创微博进行查询。
+	 * id	true	int64	要获取转发微博列表的原创微博ID。
+	 * since_id	false	int64	若指定此参数，则只返回ID比since_id大的记录（比since_id发表时间晚）。
+	 * max_id	false	int64	若指定此参数，则返回ID小于或等于max_id的记录
+	 * count	false	int，默认值20，最大值200。	单页返回的记录条数。
+	 * page	false	int，默认值1。	返回结果的页码。
+	 */
+	repost_timeline: function(data, callback, context){
+		return this.api_dispatch(data).repost_timeline(data, callback, context);
+	},
+	
 	/*
 	 * since_id	false	int64	若指定此参数，则只返回ID比since_id大的提到当前登录用户的微博消息（比since_id发表时间晚）。
 	 * max_id	false	int64	若指定此参数，则返回ID小于或等于max_id的提到当前登录用户微博消息
