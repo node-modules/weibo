@@ -24,17 +24,24 @@ tapi SDK api base on tsina api document: [http://open.t.sina.com.cn/](http://ope
 
 ### Browser
 
-Include the javascript files:
-1. sha1.js
-2. base64.js
-3. oauth.js
-4. tsina.js
-   ...
-5. twitter.js
+    Include the javascript files:
+    1. sha1.js
+    2. base64.js
+    3. oauth.js
+    4. tsina.js
+       ...
+    5. twitter.js
+    
+    tapi.js
 
-    // tapi are all ready in window object.
-    tapi.public_timeline();
+    var tapi = weibo.API;
+    tapi.init('tsina', appkey, secret);
+    tapi.public_timeline(function(data, error, xhr) {
+    });
 
 ### Server
-    var tapi = require('./node-weibo');
-    tapi.public_timeline();
+
+    var tapi = require('./node-weibo').tapi;
+    tapi.init('tsina', appkey, secret);
+    tapi.public_timeline(function(data, error, response) {
+    });
