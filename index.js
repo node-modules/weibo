@@ -1,4 +1,4 @@
-var tapi = exports.tapi = require('./lib/tapi').API;
+var tapi = exports.tapi = require('./lib/tapi');
 
 /**
  * init appkey and secret
@@ -26,4 +26,4 @@ exports.init = function tapi_init() {
  */
 exports.oauth_middleware = require('./lib/oauth_middleware');
 
-exports.instapaper = require('./lib/instapaper').instapaper;
+exports.instapaper = require('./lib/instapaper');
