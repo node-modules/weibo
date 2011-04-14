@@ -46,7 +46,7 @@ tapi SDK api base on tsina api document: [http://open.t.sina.com.cn/](http://ope
         tapi.public_timeline(function(data, error, response) {
     });
     
-### User oauth_middleware
+### Use oauth_middleware
 
 handler oauth login middleware, use on connect, express.
     
@@ -56,11 +56,13 @@ params: `function oauth_middleware(login_callback, options)`
         where login success callback: login_callback(oauth_user, referer, req, res, after_callback)
         you MUST save user info in login_callback.
     `options`: {
-        `home_url`: use to create login success oauth_callback url with referer header, default is `'http://' + req.headers.host`;
+        `home_url`: use to create login success oauth_callback url with referer header, 
+            default is `'http://' + req.headers.host`;
         `login_path`: login url, default is '/oauth'
         `logout_path`: default is '/oauth/logout'
         `callback_path`: default is login_path + '_callback'
-        `blogtype_field`: default is 'blogtype', if you want to connect weibo, login url should be '/oauth?blogtype=tsina'
+        `blogtype_field`: default is 'blogtype', 
+            if you want to connect weibo, login url should be '/oauth?blogtype=tsina'
     }
     
 how to use:
