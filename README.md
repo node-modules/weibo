@@ -34,14 +34,45 @@ tapi SDK api base on tsina api document: [http://open.t.sina.com.cn/](http://ope
     
     tapi.js
 
-    var tapi = weibo.API;
-    tapi.init('tsina', appkey, secret);
-    tapi.public_timeline(function(data, error, xhr) {
+    var tapi = window.tapi;
+        tapi.init('tsina', appkey, secret);
+        tapi.public_timeline(function(data, error, xhr) {
     });
 
 ### Server
 
     var tapi = require('./node-weibo').tapi;
-    tapi.init('tsina', appkey, secret);
-    tapi.public_timeline(function(data, error, response) {
+        tapi.init('tsina', appkey, secret);
+        tapi.public_timeline(function(data, error, response) {
     });
+    
+### User oauth_middleware
+
+handler oauth login middleware, use on connect, express.
+    
+params: function oauth_middleware(home_url, login_callback, options)
+    
+    
+    login_callback: where login success callback: login_callback(oauth_user, referer, req, res, after_callback), you MUST save user info here.
+    options: {
+        home_url: use to create login success oauth_callback url with referer header, default is `'http://' + req.headers.host`;
+        login_path: login url, default is '/oauth'
+        logout_path: default is '/oauth/logout'
+        callback_path: default is login_path + '_callback'
+        blogtype_field: default is 'blogtype', if you want to connect weibo, login url should be '/oauth?blogtype=tsina'
+    }
+    
+how to use:
+    
+    var weibo = require('node-weibo')
+      , home_url = 'http://localhost';
+    weibo.init('tsina', appkey, secret);
+    app.use(weibo.oauth_middleware(function(oauth_user, referer, req, res, callback) {
+        // do something ...
+        // save oauth_user
+        db.save_user(oauth_user);
+        // use auth redirect, just callback(), return to login referer page.
+        // otherwise, callback(true), and handler redirect by yourself
+        callback();
+    }));
+
