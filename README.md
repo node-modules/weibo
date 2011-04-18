@@ -14,7 +14,7 @@
  * leihou: [http://leihou.com/](http://leihou.com/)
  * plurk: [http://plurk.com/](http://plurk.com/)
 
-tapi SDK api base on tsina api document: [http://open.t.sina.com.cn/](http://open.t.sina.com.cn/)
+tapi SDK api base on tsina(weibo) api document: [http://open.weibo.com/](http://open.weibo.com/)
 
 ## Requires:
  * browser client: jquery(for ajax request)
@@ -22,7 +22,7 @@ tapi SDK api base on tsina api document: [http://open.t.sina.com.cn/](http://ope
 
 ## How to use
 
-### Browser
+### Browser(Not ready)
 
     Include the javascript files:
     1. sha1.js
@@ -35,15 +35,25 @@ tapi SDK api base on tsina api document: [http://open.t.sina.com.cn/](http://ope
     tapi.js
 
     var tapi = window.tapi;
-        tapi.init('tsina', appkey, secret);
-        tapi.public_timeline(function(data, error, xhr) {
+    tapi.init('tsina', appkey, secret);
+    tapi.public_timeline(function(error, data, xhr) {
+        if(error) {
+            console.error(error);
+        } else {
+            console.log(data);
+        }
     });
 
 ### Server
 
     var tapi = require('./node-weibo').tapi;
-        tapi.init('tsina', appkey, secret);
-        tapi.public_timeline(function(data, error, response) {
+    tapi.init('tsina', appkey, secret);
+    tapi.public_timeline(function(error, data, response) {
+        if(error) {
+            console.error(error);
+        } else {
+            console.log(data);
+        }
     });
     
 ### Use oauth_middleware
@@ -63,9 +73,11 @@ params: `function oauth_middleware(login_callback, options)`
         `callback_path`: default is login_path + '_callback'
         `blogtype_field`: default is 'blogtype', 
             if you want to connect weibo, login url should be '/oauth?blogtype=tsina'
+        `error_callback`: function(error, referer, user, req, res, next), 
+            if you want to handler error by yourselft.
     }
     
-how to use:
+Example:
     
     var weibo = require('node-weibo')
       , home_url = 'http://localhost';

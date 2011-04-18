@@ -12,18 +12,6 @@ exports.init = function tapi_init() {
 	tapi.init.apply(tapi, arguments);
 };
 
-/**
- * handler oauth login middleware, use on connect, express.
- * 
- * e.g.:
- * 
- *   app.use(weibo.oauth_middleware(home_url, function(oauth_user, referer, req, res, callback) {
- *   	// do something ...
- *   	// save oauth_user
- *   	// if auto redirect, callback()
- *   	// otherwise, callback(true), and handler redirect by yourself
- *   }));
- */
 exports.oauth_middleware = require('./lib/oauth_middleware');
 
 exports.instapaper = require('./lib/instapaper');
