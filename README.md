@@ -92,5 +92,5 @@ Example:
     }));
 
 ### Node Gtap Twitter API Proxy Server
-
-    $ node node-weibo/lib/gtap/server.js
+    
+    var start_gtap = require('node-weibo').start_gtap;

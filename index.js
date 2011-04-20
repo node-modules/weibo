@@ -15,3 +15,5 @@ exports.init = function tapi_init() {
 exports.oauth_middleware = require('./lib/oauth_middleware');
 
 exports.instapaper = require('./lib/instapaper');
+
+exports.start_gtap = require('./lib/gtap/server').start;
