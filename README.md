@@ -91,3 +91,6 @@ Example:
         callback();
     }));
 
+### Node Gtap Twitter API Proxy Server
+
+    $ node node-weibo/lib/gtap/server.js
