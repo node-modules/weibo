@@ -20,6 +20,10 @@ tapi SDK api base on tsina(weibo) api document: [http://open.weibo.com/](http://
  * browser client: jquery(for ajax request)
  * server: nodejs
 
+## Install
+    
+    $ npm install weibo
+
 ## How to use
 
 ### Browser(Not ready)
@@ -46,7 +50,7 @@ tapi SDK api base on tsina(weibo) api document: [http://open.weibo.com/](http://
 
 ### Server
 
-    var tapi = require('./node-weibo').tapi;
+    var tapi = require('weibo').tapi;
     tapi.init('tsina', appkey, secret);
     tapi.public_timeline(function(error, data, response) {
         if(error) {
@@ -79,7 +83,7 @@ params: `function oauth_middleware(login_callback, options)`
     
 Example:
     
-    var weibo = require('node-weibo')
+    var weibo = require('weibo')
       , home_url = 'http://localhost';
     weibo.init('tsina', appkey, secret);
     app.use(weibo.oauth_middleware(function(oauth_user, referer, req, res, callback) {
@@ -93,4 +97,4 @@ Example:
 
 ### Node Gtap Twitter API Proxy Server
     
-    var start_gtap = require('node-weibo').start_gtap;
+    var start_gtap = require('weibo').start_gtap;

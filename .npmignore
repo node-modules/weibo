@@ -1,0 +1,6 @@
+.git*
+test/
+support/
+.settings/
+.project
+mkdoc.sh
