@@ -1,8 +1,7 @@
 {
   "name": "weibo",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Weibo SDK, base on node",
-  "keywords": ["weibo", "sdk"],
   "repository": "git://github.com/fengmk2/node-weibo.git",
   "author": "fengmk2<fengmk2@gmail.com> (http://fengmk2.cnblogs.com)",
   "main": "index",
@@ -15,7 +14,7 @@
     "qs": ">= 0.0.6",
     "filestore": "*"
   },
-  "keywords": ["framework", "sinatra", "web", "rest", "restful"],
+  "keywords": ["framework", "sinatra", "web", "rest", "restful", "weibo", "sdk"],
   "repository": "git://github.com/fengmk2/node-weibo",
   "engines": { "node": ">= 0.4.1" }
 }
