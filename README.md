@@ -40,7 +40,7 @@ tapi SDK api base on tsina(weibo) api document: [http://open.weibo.com/](http://
 
     var tapi = window.tapi;
     tapi.init('tsina', appkey, secret);
-    tapi.public_timeline(function(error, data, xhr) {
+    tapi.public_timeline({}, function(error, data, xhr) {
         if(error) {
             console.error(error);
         } else {
