@@ -24,9 +24,6 @@ var users = exports.users = {
 	}
 };
 
-users.gtap_twitter = Object.extend({}, users.twitter);
-users.gtap_twitter.blogtype = 'gtap_twitter';
-
 //var user = users.twitter;
 //tapi.get_authorization_url(user, null, function(error, auth_url, res) {
 //	console.log(auth_url);

@@ -20,25 +20,24 @@ tapi SDK api base on tsina(weibo) api document: [http://open.weibo.com/](http://
  * browser client: jquery(for ajax request)
  * server: nodejs
 
-## Install
+## Nodejs Install
     
     $ npm install weibo
 
 ## How to use
 
-### Browser(Not ready)
+### Browser
 
-    Include the javascript files:
-    1. sha1.js
-    2. base64.js
-    3. oauth.js
-    4. tsina.js
-       ...
-    5. twitter.js
+    // Include the `weibo.js` javascript files:
     
-    tapi.js
+    <script type="text/javascript" src="../weibo.js"></script>
+    <script type="text/javascript">
+    // init with urlprefix where the `weibo` directory you put into 
+    weibo.init('/public/js/weibo');
+    </script>
 
-    var tapi = window.tapi;
+    var tapi = weibo.tapi;
+    var appkey = '3434422667', secret = '523f2d0d134bfd5aa138f9e5af828bf9';
     tapi.init('tsina', appkey, secret);
     tapi.public_timeline({}, function(error, data, xhr) {
         if(error) {

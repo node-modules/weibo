@@ -6,9 +6,9 @@ var connect = require('connect')
   , FileStore = require('filestore').FileStore
   , fs = require('fs')
   , urlutil = require('url')
-  , tapi = require('../tapi')
+  , tapi = require('../lib/tapi')
   , twitter = tapi.api_dispatch({blogtype: 'twitter'})
-  , oauth = require('../oauth_middleware');
+  , oauth = require('../lib/oauth_middleware');
 
 exports.start = function(port, store_dir) {
 	store_dir = store_dir || process.cwd();
