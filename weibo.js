@@ -1,6 +1,11 @@
 /**
  * only use in browser envirment
  * 
+ * MUST use the namespace: `weibo`
+ *  e.g: 
+ *  
+ *  	weibo.tapi.init(key, sceret);
+ * 
  * deal with javascript script loading
  */
 
@@ -17,8 +22,7 @@ weibo._requires = [
   , 'lib/tapi.js'
 ];
 
-
-weibo.init = function(url_prefix) {
+weibo.load = function(url_prefix) {
 	if(url_prefix[url_prefix.length - 1] != '/') {
 		url_prefix += '/';
 	}
