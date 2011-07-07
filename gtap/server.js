@@ -38,9 +38,9 @@ exports.start = function(port, store_dir) {
 		connect.bodyParser(),
 		connect.static(__dirname + '/public'),
 		connect.favicon(),
-		connect.logger(),
+		//connect.logger(),
 		connect.cookieParser(),
-		connect.session({secret: 'gtap-server-session-secret', store: new FileStore(store_dir + '/gtap_sessions')}),
+		connect.session({secret: 'gtap-server-session-secret'}),
 		oauth(function(oauth_user, referer, req, res, callback) {
 			var key = req.session.user.username + req.session.user.password;
 			cache.set(key, oauth_user);
@@ -148,6 +148,7 @@ exports.start = function(port, store_dir) {
 		    });
 		}
 	);
-	server.listen(port || 8080);
-	console.log('server start');
+	port = port || 8080;
+	server.listen(port);
+	console.log('server start listen on ' + port);
 };
