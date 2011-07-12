@@ -37,7 +37,7 @@ tapi SDK api base on tsina(weibo) api document: [http://open.weibo.com/](http://
     </script>
 
     var tapi = weibo.tapi;
-    var appkey = '3434422667', secret = '523f2d0d134bfd5aa138f9e5af828bf9';
+    var appkey = 'your appkey', secret = 'your app secret';
     tapi.init('tsina', appkey, secret);
     tapi.public_timeline({}, function(error, data, xhr) {
         if(error) {
@@ -51,7 +51,7 @@ tapi SDK api base on tsina(weibo) api document: [http://open.weibo.com/](http://
 
     var tapi = require('weibo').tapi;
     // change appkey to yours
-    var appkey = '3434422667', secret = '523f2d0d134bfd5aa138f9e5af828bf9';
+    var appkey = 'your appkey', secret = 'your app secret';
     tapi.init('tsina', appkey, secret);
     tapi.public_timeline({}, function(error, data, response) {
         if(error) {
