@@ -38,7 +38,8 @@ tapi SDK api base on tsina(weibo) api document: [http://open.weibo.com/](http://
 
     var tapi = weibo.tapi;
     var appkey = 'your appkey', secret = 'your app secret';
-    tapi.init('tsina', appkey, secret);
+    var oauth_callback_url = 'your callback url' || 'oob';
+    tapi.init('tsina', appkey, secret, oauth_callback_url);
     tapi.public_timeline({}, function(error, data, xhr) {
         if(error) {
             console.error(error);
@@ -52,7 +53,8 @@ tapi SDK api base on tsina(weibo) api document: [http://open.weibo.com/](http://
     var tapi = require('weibo').tapi;
     // change appkey to yours
     var appkey = 'your appkey', secret = 'your app secret';
-    tapi.init('tsina', appkey, secret);
+    var oauth_callback_url = 'your callback url' || 'oob';
+    tapi.init('tsina', appkey, secret, oauth_callback_url);
     tapi.public_timeline({}, function(error, data, response) {
         if(error) {
             console.error(error);
