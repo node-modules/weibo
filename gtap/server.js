@@ -47,7 +47,7 @@ exports.start = function(port, store_dir) {
 		oauth(function(oauth_user, referer, req, res, callback) {
 			var key = req.session.user.username + req.session.user.password;
 			cache.save(key, oauth_user, function(err) {
-			    if(err) { return next(err); }
+			    if(err) { console.error(err); }
 			    redirect(res, '/user_info');
 	            callback(true);
 			});
