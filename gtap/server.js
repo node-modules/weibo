@@ -3,7 +3,6 @@
  */
 
 var connect = require('connect')
-  , FileStore = require('filestore').FileStore
   , fs = require('fs')
   , urlutil = require('url')
   , tapi = require('../lib/tapi')
@@ -17,7 +16,7 @@ exports.start = function(port, store_dir) {
 	 * CONSUMER_KEY = 'xzR7LOq6Aeq8uAaGORJHGQ'
 	 * CONSUMER_SECRET = 'bCgaGEfejtE9mzq5pTMZngjnjd6rRL7hf2WBFjT4'
 	 */
-	tapi.init('twitter', 'xzR7LOq6Aeq8uAaGORJHGQ', 'bCgaGEfejtE9mzq5pTMZngjnjd6rRL7hf2WBFjT4');
+	tapi.init('twitter', 'i1aAkHo2GkZRWbUOQe8zA', 'MCskw4dW5dhWAYKGl3laRVTLzT8jTonOIOpmzEY');
 
 	function redirect(res, url) {
 		res.writeHead(302, {
@@ -27,7 +26,12 @@ exports.start = function(port, store_dir) {
 		res.end();
 	};
 	
-	var cache = new FileStore(store_dir + '/gtap_oauth_user_cache');
+	// Load the library
+	var nStore = require('nstore');
+	// Create a store
+	var cache = nStore.new(store_dir + '/gtap_oauth_user_cache.db', function (){
+	  // It's loaded now
+	});
 	
 	var views = {
 		'/': fs.readFileSync(__dirname + '/views/index.html'),
@@ -38,22 +42,22 @@ exports.start = function(port, store_dir) {
 		connect.bodyParser(),
 		connect.static(__dirname + '/public'),
 		connect.favicon(),
-		//connect.logger(),
 		connect.cookieParser(),
 		connect.session({secret: 'gtap-server-session-secret'}),
 		oauth(function(oauth_user, referer, req, res, callback) {
 			var key = req.session.user.username + req.session.user.password;
-			cache.set(key, oauth_user);
-			redirect(res, '/user_info');
-			callback(true);
+			cache.save(key, oauth_user, function(err) {
+			    if(err) { return next(err); }
+			    redirect(res, '/user_info');
+	            callback(true);
+			});
 		}, {default_blogtype: 'twitter'}),
 		function(req, res, next) {
 			if(req.url == '/') {
-				var view = null;
 				var user = req.session.user;
 				if(user) {
 					var key = user.username + user.password;
-					cache.get(key, function(err, oauth_user) {
+					cache.get(key, function(err, oauth_user, k) {
 						if(oauth_user) {
 							redirect(res, '/user_info');
 						} else {
@@ -69,20 +73,13 @@ exports.start = function(port, store_dir) {
 				}
 				var user = {username: req.body.username, password: req.body.password};
 				var key = user.username + user.password;
-				cache.get(key, function(err, oauth_user) {
+				cache.get(key, function(err, oauth_user, k) {
 					if(err) {
 						console.log('cache.get ' + key + ' user: ' + user.username  + ' error: ' + err.message);
 					}
 					if(oauth_user) {
 						req.session.user = user;
 						redirect(res, '/user_info');
-//						if(oauth_user.screen_name == user.username) {
-//							req.session.user = user;
-//							redirect(res, '/user_info');
-//						} else {
-//							res.writeHeader(200, {'Content-type': 'text/html'});
-//							res.end(req.session.user.username + ' already exits，Please <a href="/">Reset your username and password</a>');
-//						}
 					} else {
 						req.session.user = user;
 						redirect(res, '/');
@@ -99,16 +96,6 @@ exports.start = function(port, store_dir) {
 			} else if(req.url == '/logout') {
 				req.session.user = null;
 				redirect(res, '/');
-//				
-//				if(!req.session.user) {
-//					return redirect(res, '/');
-//				}
-//				var user = req.session.user;
-//				var key = user.username + user.password;
-//				cache.destroy(key, function(err) {
-//					req.session.user = null;
-//					redirect(res, '/');
-//				});
 			} else {
 				next();
 			}
@@ -134,7 +121,7 @@ exports.start = function(port, store_dir) {
 	
 		    if ('Basic' != scheme) return connect.utils.badRequest(res);
 		    var key = credentials[0] + credentials[1];
-		    cache.get(key, function(err, oauth_user) {
+		    cache.get(key, function(err, oauth_user, k) {
 		    	var params = {
 		    		url: urlinfo.pathname,
 		    		play_load: 'string',

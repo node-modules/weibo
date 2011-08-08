@@ -100,4 +100,6 @@ Example:
 
 ### Node Gtap Twitter API Proxy Server
     
+    $ npm install nstore
+    
     var start_gtap = require('weibo').start_gtap;
