@@ -129,8 +129,12 @@ exports.start = function(port, store_dir) {
 		    		user: oauth_user,
 		    		data: data
 		    	};
-		    	twitter._send_request(params, function(err, data) {
-		    		res.end(data);
+		    	twitter._send_request(params, function(err, s, response) {
+		    	    if(err) {
+		    	        s = JSON.stringify(err);
+		    	    }
+		    	    res.writeHead(response.statusCode, response.headers);
+		    		res.end(s);
 		    	});
 		    });
 		}
