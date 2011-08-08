@@ -16,7 +16,7 @@ exports.start = function(port, store_dir) {
 	 * CONSUMER_KEY = 'xzR7LOq6Aeq8uAaGORJHGQ'
 	 * CONSUMER_SECRET = 'bCgaGEfejtE9mzq5pTMZngjnjd6rRL7hf2WBFjT4'
 	 */
-	tapi.init('twitter', 'i1aAkHo2GkZRWbUOQe8zA', 'MCskw4dW5dhWAYKGl3laRVTLzT8jTonOIOpmzEY');
+	tapi.init('twitter', 'Bs03m4guPuksRtIBuvntxw', 'EwwTc3q4xEwxmm9OQnpy7cZdt43HYepeO8wdElGI');
 
 	function redirect(res, url) {
 		res.writeHead(302, {
