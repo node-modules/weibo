@@ -34,7 +34,6 @@ tapi SDK api base on tsina(weibo) api document: [http://open.weibo.com/](http://
     <script type="text/javascript">
     // load all the lib scripts with urlprefix where the `weibo` directory you put into 
     weibo.load('/public/js/weibo');
-    </script>
 
     var tapi = weibo.tapi;
     var appkey = 'your appkey', secret = 'your app secret';
@@ -47,6 +46,8 @@ tapi SDK api base on tsina(weibo) api document: [http://open.weibo.com/](http://
             console.log(data);
         }
     });
+    
+    </script>
 
 ### Server
 

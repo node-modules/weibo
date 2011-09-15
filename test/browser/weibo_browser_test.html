@@ -14,7 +14,8 @@
 	    var $console = $('#console');
 	    var html = $console.html();
 	    for(var i = 0; i < keys.length; i++) {
-	        if(!weibo[keys[i]]) {
+	        var lib = weibo[keys[i]];
+	        if(!lib) {
 	            html += '<li style="color: red;">' + keys[i] + ' error.</li>';
 	        } else {
 	            html += '<li style="color: green;">' + keys[i] + ' success.</li>';
