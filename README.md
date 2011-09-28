@@ -87,7 +87,7 @@ params: `function oauth_middleware(login_callback, options)`
     
 Example:
     
-    var weibo = require('../node-weibo'),
+    var weibo = require('weibo'),
     home_url = 'http://localhost:8024/oauth';
     var appkey = 'xx', secret = 'xxxx';
     
