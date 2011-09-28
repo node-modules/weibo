@@ -87,16 +87,28 @@ params: `function oauth_middleware(login_callback, options)`
     
 Example:
     
-    var weibo = require('weibo')
-      , home_url = 'http://localhost';
+    var weibo = require('../node-weibo'),
+    home_url = 'http://localhost:8024/oauth';
+    var appkey = 'xx', secret = 'xxxx';
+    
     weibo.init('tsina', appkey, secret);
+    
+    var express = require('express');
+    var app = express.createServer();
+    var port = 8024;
+    
+    app.listen(port);
+    
     app.use(weibo.oauth_middleware(function(oauth_user, referer, req, res, callback) {
         // do something ...
         // save oauth_user
-        db.save_user(oauth_user);
+        console.log(oauth_user);
+        //db.save_user(oauth_user);
         // use auth redirect, just callback(), return to login referer page.
         // otherwise, callback(true), and handler redirect by yourself
         callback();
+    },{
+     default_blogtype : 'tsina'
     }));
 
 ### Node Gtap Twitter API Proxy Server
