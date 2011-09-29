@@ -5,7 +5,7 @@
 var tapi = require('../lib/tapi');
 
 // init appkey
-tapi.init('tsina', '3538199806', '18cf587d60e11e3c160114fd92dd1f2b', 'oob');
+tapi.init('tsina', '4010445928', 'd119f62bfb70a4ba8d9b68bf14d6e45a', 'oob');
 tapi.init('twitter', 'i1aAkHo2GkZRWbUOQe8zA', 'MCskw4dW5dhWAYKGl3laRVTLzT8jTonOIOpmzEY', 'oob');
 
 exports.tapi = tapi;
