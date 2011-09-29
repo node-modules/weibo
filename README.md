@@ -103,8 +103,10 @@ Example:
     app.use(weibo.oauth_middleware(function(oauth_user, referer, req, res, callback) {
 
         var user = {
-		    oauth_token_key: oauth_user.oauth_token_key,
-		    oauth_token_secret: oauth_user.oauth_token_secret
+        	blogtype: oauth_user.blogtype,
+		authtype: oauth_user.authtype,
+		oauth_token_key: oauth_user.oauth_token_key,
+		oauth_token_secret: oauth_user.oauth_token_secret
         }
         
         var params = {
