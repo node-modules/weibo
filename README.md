@@ -88,10 +88,11 @@ params: `function oauth_middleware(login_callback, options)`
 Example:
     
     var weibo = require('weibo'),
-    home_url = 'http://localhost:8024/oauth';
+        tapi = weibo.tapi,
+        home_url = 'http://localhost:8024/oauth';
     var appkey = 'xx', secret = 'xxxx';
     
-    weibo.init('tsina', appkey, secret);
+    tapi.init('tsina', appkey, secret);
     
     var express = require('express');
     var app = express.createServer();
@@ -100,13 +101,33 @@ Example:
     app.listen(port);
     
     app.use(weibo.oauth_middleware(function(oauth_user, referer, req, res, callback) {
-        // do something ...
-        // save oauth_user
-        console.log(oauth_user);
-        //db.save_user(oauth_user);
-        // use auth redirect, just callback(), return to login referer page.
-        // otherwise, callback(true), and handler redirect by yourself
-        callback();
+
+        var user = {
+		    oauth_token_key: oauth_user.oauth_token_key,
+		    oauth_token_secret: oauth_user.oauth_token_secret
+        }
+        
+        var params = {
+            user:user ,
+            data:{
+                status:'test'
+            }
+        }
+        
+        tapi.update(params , function(err , data , res){
+            if(err)
+                console.log('error');
+            else
+                console.log(data);
+        });
+        
+        tapi.user_timeline({user: user}, function(err, data){
+    		if(err)
+                console.log('error');
+            else
+                console.log(data);
+		});
+
     },{
      default_blogtype : 'tsina'
     }));
