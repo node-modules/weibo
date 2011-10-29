@@ -69,7 +69,7 @@ for(var i = 0 ; i < apps.length; i++) {
 	});
 	*/
 	
-	/*
+
 	tapi.verify_credentials(apps[i].oauth_user, function(error, t_user) {
 		if(error)
 	  		console.log('err:'+ JSON.stringify(error));
@@ -77,9 +77,9 @@ for(var i = 0 ; i < apps.length; i++) {
 	    	console.log('user:'+ JSON.stringify(t_user));
 	   }	
 	});
-	*/
 	
 	
+	/*
 	tapi.update({ user:apps[i].oauth_user, status : '今天天气不错 哈哈'},function(err,data){
 		if(err)
 		  	console.log('err:'+JSON.stringify(err));
@@ -87,7 +87,7 @@ for(var i = 0 ; i < apps.length; i++) {
 		    console.log('update:'+JSON.stringify(data));
 		}	
 	});
-	
+	*/
 };
 
 
