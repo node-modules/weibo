@@ -1,12 +1,13 @@
 {
   "name": "weibo",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Weibo SDK, base on node",
   "repository": "git://github.com/fengmk2/node-weibo.git",
   "author": "fengmk2<fengmk2@gmail.com> (http://fengmk2.cnblogs.com)",
   "main": "index",
   "contributors": [ 
-    { "name": "fengmk2", "email": "fengmk2@gmail.com" }
+    { "name": "fengmk2", "email": "fengmk2@gmail.com" },
+    { "name": "hpf1908", "email": "hpf1908@gmail.com" }
   ],
   "dependencies": {
     "connect": ">= 1.5.2 < 2.0.0",
