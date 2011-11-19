@@ -38,8 +38,8 @@ var sohuApp = {
 	}
 }
 
-//var apps = [sinaApp,  qqApp , sohuApp];
-var apps = [sohuApp];
+var apps = [sinaApp,  qqApp , sohuApp];
+//var apps = [sohuApp];
 
 var tapi = require('../node-weibo').tapi,
 	querystring = require('querystring');
