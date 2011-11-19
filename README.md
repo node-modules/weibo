@@ -87,16 +87,51 @@ params: `function oauth_middleware(login_callback, options)`
     
 Example:
     
-    var weibo = require('weibo')
-      , home_url = 'http://localhost';
-    weibo.init('tsina', appkey, secret);
+    var weibo = require('weibo'),
+        tapi = weibo.tapi,
+        home_url = 'http://localhost:8024/oauth';
+    var appkey = 'xx', secret = 'xxxx';
+    
+    tapi.init('tsina', appkey, secret);
+    
+    var express = require('express');
+    var app = express.createServer();
+    var port = 8024;
+    
+    app.listen(port);
+    
     app.use(weibo.oauth_middleware(function(oauth_user, referer, req, res, callback) {
-        // do something ...
-        // save oauth_user
-        db.save_user(oauth_user);
-        // use auth redirect, just callback(), return to login referer page.
-        // otherwise, callback(true), and handler redirect by yourself
-        callback();
+
+        var user = {
+        	blogtype: oauth_user.blogtype,
+		authtype: oauth_user.authtype,
+		oauth_token_key: oauth_user.oauth_token_key,
+		oauth_token_secret: oauth_user.oauth_token_secret
+        }
+        
+        var params = {
+            user:user ,
+            data:{
+                status:'test'
+            }
+        }
+        
+        tapi.update(params , function(err , data , res){
+            if(err)
+                console.log('error');
+            else
+                console.log(data);
+        });
+        
+        tapi.user_timeline({user: user}, function(err, data){
+    		if(err)
+                console.log('error');
+            else
+                console.log(data);
+		});
+
+    },{
+     default_blogtype : 'tsina'
     }));
 
 ### Node Gtap Twitter API Proxy Server

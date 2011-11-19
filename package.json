@@ -9,6 +9,9 @@
     { "name": "fengmk2", "email": "fengmk2@gmail.com" }
   ],
   "dependencies": {
+    "connect": ">= 1.5.2 < 2.0.0",
+    "mime": ">= 0.0.1",
+    "qs": ">= 0.3.1"
   },
   "keywords": ["framework", "sinatra", "web", "rest", "restful", "weibo", "sdk"],
   "repository": "git://github.com/fengmk2/node-weibo",
