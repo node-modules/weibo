@@ -1,6 +1,0 @@
-[submodule "support/connect"]
-	path = support/connect
-	url = https://github.com/senchalabs/connect.git
-[submodule "support/filestore"]
-	path = support/filestore
-	url = https://github.com/fengmk2/filestore.git
