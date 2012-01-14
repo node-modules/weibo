@@ -1,7 +1,7 @@
 {
   "name": "weibo",
-  "version": "0.2.3",
-  "description": "Weibo SDK, base on node",
+  "version": "0.3.1",
+  "description": "Weibo SDK, base on node. Now support weibo, tqq, tsohu, twitter.",
   "repository": "git://github.com/fengmk2/node-weibo.git",
   "author": "fengmk2<fengmk2@gmail.com> (http://fengmk2.cnblogs.com)",
   "main": "index",

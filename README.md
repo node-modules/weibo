@@ -21,121 +21,124 @@ tapi SDK api base on tsina(weibo) api document: [http://open.weibo.com/](http://
  * server: nodejs
 
 ## Nodejs Install
-    
-    $ npm install weibo
+
+```
+$ npm install weibo
+```
 
 ## How to use
 
 ### Browser
 
-    // Include the `weibo.js` javascript files:
-    
-    <script type="text/javascript" src="../weibo.js"></script>
-    <script type="text/javascript">
-    // load all the lib scripts with urlprefix where the `weibo` directory you put into 
-    weibo.load('/public/js/weibo');
+```
+// Include the `weibo.js` javascript files:
 
-    var tapi = weibo.tapi;
-    var appkey = 'your appkey', secret = 'your app secret';
-    var oauth_callback_url = 'your callback url' || 'oob';
-    tapi.init('tsina', appkey, secret, oauth_callback_url);
-    tapi.public_timeline({}, function(error, data, xhr) {
-        if(error) {
-            console.error(error);
-        } else {
-            console.log(data);
-        }
-    });
-    
-    </script>
+<script type="text/javascript" src="../weibo.js"></script>
+<script type="text/javascript">
+// load all the lib scripts with urlprefix where the `weibo` directory you put into 
+weibo.load('/public/js/weibo');
+
+var tapi = weibo.tapi;
+var appkey = 'your appkey', secret = 'your app secret';
+var oauth_callback_url = 'your callback url' || 'oob';
+tapi.init('tsina', appkey, secret, oauth_callback_url);
+tapi.public_timeline({}, function(error, data, xhr) {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log(data);
+  }
+});
+
+</script>
+```
 
 ### Server
 
-    var tapi = require('weibo').tapi;
-    // change appkey to yours
-    var appkey = 'your appkey', secret = 'your app secret';
-    var oauth_callback_url = 'your callback url' || 'oob';
-    tapi.init('tsina', appkey, secret, oauth_callback_url);
-    tapi.public_timeline({}, function(error, data, response) {
-        if(error) {
-            console.error(error);
-        } else {
-            console.log(data);
-        }
-    });
+```
+var tapi = require('weibo').tapi;
+// change appkey to yours
+var appkey = 'your appkey', secret = 'your app secret';
+var oauth_callback_url = 'your callback url' || 'oob';
+tapi.init('tsina', appkey, secret, oauth_callback_url);
+tapi.public_timeline({}, function(error, data, response) {
+  if (error) {
+      console.error(error);
+  } else {
+      console.log(data);
+  }
+});
+```
     
 ### Use oauth_middleware
 
 handler oauth login middleware, use on connect, express.
-    
-params: `function oauth_middleware(login_callback, options)`
-    
-    `login_callback`:
-        where login success callback: login_callback(oauth_user, referer, req, res, after_callback)
-        you MUST save user info in login_callback.
-    `options`: {
-        `home_url`: use to create login success oauth_callback url with referer header, 
-            default is `'http://' + req.headers.host`;
-        `login_path`: login url, default is '/oauth'
-        `logout_path`: default is '/oauth/logout'
-        `callback_path`: default is login_path + '_callback'
-        `blogtype_field`: default is 'blogtype', 
-            if you want to connect weibo, login url should be '/oauth?blogtype=tsina'
-        `error_callback`: function(error, referer, user, req, res, next), 
-            if you want to handler error by yourselft.
-    }
-    
-Example:
-    
-    var weibo = require('weibo'),
-        tapi = weibo.tapi,
-        home_url = 'http://localhost:8024/oauth';
-    var appkey = 'xx', secret = 'xxxx';
-    
-    tapi.init('tsina', appkey, secret);
-    
-    var express = require('express');
-    var app = express.createServer();
-    var port = 8024;
-    
-    app.listen(port);
-    
-    app.use(weibo.oauth_middleware(function(oauth_user, referer, req, res, callback) {
 
-        var user = {
-        	blogtype: oauth_user.blogtype,
-		authtype: oauth_user.authtype,
-		oauth_token_key: oauth_user.oauth_token_key,
-		oauth_token_secret: oauth_user.oauth_token_secret
-        }
-        
-        var params = {
-            user:user ,
-            data:{
-                status:'test'
-            }
-        }
-        
-        tapi.update(params , function(err , data , res){
-            if(err)
-                console.log('error');
-            else
-                console.log(data);
-        });
-        
-        tapi.user_timeline({user: user}, function(err, data){
-    		if(err)
-                console.log('error');
-            else
-                console.log(data);
-		});
-
-    },{
-     default_blogtype : 'tsina'
-    }));
-
-### Node Gtap Twitter API Proxy Server
+```
+/**
+ * oauth middleware for connect
+ *
+ * example:
+ *
+ *  connect(
+ *    connect.query(),
+ *    connect.cookieParser(),
+ *    connect.session({ secret: "oh year a secret" }),
+ *    weibo.oauth()
+ *  );
+ *
+ * @param {Object} options
+ *   - `home_url`: use to create login success oauth_callback url with referer header, 
+ *     default is `'http://' + req.headers.host`;
+ *   - `login_path`: login url, default is '/oauth'
+ *   - `logout_path`: default is '/oauth/logout'
+ *   - `callback_path`: default is login_path + '_callback'
+ *   - `blogtype_field`: default is 'blogtype', 
+ *     if you want to connect weibo, login url should be '/oauth?blogtype=weibo'
+ */
+```
     
-    $ npm install nstore
-    
-    var start_gtap = require('weibo').start_gtap;
+Example: A simple web with oauth login.
+
+```
+var connect = require('connect');
+var weibo = require('../');
+
+/**
+ * init weibo api settings
+ */ 
+
+weibo.init('weibo', 'appkey', 'secret');
+
+/**
+ * Create a web application.
+ */
+
+var app = connect(
+  connect.query(),
+  connect.cookieParser(),
+  connect.session({ secret: "oh year a secret" }),
+  // using weibo.oauth middleware for use login
+  // will auto save user in req.session.oauthUser
+  weibo.oauth({
+    login_path: '/login',
+    logout_path: '/logout',
+    blogtype_field: 'type'
+  }),
+  connect.errorHandler({ stack: true, dump: true })
+);
+
+app.use('/', function(req, res, next) {
+  var user = req.session.oauthUser;
+  res.writeHeader(200, { 'Content-Type': 'text/html' });
+  if (!user) {
+    res.end('<a href="/login?type=weibo">Login</a> first, please.');
+    return;
+  }
+  res.end('Hello, <a href="' + user.t_url + 
+    '" target="_blank">@' + user.screen_name + '</a>. ' + 
+    '<a href="/logout">Logout</a>');
+});
+
+app.listen(8080);
+```
