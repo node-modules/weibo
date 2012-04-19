@@ -10,7 +10,7 @@
     { "name": "hpf1908", "email": "hpf1908@gmail.com" }
   ],
   "dependencies": {
-    "connect": ">= 1.5.2 < 2.0.0",
+    "connect": ">= 0.5.2 < 2.0.0",
     "mime": ">= 0.0.1",
     "qs": ">= 0.3.1"
   },
