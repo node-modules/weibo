@@ -22,7 +22,7 @@ tapi SDK api base on tsina(weibo) api document: [http://open.weibo.com/](http://
 
 ## Nodejs Install
 
-```
+```bash
 $ npm install weibo
 ```
 
@@ -30,7 +30,7 @@ $ npm install weibo
 
 ### Browser
 
-```
+```javascript
 // Include the `weibo.js` javascript files:
 
 <script type="text/javascript" src="../weibo.js"></script>
@@ -55,7 +55,7 @@ tapi.public_timeline({}, function(error, data, xhr) {
 
 ### Server
 
-```
+```javascript
 var tapi = require('weibo').tapi;
 // change appkey to yours
 var appkey = 'your appkey', secret = 'your app secret';
@@ -74,7 +74,7 @@ tapi.public_timeline({}, function(error, data, response) {
 
 handler oauth login middleware, use on connect, express.
 
-```
+```javascript
 /**
  * oauth middleware for connect
  *
@@ -100,7 +100,7 @@ handler oauth login middleware, use on connect, express.
     
 Example: A simple web with oauth login.
 
-```
+```javascript
 var connect = require('connect');
 var weibo = require('../');
 
