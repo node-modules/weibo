@@ -1,4 +1,4 @@
-# tapi: A weibo(like twitter) API SDK, use on browser client and nodejs server.
+# node-weibo: A weibo(like twitter) API SDK, use on browser client and nodejs server.
 
 ## Supports:
  * twitter: [http://twitter.com/](http://twitter.com/)
@@ -6,7 +6,7 @@
  * fanfou: [http://fanfou.com/](http://fanfou.com/)
  * digu: [http://digu.com/](http://digu.com/)
  * zuosa: [http://zuosa.com/](http://zuosa.com/)
- * tsina: [http://t.sina.com.cn/](http://t.sina.com.cn/)
+ * weibo: [http://t.sina.com.cn/](http://weibo.com/)
  * tqq: [http://t.qq.com/](http://t.qq.com/)
  * tsohu: [http://t.sohu.com/](http://t.sohu.com/)
  * t163: [http://t.163.com/](http://t.163.com/)
@@ -14,10 +14,10 @@
  * leihou: [http://leihou.com/](http://leihou.com/)
  * plurk: [http://plurk.com/](http://plurk.com/)
 
-tapi SDK api base on tsina(weibo) api document: [http://open.weibo.com/](http://open.weibo.com/)
+node-weibo API base on weibo API document: [http://open.weibo.com/](http://open.weibo.com/)
 
 ## Requires:
- * browser client: jquery(for ajax request)
+ * (working)browser client: jquery(for ajax request), browser must enable cross-domain request.
  * server: nodejs
 
 ## Nodejs Install
