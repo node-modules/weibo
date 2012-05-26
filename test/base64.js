@@ -2,8 +2,8 @@
  * Module dependencies.
  */
 
-var base64 = require('../lib/base64');
-
+var libpath = process.env.WEIBO_COV ? '../lib-cov' : '../lib';
+var base64 = require(libpath + '/base64');
 
 describe('base64.js', function () {
 

@@ -8,11 +8,11 @@
  * Module dependencies.
  */
 
-var tapi = require('../lib/tapi');
+var tapi = require('../');
 var should = require('should');
 var users = require('./config').users;
 
-describe('tapi.js', function () {
+describe('tsina.js', function () {
 
   var proxy = 'http://127.0.0.1:37456/';
   var anonymous = {
@@ -65,6 +65,22 @@ describe('tapi.js', function () {
     status.should.have.property('user');
     checkUser(status.user);
   }
+
+  describe('update() and destroy()', function () {
+    it('should send a text status and destroy it', function (done) {
+      var text = '++这是测试微博update()，来自单元测试 tapi.test.js at ' + new Date();
+      text += ' || +按道理是不会出现的，如果出现了，就是单元测试不通过了。';
+      tapi.update({ user: users.tsina, status: text }, function (err, status) {
+        should.not.exist(err);
+        status.text.should.equal(text);
+        tapi.destroy({ user: users.tsina, id: status.id }, function (err, deleteStatus) {
+          should.not.exist(err);
+          String(deleteStatus.id).should.equal(String(status.id));
+          done();
+        });
+      });
+    });
+  });
 
   describe('public_timeline()', function () {
 
@@ -120,6 +136,15 @@ describe('tapi.js', function () {
 
   describe('friends_timeline()', function () {
 
+    var firstStatuses;
+    before(function (done) {
+      tapi.friends_timeline({ user: users.tsina }, function (err, statuses) {
+        should.not.exist(err);
+        firstStatuses = statuses;
+        done();
+      });
+    });
+
     it('anonymous should not return', function (done) {
       tapi.friends_timeline({ user: anonymous }, function (err, statuses) {
         should.exist(err);
@@ -165,6 +190,20 @@ describe('tapi.js', function () {
         done();
       });
     });
+
+    it('should get next page by max_id and ignore the max_id status', function (done) {
+      var max_id = firstStatuses[firstStatuses.length - 1].id;
+      tapi.friends_timeline({ user: users.tsina, max_id: max_id }, function (err, statuses) {
+        should.not.exist(err);
+        should.exist(statuses);
+        statuses.length.should.above(15);
+        statuses.forEach(function (status) {
+          checkStatus(status);
+        });
+        String(statuses[0].id).should.not.equal(String(max_id));
+        done();
+      });
+    });
   });
 
   it('emotions() should return', function (done) {
@@ -182,6 +221,24 @@ describe('tapi.js', function () {
         emotion.title.should.length(emotion.phrase.length - 2);
       });
       done();
+    });
+  });
+
+  describe('respost() and destroy()', function () {
+    it('should respost a status and destroy it', function (done) {
+      var text = '+这是测试转发微博respost()，++来自单元测试 tapi.test.js at ' + new Date();
+      text += ' || 按道理是不会出现的，如果出现了，就是单元测试不通过了。';
+      var source_id = 3449709785616243;
+      tapi.repost({ user: users.tsina, id: source_id, status: text }, function (err, status) {
+        should.not.exist(err);
+        status.text.should.equal(text);
+        String(status.retweeted_status.id).should.equal(String(source_id));
+        tapi.destroy({ user: users.tsina, id: status.id }, function (err, deleteStatus) {
+          should.not.exist(err);
+          String(deleteStatus.id).should.equal(String(status.id));
+          done();
+        });
+      });
     });
   });
 

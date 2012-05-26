@@ -30,44 +30,52 @@ $ npm install weibo
 
 ## How to use
 
-### Browser
+### Browser: `Phonegap` or `Chrome extension`
+
+* require `jQuery`
 
 ```javascript
-// Include the `weibo.js` javascript files:
+// Include the javascript files:
 
-<script type="text/javascript" src="/weibo/weibo.js"></script>
+<script src="lib/weibo/lib/eventproxy.js"></script>
+<script src="lib/weibo/lib/base64.js"></script>
+<script src="lib/weibo/lib/sha1.js"></script>
+<script src="lib/weibo/lib/utils.js"></script>
+<script src="lib/weibo/lib/oauth.js"></script>
+<script src="lib/weibo/lib/urllib.js"></script>
+<script src="lib/weibo/lib/tsina.js"></script>
+<script src="lib/weibo/lib/tapi.js"></script>
 <script type="text/javascript">
-// load all the lib scripts with urlprefix where the `weibo` directory you put into 
-weibo.load('/weibo/');
-
 var tapi = weibo.TAPI;
 var appkey = 'your appkey', secret = 'your app secret';
 var oauth_callback_url = 'your callback url' || 'oob';
 tapi.init('tsina', appkey, secret, oauth_callback_url);
-tapi.public_timeline({}, function (error, data, xhr) {
-  if (error) {
+tapi.public_timeline({ user: { blogType: 'tsina' } }, function (err, statuses) {
+  if (err) {
     console.error(error);
   } else {
-    console.log(data);
+    console.log(statuses);
   }
 });
-
 </script>
 ```
 
 ### Server
 
 ```javascript
-var tapi = require('weibo').tapi;
+
+var tapi = require('weibo');
+
 // change appkey to yours
 var appkey = 'your appkey', secret = 'your app secret';
 var oauth_callback_url = 'your callback url' || 'oob';
 tapi.init('tsina', appkey, secret, oauth_callback_url);
-tapi.public_timeline({}, function (error, data, response) {
-  if (error) {
-      console.error(error);
+
+tapi.public_timeline({ user: { blogType: 'tsina' } }, function (err, statuses) {
+  if (err) {
+      console.error(err);
   } else {
-      console.log(data);
+      console.log(statuses);
   }
 });
 ```

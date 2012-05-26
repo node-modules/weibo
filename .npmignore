@@ -4,3 +4,8 @@ support/
 .settings/
 .project
 mkdoc.sh
+Makefile
+gtap
+node_modules
+.travis.yml
+coverage.html

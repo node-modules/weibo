@@ -8,5 +8,5 @@
  * Module dependencies.
  */
 
-var libpath = process.env.URLLIB_COV ? './lib-cov' : './lib';
+var libpath = process.env.WEIBO_COV ? './lib-cov' : './lib';
 module.exports = require(libpath + '/tapi');

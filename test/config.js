@@ -2,10 +2,11 @@
  * Module dependencies.
  */
 
-var tapi = require('../lib/tapi');
+var tapi = require('../');
 
 // init appkey
 tapi.init('tsina', '4010445928', 'd119f62bfb70a4ba8d9b68bf14d6e45a', 'oob');
+// tapi.init('tsina', '3538199806', '18cf587d60e11e3c160114fd92dd1f2b', 'oob');
 // tapi.init('twitter', 'i1aAkHo2GkZRWbUOQe8zA', 'MCskw4dW5dhWAYKGl3laRVTLzT8jTonOIOpmzEY', 'oob');
 
 // exports.tapi = tapi;
@@ -13,8 +14,8 @@ var users = exports.users = {
   tsina: { 
     blogtype: 'tsina',
     authtype: 'oauth',
-    oauth_token_key: '10860b4bd170b003381ea6d953f3aba6',
-    oauth_token_secret: 'c0af7008eba4d9de8e14a4c61e45b318' 
+    oauth_token_key: 'd1ef5fa9aa9fee08fdc6267193a59d6a',
+    oauth_token_secret: '798722589f339cc4e9e0a66a9b53f693' 
   },
   twitter: {
     blogtype: 'twitter',
@@ -24,7 +25,7 @@ var users = exports.users = {
   }
 };
 
-// var user = users.tsina;
+var user = users.tsina;
 // tapi.get_authorization_url(user, null, function (error, auth_url, res) {
 //   console.log(auth_url);
 //   console.log(user);
@@ -32,9 +33,9 @@ var users = exports.users = {
 
 // tapi.get_access_token({ blogtype: 'tsina',
 //   authtype: 'oauth', 
-//   oauth_verifier: '774897',
-//   oauth_token_key: '720a0a45ee131374bc681ac87245c9a9',
-//   oauth_token_secret: 'd0c829b62cade4699d66255fca9e6345' }, function(error, auth_user) {
+//   oauth_verifier: '838320',
+//   oauth_token_key: '9bfc5e567e614e37763f4fecca8d6abb',
+//   oauth_token_secret: 'ed003a5d06c52dda0d504abebaa4de46' }, function (error, auth_user) {
 //   console.log(auth_user);
 // });
 
