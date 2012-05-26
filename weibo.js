@@ -32,7 +32,7 @@ weibo.load = function (url_prefix) {
   }
   for (var i = 0, len = weibo._requires.length; i < len; i++) {
     var src = url_prefix + weibo._requires[i];
-    document.write('<script type="text/javascript" src="' + src + '"></script>'); 
+    document.write('<script src="' + src + '"></script>'); 
   }
 };
 
