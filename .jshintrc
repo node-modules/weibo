@@ -10,7 +10,8 @@
     "describe",
     "before",
     "after",
-    "should"
+    "should",
+    "jQuery"
   ],
 
   "node" : true,

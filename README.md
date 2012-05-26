@@ -35,16 +35,16 @@ $ npm install weibo
 ```javascript
 // Include the `weibo.js` javascript files:
 
-<script type="text/javascript" src="../weibo.js"></script>
+<script type="text/javascript" src="/weibo/weibo.js"></script>
 <script type="text/javascript">
 // load all the lib scripts with urlprefix where the `weibo` directory you put into 
-weibo.load('/public/js/weibo');
+weibo.load('/weibo/');
 
-var tapi = weibo.tapi;
+var tapi = weibo.TAPI;
 var appkey = 'your appkey', secret = 'your app secret';
 var oauth_callback_url = 'your callback url' || 'oob';
 tapi.init('tsina', appkey, secret, oauth_callback_url);
-tapi.public_timeline({}, function(error, data, xhr) {
+tapi.public_timeline({}, function (error, data, xhr) {
   if (error) {
     console.error(error);
   } else {
@@ -63,7 +63,7 @@ var tapi = require('weibo').tapi;
 var appkey = 'your appkey', secret = 'your app secret';
 var oauth_callback_url = 'your callback url' || 'oob';
 tapi.init('tsina', appkey, secret, oauth_callback_url);
-tapi.public_timeline({}, function(error, data, response) {
+tapi.public_timeline({}, function (error, data, response) {
   if (error) {
       console.error(error);
   } else {

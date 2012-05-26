@@ -17,6 +17,7 @@
     "mocha": ">=0.14.1"
   },
   "dependencies": {
+    "urllib": ">=0.2.5"
   },
   "keywords": [ "framework", "sinatra", "web", "rest", "restful", "weibo", "sdk" ],
   "engines": { "node": ">= 0.4.1" }

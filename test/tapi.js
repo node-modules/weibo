@@ -14,9 +14,25 @@ var users = require('./config').users;
 
 describe('tapi.js', function () {
 
+  var proxy = 'http://127.0.0.1:37456/';
   var anonymous = {
     blogType: 'weibo'
   };
+  var anonymousProxy = {
+    blogType: 'weibo',
+    proxy: proxy
+  };
+
+  var proxyUsers = {};
+  for (var blogType in users) {
+    var user = users[blogType];
+    var proxyUser = {};
+    for (var k in user) {
+      proxyUser[k] = user[k];
+    }
+    proxyUser.proxy = proxy;
+    proxyUsers[blogType] = proxyUser;
+  }
 
   it('api_dispatch() should return right type', function () {
     for (var k in tapi.TYPES) {
@@ -64,8 +80,32 @@ describe('tapi.js', function () {
       });
     });
 
+    it('anonymousProxy should return', function (done) {
+      tapi.public_timeline({ user: anonymousProxy }, function (err, statuses) {
+        should.not.exist(err);
+        should.exist(statuses);
+        statuses.length.should.above(15);
+        statuses.forEach(function (status) {
+          checkStatus(status);
+        });
+        done();
+      });
+    });
+
     it('oauth user should return', function (done) {
       tapi.public_timeline({ user: users.tsina }, function (err, statuses) {
+        should.not.exist(err);
+        should.exist(statuses);
+        statuses.length.should.above(15);
+        statuses.forEach(function (status) {
+          checkStatus(status);
+        });
+        done();
+      });
+    });
+
+    it('oauth userProxy should return', function (done) {
+      tapi.public_timeline({ user: proxyUsers.tsina }, function (err, statuses) {
         should.not.exist(err);
         should.exist(statuses);
         statuses.length.should.above(15);
@@ -91,6 +131,17 @@ describe('tapi.js', function () {
       });
     });
 
+    it('anonymousProxy should not return', function (done) {
+      tapi.friends_timeline({ user: anonymousProxy }, function (err, statuses) {
+        should.exist(err);
+        err.name.should.equal('HTTPResponseError');
+        err.message.should.include('auth faild');
+        err.status_code.should.equal(403);
+        should.not.exist(statuses);
+        done();
+      });
+    });
+
     it('oauth user should return', function (done) {
       tapi.friends_timeline({ user: users.tsina }, function (err, statuses) {
         should.not.exist(err);
@@ -103,8 +154,18 @@ describe('tapi.js', function () {
       });
     });
 
+    it('oauth proxyUser should return', function (done) {
+      tapi.friends_timeline({ user: proxyUsers.tsina }, function (err, statuses) {
+        should.not.exist(err);
+        should.exist(statuses);
+        statuses.length.should.above(15);
+        statuses.forEach(function (status) {
+          checkStatus(status);
+        });
+        done();
+      });
+    });
   });
-
 
   it('emotions() should return', function (done) {
     tapi.emotions(anonymous, function (err, emotions) {
