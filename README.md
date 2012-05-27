@@ -159,14 +159,14 @@ Below is the output from `git-summary`.
 
 ```
  project: node-weibo
- commits: 93
- active : 45 days
- files  : 53
+ commits: 98
+ active : 46 days
+ files  : 49
  authors: 
-    83  fengmk2                 89.2%
-     7  hpf1908                 7.5%
-     2  QLeelulu                2.2%
-     1  mk2                     1.1%
+    88  fengmk2                 89.8%
+     7  hpf1908                 7.1%
+     2  QLeelulu                2.0%
+     1  mk2                     1.0%
 ```
 
 ## License 
