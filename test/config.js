@@ -5,7 +5,7 @@
 var tapi = require('../');
 
 // init appkey
-tapi.init('tsina', '4010445928', 'd119f62bfb70a4ba8d9b68bf14d6e45a', 'oob');
+tapi.init('tsina', '4010445928', 'd119f62bfb70a4ba8d9b68bf14d6e45a', 'file:///Users/jb/Library/iPhone/www/index.html');
 // tapi.init('tsina', '3538199806', '18cf587d60e11e3c160114fd92dd1f2b', 'oob');
 // tapi.init('twitter', 'i1aAkHo2GkZRWbUOQe8zA', 'MCskw4dW5dhWAYKGl3laRVTLzT8jTonOIOpmzEY', 'oob');
 
@@ -26,9 +26,8 @@ var users = exports.users = {
 };
 
 var user = users.tsina;
-// tapi.get_authorization_url(user, null, function (error, auth_url, res) {
-//   console.log(auth_url);
-//   console.log(user);
+// tapi.get_authorization_url(user, function (error, auth_info) {
+//   console.log(error, auth_info);
 // });
 
 // tapi.get_access_token({ blogtype: 'tsina',

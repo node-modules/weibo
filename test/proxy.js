@@ -35,7 +35,7 @@ http.createServer(function (req, res) {
   proxyReq.on('error', function (err) {
     proxyReq.abort();
     res.writeHead(500);
-    res.end(req.query.url + ' error: ' + err.message);
+    res.end(url + ' error: ' + err.message);
   });
 
   req.on('data', function (chunk) {
