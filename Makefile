@@ -1,4 +1,3 @@
-
 TESTS = test/*.js
 REPORTER = spec
 TIMEOUT = 10000

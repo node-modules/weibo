@@ -1,7 +1,7 @@
 {
   "name": "weibo",
-  "version": "0.4.1",
-  "description": "Weibo SDK, base on node. Now support weibo, tqq, tsohu, twitter.",
+  "version": "0.5.0",
+  "description": "Weibo SDK, base on node. Now support weibo, tqq, tsohu, twitter and github.",
   "repository": "git://github.com/fengmk2/node-weibo.git",
   "author": "fengmk2<fengmk2@gmail.com> (http://fengmk2.cnblogs.com)",
   "main": "index",
@@ -13,11 +13,11 @@
     "test": "make test"
   },
   "devDependencies": {
-    "should": ">=0.4.2",
-    "mocha": ">=0.14.1"
+    "should": "*",
+    "mocha": "*"
   },
   "dependencies": {
-    "urllib": ">=0.2.5"
+    "urllib": ">=0.2.6"
   },
   "keywords": [ "framework", "sinatra", "web", "rest", "restful", "weibo", "sdk" ],
   "engines": { "node": ">= 0.4.1" }
