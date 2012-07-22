@@ -10,3 +10,4 @@
 
 var libpath = process.env.WEIBO_COV ? './lib-cov' : './lib';
 module.exports = require(libpath + '/tapi');
+module.exports.oauth = require(libpath + '/oauth_middleware');
