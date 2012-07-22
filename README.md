@@ -73,9 +73,9 @@ tapi.init('tsina', appkey, secret, oauth_callback_url);
 
 tapi.public_timeline({ user: { blogType: 'tsina' } }, function (err, statuses) {
   if (err) {
-      console.error(err);
+    console.error(err);
   } else {
-      console.log(statuses);
+    console.log(statuses);
   }
 });
 ```
@@ -92,25 +92,25 @@ handler oauth login middleware, use on connect, express.
  *
  *  connect(
  *    connect.query(),
- *    connect.cookieParser(),
+ *    connect.cookieParser('I\'m cookie secret.'),
  *    connect.session({ secret: "oh year a secret" }),
  *    weibo.oauth()
  *  );
  *
  * @param {Object} options
- *   - `home_url`: use to create login success oauth_callback url with referer header, 
+ *   - `homeUrl`: use to create login success oauth_callback url with referer header, 
  *     default is `'http://' + req.headers.host`;
- *   - `login_path`: login url, default is '/oauth'
- *   - `logout_path`: default is '/oauth/logout'
- *   - `callback_path`: default is login_path + '_callback'
- *   - `blogtype_field`: default is 'blogtype', 
- *     if you want to connect weibo, login url should be '/oauth?blogtype=weibo'
+ *   - `loginPath`: login url, default is '/oauth'
+ *   - `logoutPath`: default is '/oauth/logout'
+ *   - `callbackPath`: default is login_path + '/callback'
+ *   - `blogtypeField`: default is 'type', 
+ *     if you want to connect weibo, login url should be '/oauth?type=weibo'
  */
 ```
     
 Example: A simple web with oauth login.
 
-```javascript
+```js
 var connect = require('connect');
 var weibo = require('../');
 
@@ -118,7 +118,9 @@ var weibo = require('../');
  * init weibo api settings
  */ 
 
-weibo.init('weibo', 'appkey', 'secret');
+weibo.init('weibo', '$appkey', '$secret');
+weibo.init('tqq', '$appkey', '$secret');
+weibo.init('github', '$ClientID', '$ClientSecret');
 
 /**
  * Create a web application.
@@ -126,31 +128,35 @@ weibo.init('weibo', 'appkey', 'secret');
 
 var app = connect(
   connect.query(),
-  connect.cookieParser(),
+  connect.cookieParser('oh year a cookie secret'),
   connect.session({ secret: "oh year a secret" }),
   // using weibo.oauth middleware for use login
   // will auto save user in req.session.oauthUser
   weibo.oauth({
-    login_path: '/login',
-    logout_path: '/logout',
-    blogtype_field: 'type'
+    loginPath: '/login',
+    logoutPath: '/logout',
+    blogtypeField: 'type'
   }),
   connect.errorHandler({ stack: true, dump: true })
 );
 
-app.use('/', function(req, res, next) {
+app.use('/', function (req, res, next) {
   var user = req.session.oauthUser;
   res.writeHeader(200, { 'Content-Type': 'text/html' });
   if (!user) {
-    res.end('<a href="/login?type=weibo">Login</a> first, please.');
+    res.end('Login with <a href="/login?type=weibo">Weibo</a> | \
+      <a href="/login?type=tqq">QQ</a> | \
+      <a href="/login?type=github">Github</a>');
     return;
   }
-  res.end('Hello, <a href="' + user.t_url + 
+  res.end('Hello, <img src="' + user.profile_image_url + '" />\
+    <a href="' + user.t_url + 
     '" target="_blank">@' + user.screen_name + '</a>. ' + 
     '<a href="/logout">Logout</a>');
 });
 
-app.listen(8080);
+app.listen(8088);
+console.log('Server start on http://localhost:8088/');
 ```
 
 ## Authors
@@ -159,14 +165,15 @@ Below is the output from `git-summary`.
 
 ```
  project: node-weibo
- commits: 98
- active : 46 days
+ commits: 102
+ active : 49 days
  files  : 49
  authors: 
-    88  fengmk2                 89.8%
-     7  hpf1908                 7.1%
+    91  fengmk2                 89.2%
+     7  hpf1908                 6.9%
      2  QLeelulu                2.0%
      1  mk2                     1.0%
+     1  xydudu                  1.0%
 ```
 
 ## License 

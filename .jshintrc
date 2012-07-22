@@ -11,7 +11,8 @@
     "before",
     "after",
     "should",
-    "jQuery"
+    "jQuery",
+    "weibo"
   ],
 
   "node" : true,
