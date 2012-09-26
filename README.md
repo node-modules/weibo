@@ -1,8 +1,11 @@
-# node-weibo: A weibo(like twitter) API SDK, use on browser client and nodejs server.
+# node-weibo
+
+A weibo(like twitter) API SDK, use on browser client and nodejs server.
 
 [![Build Status](https://secure.travis-ci.org/fengmk2/node-weibo.png?branch=master)](http://travis-ci.org/fengmk2/node-weibo)
 
 ## Supports:
+ * github: [http://github.com](http://github.com)
  * twitter: [http://twitter.com/](http://twitter.com/)
  * facebook: [http://facebook.com/](http://facebook.com/)
  * fanfou: [http://fanfou.com/](http://fanfou.com/)
@@ -135,7 +138,15 @@ var app = connect(
   weibo.oauth({
     loginPath: '/login',
     logoutPath: '/logout',
-    blogtypeField: 'type'
+    blogtypeField: 'type',
+    afterLogin: function (req, res, callback) {
+      console.log(req.session.oauthUser.screen_name, 'login success');
+      process.nextTick(callback);
+    },
+    beforeLogout: function (req, res, callback) {
+      console.log(req.session.oauthUser.screen_name, 'loging out');
+      process.nextTick(callback);
+    }
   }),
   connect.errorHandler({ stack: true, dump: true })
 );

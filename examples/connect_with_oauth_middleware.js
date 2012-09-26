@@ -32,9 +32,16 @@ var app = connect(
   weibo.oauth({
     loginPath: '/login',
     logoutPath: '/logout',
-    blogtypeField: 'type'
-  }),
-  connect.errorHandler({ stack: true, dump: true })
+    blogtypeField: 'type',
+    afterLogin: function (req, res, callback) {
+      console.log(req.session.oauthUser.screen_name, 'login success');
+      process.nextTick(callback);
+    },
+    beforeLogout: function (req, res, callback) {
+      console.log(req.session.oauthUser.screen_name, 'loging out');
+      process.nextTick(callback);
+    }
+  })
 );
 
 app.use('/', function (req, res, next) {

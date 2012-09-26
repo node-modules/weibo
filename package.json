@@ -1,11 +1,11 @@
 {
   "name": "weibo",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Weibo SDK, base on node. Now support weibo, tqq, tsohu, twitter and github.",
   "repository": "git://github.com/fengmk2/node-weibo.git",
   "author": "fengmk2<fengmk2@gmail.com> (http://fengmk2.github.com)",
   "main": "index",
-  "contributors": [ 
+  "contributors": [
     { "name": "fengmk2", "email": "fengmk2@gmail.com" },
     { "name": "hpf1908", "email": "hpf1908@gmail.com" }
   ],
@@ -13,6 +13,7 @@
     "test": "make test"
   },
   "devDependencies": {
+    "connect": ">=1.8.0",
     "should": "*",
     "mocha": "*"
   },
