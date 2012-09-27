@@ -1,29 +1,21 @@
-# node-weibo
+# node-weibo [![Build Status](https://secure.travis-ci.org/fengmk2/node-weibo.png)](http://travis-ci.org/fengmk2/node-weibo)
 
-A weibo(like twitter) API SDK, use on browser client and nodejs server.
+A [weibo](http://weibo.com)(like [twitter](http://twitter.com)) API SDK, use on browser client and nodejs server.
 
-[![Build Status](https://secure.travis-ci.org/fengmk2/node-weibo.png?branch=master)](http://travis-ci.org/fengmk2/node-weibo)
+Please see the [API Documents](https://github.com/fengmk2/node-weibo/blob/master/api.md) first.
 
-## Supports:
- * github: [http://github.com](http://github.com)
- * twitter: [http://twitter.com/](http://twitter.com/)
- * facebook: [http://facebook.com/](http://facebook.com/)
- * fanfou: [http://fanfou.com/](http://fanfou.com/)
- * digu: [http://digu.com/](http://digu.com/)
- * zuosa: [http://zuosa.com/](http://zuosa.com/)
+## Supports APIs
+
  * weibo: [http://t.sina.com.cn/](http://weibo.com/)
+ * github: [http://github.com](http://github.com), only `oauth` for now.
+ * twitter(unavailable): [http://twitter.com/](http://twitter.com/)
+ * facebook(unavailable): [http://facebook.com/](http://facebook.com/)
+ * fanfou(unavailable): [http://fanfou.com/](http://fanfou.com/)
+ * digu(unavailable): [http://digu.com/](http://digu.com/)
  * tqq: [http://t.qq.com/](http://t.qq.com/)
- * tsohu: [http://t.sohu.com/](http://t.sohu.com/)
- * t163: [http://t.163.com/](http://t.163.com/)
- * renjian: [http://renjian.com/](http://renjian.com/)
- * leihou: [http://leihou.com/](http://leihou.com/)
- * plurk: [http://plurk.com/](http://plurk.com/)
-
-node-weibo API base on weibo API document: [http://open.weibo.com/](http://open.weibo.com/)
-
-## Requires:
- * (working)browser client: jquery(for ajax request), browser must enable cross-domain request.
- * server: nodejs
+ * tsohu(unavailable): [http://t.sohu.com/](http://t.sohu.com/)
+ * t163(unavailable): [http://t.163.com/](http://t.163.com/)
+ * plurk(unavailable): [http://plurk.com/](http://plurk.com/)
 
 ## Nodejs Install
 
@@ -33,22 +25,13 @@ $ npm install weibo
 
 ## How to use
 
-### Browser: `Phonegap` or `Chrome extension`
+### Browser: `Phonegap`, `Chrome extension` or [node-webkit](https://github.com/rogerwang/node-webkit).
 
-* require `jQuery`
+browser must enable **cross-domain** request.
 
-```javascript
-// Include the javascript files:
-
-<script src="lib/weibo/lib/eventproxy.js"></script>
-<script src="lib/weibo/lib/base64.js"></script>
-<script src="lib/weibo/lib/sha1.js"></script>
-<script src="lib/weibo/lib/utils.js"></script>
-<script src="lib/weibo/lib/oauth.js"></script>
-<script src="lib/weibo/lib/urllib.js"></script>
-<script src="lib/weibo/lib/tsina.js"></script>
-<script src="lib/weibo/lib/tapi.js"></script>
-<script type="text/javascript">
+```js
+<script src="weibo.js"></script>
+<script>
 var tapi = weibo.TAPI;
 var appkey = 'your appkey', secret = 'your app secret';
 var oauth_callback_url = 'your callback url' || 'oob';
@@ -65,16 +48,18 @@ tapi.public_timeline({ user: { blogType: 'tsina' } }, function (err, statuses) {
 
 ### Server
 
-```javascript
-
-var tapi = require('weibo');
+```js
+var weibo = require('weibo');
 
 // change appkey to yours
-var appkey = 'your appkey', secret = 'your app secret';
+var appkey = 'your appkey';
+var secret = 'your app secret';
 var oauth_callback_url = 'your callback url' || 'oob';
-tapi.init('tsina', appkey, secret, oauth_callback_url);
+weibo.init('tsina', appkey, secret, oauth_callback_url);
 
-tapi.public_timeline({ user: { blogType: 'tsina' } }, function (err, statuses) {
+var user = { blogtype: 'tsina' };
+var cursor = {count: 20};
+weibo.public_timeline(user, cursor, function (err, statuses) {
   if (err) {
     console.error(err);
   } else {
@@ -83,11 +68,11 @@ tapi.public_timeline({ user: { blogType: 'tsina' } }, function (err, statuses) {
 });
 ```
     
-### Use oauth_middleware
+### Use `weibo.oauth` middleware
 
 handler oauth login middleware, use on connect, express.
 
-```javascript
+```js
 /**
  * oauth middleware for connect
  *
@@ -100,14 +85,16 @@ handler oauth login middleware, use on connect, express.
  *    weibo.oauth()
  *  );
  *
- * @param {Object} options
- *   - `homeUrl`: use to create login success oauth_callback url with referer header, 
+ * @param {Object} [options]
+ *   - {String} [homeUrl], use to create login success oauth_callback url with referer header, 
  *     default is `'http://' + req.headers.host`;
- *   - `loginPath`: login url, default is '/oauth'
- *   - `logoutPath`: default is '/oauth/logout'
- *   - `callbackPath`: default is login_path + '/callback'
- *   - `blogtypeField`: default is 'type', 
- *     if you want to connect weibo, login url should be '/oauth?type=weibo'
+ *   - {String} [loginPath], login url, default is '/oauth'
+ *   - {String} [logoutPath], default is '/oauth/logout'
+ *   - {String} [callbackPath], default is login_path + '/callback'
+ *   - {String} [blogtypeField], default is 'type', 
+ *       if you want to connect weibo, login url should be '/oauth?type=weibo'
+ *   - {Function(req, res, callback)} [afterLogin], when oauth login success, will call this function.
+ *   - {Function(req, res, callback)} [beforeLogout], will call this function before user logout.
  */
 ```
     

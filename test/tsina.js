@@ -8,7 +8,7 @@
  * Module dependencies.
  */
 
-var tapi = require('../');
+var tapi = process.env.WEIBO_COV ? require('../lib-cov/tapi') : require('../lib/tapi');
 var should = require('should');
 var users = require('./config').users;
 
@@ -37,86 +37,6 @@ describe('tsina.js', function () {
   var currentUser = users.tsina;
   var currentUserProxy = proxyUsers.tsina;
 
-  function checkUser(user) {
-    user.id.should.match(/^\d+$/);
-    user.screen_name.should.be.a('string');
-    user.profile_image_url.should.match(/^http:\/\//);
-    user.t_url.should.match(/^http:\/\//);
-    if (user.status) {
-      checkStatus(user.status);
-    }
-  }
-
-  function checkStatus(status) {
-    status.text.should.be.a('string');
-    status.id.should.match(/^\d+$/);
-    if (status.thumbnail_pic) {
-      status.thumbnail_pic.should.match(/^http:\/\//);
-    }
-    if (status.bmiddle_pic) {
-      status.bmiddle_pic.should.match(/^http:\/\//);
-    }
-    if (status.original_pic) {
-      status.original_pic.should.match(/^http:\/\//);
-    }
-    status.t_url.should.match(/^http:\/\//);
-    status.source.should.be.a('string');
-    // status.should.have.property('user');
-    if (status.user) {
-      checkUser(status.user);
-    }
-    if (status.retweeted_status) {
-      checkStatus(status.retweeted_status);
-    }
-  }
-
-  function checkComment(comment) {
-    comment.text.should.be.a('string');
-    comment.source.should.be.a('string');
-    comment.id.should.match(/^\d+$/);
-    checkUser(comment.user);
-    checkStatus(comment.status);
-  }
-
-  describe('api_dispatch()', function () {
-
-    it('should return right type api', function () {
-      for (var k in tapi.TYPES) {
-        var user = { blogType: k };
-        tapi.api_dispatch(user).should.equal(tapi.TYPES[k]);
-      }
-    });
-
-  });
-
-  describe('get_authorization_url()', function () {
-
-    it('should return login url and request token', function (done) {
-      tapi.get_authorization_url({ blogType: 'weibo' }, function (err, auth_info) {
-        should.not.exist(err);
-        auth_info.should.have.keys('auth_url', 'oauth_token_key', 'oauth_token_secret');
-        done();
-      });
-    });
-
-    it('should return login url contains `oauth_callback param` and request token', function (done) {
-      var user = { blogType: 'weibo', oauth_callback: 'http://localhost/oauth_callback' };
-      tapi.get_authorization_url(user, function (err, auth_info) {
-        should.not.exist(err);
-        auth_info.should.have.keys('auth_url', 'oauth_token_key', 'oauth_token_secret');
-        auth_info.auth_url.should.include('oauth_callback=' + encodeURIComponent(user.oauth_callback));
-
-        auth_info.blogType = 'weibo';
-        tapi.get_access_token(auth_info, function (err, auth_user) {
-          should.exist(err);
-          err.name.should.equal('GetAccessTokenError');
-          should.not.exist(auth_user);
-          done();
-        });
-      });
-    });
-
-  });
 
   describe('update() and destroy()', function () {
     it('should send a text status and destroy it', function (done) {
@@ -132,26 +52,6 @@ describe('tsina.js', function () {
         });
       });
     });
-  });
-
-  describe('verify_credentials()', function () {
-
-    it('should return current user info', function (done) {
-      tapi.verify_credentials(currentUser, function (err, user) {
-        should.not.exist(err);
-        checkUser(user);
-        done();
-      });
-    });
-
-    it('should return current proxy user info', function (done) {
-      tapi.verify_credentials(currentUserProxy, function (err, user) {
-        should.not.exist(err);
-        checkUser(user);
-        done();
-      });
-    });
-
   });
 
   describe('rate_limit_status()', function () {

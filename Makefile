@@ -1,11 +1,12 @@
 TESTS = test/*.js
 REPORTER = spec
 TIMEOUT = 10000
+MOCHA_OPTS =
 
 test:
 	@NODE_ENV=test ./node_modules/mocha/bin/mocha \
 		--reporter $(REPORTER) \
-		--timeout $(TIMEOUT) \
+		--timeout $(TIMEOUT) $(MOCHA_OPTS) \
 		$(TESTS)
 
 test-cov:
@@ -16,4 +17,7 @@ test-cov:
 lib-cov:
 	@jscoverage lib $@
 
-.PHONY: test-cov test test-cov
+build:
+	./node_modules/browserify/bin/cmd.js index.js -o weibo.js
+
+.PHONY: test-cov test test-cov build
