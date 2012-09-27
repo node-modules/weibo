@@ -700,3 +700,28 @@ Demo:
   [tsohu]: http://open.t.sohu.com
   [github]: http://dev.github.com
 
+## OAuth
+
+### RequestToken
+
+|Field name|Data Type|
+|----------|---------|
+|oauth_token|string|
+|oauth_token_secret|string|
+
+### AccessToken
+
+|Field name|Data Type|
+|----------|---------|
+|oauth_token|string|
+|oauth_token_secret|string|
+
+### V1.0
+
+![oauth v1.0](http://ww2.sinaimg.cn/large/6cfc7910jw1dxbmrsksvsj.jpg)
+
+### V2.0
+
+![oauth v2.0](http://ww2.sinaimg.cn/large/6cfc7910jw1dxbms40ti8j.jpg)
+
+
