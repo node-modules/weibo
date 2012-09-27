@@ -6,27 +6,42 @@ All apis and data in `node-weibo` will convert to this unity format.
 |--------|-----------|:--------------:|
 | **[Status](#status) APIs** |||
 | Write |||
-|  * [update](#update)(user, status, callback)|Post a status|all|
-|  * [upload](#upload)(user, status, pic, callback)|Post a status contain an image|all|
-|  * [repost](#repost)(user, id, status, callback)|Repost a status|all|
-|  * [destroy](#destroy)(user, id, callback)|Remove a status by id|all|
+|  * [update](#update)(user, status, callback)|Post a status|[tqq]|
+|  * [upload](#upload)(user, status, pic, callback)|Post a status contain an image|[tqq]|
+|  * [repost](#repost)(user, id, status, callback)|Repost a status|[tqq]|
+|  * [destroy](#destroy)(user, id, callback)|Remove a status by id|[tqq]|
 | Read |||
-|  * [show](#show)(user, id, callback)|Get a status by id|all|
-|  * [home_timeline](#home_timeline)(user[, cursor], callback)|List user home timeline statuses|all|
-|  * [user_timeline](#user_timeline)(user[, cursor], callback)|List user personal timeline statuses|all|
-|  * [public_timeline](#public_timeline)(user[, cursor], callback)|List public timeline statuses|all|
-|  * [mentions](#mentions)(user[, cursor], callback)|List @me timeline statuses|all|
-|  * [comments_mentions](#comments_mentions)(user[, cursor], callback)|List @me comments|weibo|
-|  * [comments_timeline](#comments_timeline)(user[, cursor], callback)|List comments to my statues|all|
-|  * [repost_timeline](#repost_timeline)(user, id[, cursor], callback)|List one status's reposted statuses|all|
-|  * [comments](#comments)(user, id[, cursor], callback)|List one status's comments|all|
-|  * [search](#search)(user, query, callback)|Search statues|all|
+|  * [show](#show)(user, id, callback)|Get a status by id|[tqq]|
+|  * [home_timeline](#home_timeline)(user[, cursor], callback)|List user home timeline statuses|[tqq]|
+|  * [user_timeline](#user_timeline)(user[, cursor], callback)|List user personal timeline statuses|[tqq]|
+|  * [public_timeline](#public_timeline)(user[, cursor], callback)|List public timeline statuses|[tqq]|
+|  * [mentions](#mentions)(user[, cursor], callback)|List @me timeline statuses|[tqq]|
+|  * [repost_timeline](#repost_timeline)(user, id[, cursor], callback)|List one status's reposted statuses|[tqq]|
+|  * [search](#search)(user, query, callback)|Search statues|-|
 | **[Comment](#comment) APIs** |||
 | Write |||
+|  * [comment_create](#comment_create)(user, comment, id, callback)|post a comment to a status|-|
+|  * [comment_destroy](#comment_destroy)(user, comment, id, callback)|remove a comment|-|
+|  * [comment_reply](#comment_reply)(user, comment, id, callback)|reply to a comment|-|
+| Read |||
+|  * [comments](#comments)(user, id[, cursor], callback)|List one status's comments|[tqq]|
+|  * [comments_mentions](#comments_mentions)(user[, cursor], callback)|List @me comments|[weibo]|
+|  * [comments_timeline](#comments_timeline)(user[, cursor], callback)|List comments to my statues|[tqq]|
+|  * [comments_to_me](#comments_to_me)(user[, cursor], callback)|List comments to me|-|
+|  * [comments_by_me](#comments_by_me)(user[, cursor], callback)|List comments by me|-|
+| **[Message](#message) APIs** |||
+| Write |||
+|  * [message_create](#message_create)(user, text, id, callback)|post a message to some one|-|
+|  * [message_destroy](#message_destroy)(user, text, id, callback)|remove a message|-|
 | Read |||
 | **[User](#user) APIs** |||
-| Write |||
 | Read |||
+|  * [verify_credentials](#verify_credentials)(user, callback)|get oauth user profile infomation|[tqq]|
+| Write |||
+| **[OAuth](#oauth) APIs** |||
+| Read |||
+|  * [get_authorization_url](#get_authorization_url)(user, callback)|get the user oauth login url|[weibo], [tqq]|
+|  * [get_access_token](#get_access_token)(user, callback)|get oauth access token|[tqq]|
 
 |Data Structure|
 |--------------|
@@ -203,6 +218,61 @@ comments(user, id[, cursor], callback) {
 ```
 
 ### search
+
+### get_authorization_url
+
+```js
+/**
+ * Get authorization token and login url.
+ * 
+ * @param {Object} user
+ *  - {String} blogtype, 'weibo' or other blog type,
+ *  - {String} oauth_callback, 'login callback url' or 'oob'
+ * @param {Function(err, auth_info)} callback
+ *  - {Object} auth_info
+ *   - {String} auth_url: 'http://xxxx/auth?xxx',
+ *   - {String} oauth_token: $oauth_token,
+ *   - {String} oauth_token_secret: $oauth_token_secret
+ * @return {Context} this, blogType api.
+ */
+get_authorization_url: function (user, callback)
+```
+
+### get_access_token
+
+```js
+/**
+ * Get access token.
+ * 
+ * @param {Object} user
+ *  - {String} blogtype
+ *  - {String} oauth_token, authorization `oauth_token`
+ *  - {String} oauth_verifier, authorization `oauth_verifier`
+ *  - {String} oauth_token_secret, request token secret
+ * @param {Function(err, token)} callback
+ *  - {Object} token
+ *   - {String} oauth_token
+ *   - {String} oauth_token_secret
+ * @return {Context} this
+ */
+get_access_token: function (user, callback)
+```
+
+### verify_credentials
+
+```js
+/**
+ * Get user profile infomation by access token.
+ * 
+ * @param {Object} user
+ *  - {String} blogtype
+ *  - {String} oauth_token, access oauth token
+ *  - {String} oauth_token_secret, access oauth token secret
+ * @param {Function(err, User)} callback
+ * @return {Context} this
+ */
+verify_credentials: function (user, callback)
+```
 
 ## Write
 
@@ -624,3 +694,9 @@ Demo:
   [Message]: #message
   [GEO]: #geo
   [Cursor]: #cursor
+  [weibo]: http://open.weibo.com
+  [tqq]: http://dev.t.qq.com
+  [t163]: http://open.t.163.com
+  [tsohu]: http://open.t.sohu.com
+  [github]: http://dev.github.com
+
