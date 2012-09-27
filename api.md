@@ -2,29 +2,31 @@
 
 All apis and data in `node-weibo` will convert to this unity format.
 
-|API name|Description|
-|---|-----------|
-| **[Status](#status) APIs** ||
-| Write ||
-|  * [update](#update)(user, status, callback)|Post a status|
-|  * [upload](#upload)(user, status, pic, callback)|Post a status contain an image|
-|  * [repost](#repost)(user, id, status, callback)|Repost a status|
-|  * [destroy](#destroy)(user, id, callback)|Remove a status by id|
-| Read ||
-|  * [show](#show)(user, id, callback)|Get a status by id|
-|  * [home_timeline](#home_timeline)(user[, cursor], callback)|List user home timeline statuses|
-|  * [user_timeline](#user_timeline)(user[, cursor], callback)|List user personal timeline statuses|
-|  * [public_timeline](#public_timeline)(user[, cursor], callback)|List public timeline statuses|
-|  * [mentions](#mentions)(user[, cursor], callback)|List @me timeline statuses|
-|  * [repost_timeline](#repost_timeline)(user, id[, cursor], callback)|List one status's reposted statuses|
-|  * [comments](#comments)(user, id[, cursor], callback)|List one status's comments|
-|  * [search](#search)(user, query, callback)|Search statues|
-| **[Comment](#comment) APIs** ||
-| Write ||
-| Read ||
-| **[User](#user) APIs** ||
-| Write ||
-| Read ||
+|API name|Description|Support blogtype|
+|--------|-----------|:--------------:|
+| **[Status](#status) APIs** |||
+| Write |||
+|  * [update](#update)(user, status, callback)|Post a status|all|
+|  * [upload](#upload)(user, status, pic, callback)|Post a status contain an image|all|
+|  * [repost](#repost)(user, id, status, callback)|Repost a status|all|
+|  * [destroy](#destroy)(user, id, callback)|Remove a status by id|all|
+| Read |||
+|  * [show](#show)(user, id, callback)|Get a status by id|all|
+|  * [home_timeline](#home_timeline)(user[, cursor], callback)|List user home timeline statuses|all|
+|  * [user_timeline](#user_timeline)(user[, cursor], callback)|List user personal timeline statuses|all|
+|  * [public_timeline](#public_timeline)(user[, cursor], callback)|List public timeline statuses|all|
+|  * [mentions](#mentions)(user[, cursor], callback)|List @me timeline statuses|all|
+|  * [comments_mentions](#comments_mentions)(user[, cursor], callback)|List @me comments|weibo|
+|  * [comments_timeline](#comments_timeline)(user[, cursor], callback)|List comments to my statues|all|
+|  * [repost_timeline](#repost_timeline)(user, id[, cursor], callback)|List one status's reposted statuses|all|
+|  * [comments](#comments)(user, id[, cursor], callback)|List one status's comments|all|
+|  * [search](#search)(user, query, callback)|Search statues|all|
+| **[Comment](#comment) APIs** |||
+| Write |||
+| Read |||
+| **[User](#user) APIs** |||
+| Write |||
+| Read |||
 
 |Data Structure|
 |--------------|
@@ -192,7 +194,7 @@ repost_timeline(user, id[, cursor], callback)
  *  - {Number} [filter_by_author], 0: all, 1: only I following、2: stranger, default is `0`.
  * @param {Function(err, result)} callback
  *  {Object} result:
- *   - {Array} items, [Status, ...]
+ *   - {Array} items, [Comment, ...]
  *   - {Cursor} cursor
  *   - ...
  * @return {Context} this
