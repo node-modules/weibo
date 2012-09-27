@@ -20,6 +20,11 @@ var path = require('path');
 var types = Object.keys(users);
 types.forEach(function (blogtype) {
 
+var userIDs = {
+  tqq: {id: 'fengmk2', screen_name: 'Python发烧友'},
+  weibo: {id: '1640328892', screen_name: 'Python发烧友'},
+};
+
 describe('tapi.js ' + blogtype + ' API', function () {
   var api;
   var currentUser = users[blogtype];
@@ -86,16 +91,7 @@ describe('tapi.js ' + blogtype + ' API', function () {
         if (status.text) {
           check.checkStatus(status);
         }
-        setTimeout(function () {
-          tapi.show(currentUser, status.id, function (err, status) {
-            console.log(arguments)
-            should.not.exist(err);
-            should.exist(status);
-            check.checkStatus(status);
-            status.text.should.equal(text);
-            done();
-          });
-        }, 5000);        
+        done();     
       });
     });
 
@@ -181,13 +177,13 @@ describe('tapi.js ' + blogtype + ' API', function () {
   });
 
   describe('repost()', function () {
+    var newStatus;
     before(function (done) {
-      tapi.verify_credentials(currentUser, function (err, user) {
+      tapi.update(currentUser, 'must be repost soon ' + new Date(), function (err, status) {
         should.not.exist(err);
-        check.checkUser(user);
-        for (var k in user) {
-          currentUser[k] = user[k];
-        }
+        should.exist(status);
+        status.should.have.property('id').with.match(/^\d+$/);
+        newStatus = status;
         done();
       });
     });
@@ -199,7 +195,7 @@ describe('tapi.js ' + blogtype + ' API', function () {
         long: '113.421234',
         lat: 22.354231
       };
-      tapi.repost(currentUser, currentUser.status.id, status, function (err, status) {
+      tapi.repost(currentUser, newStatus.id, status, function (err, status) {
         should.not.exist(err);
         should.exist(status);
         status.should.have.property('id').with.match(/^\d+$/);
@@ -231,19 +227,19 @@ describe('tapi.js ' + blogtype + ' API', function () {
   });
 
   describe('destroy()', function () {
+    var newStatus;
     before(function (done) {
-      tapi.verify_credentials(currentUser, function (err, user) {
+      tapi.update(currentUser, 'must be destroy soon ' + new Date(), function (err, status) {
         should.not.exist(err);
-        check.checkUser(user);
-        for (var k in user) {
-          currentUser[k] = user[k];
-        }
+        should.exist(status);
+        status.should.have.property('id').with.match(/^\d+$/);
+        newStatus = status;
         done();
       });
     });
 
     it('should remove a status', function (done) {
-      tapi.destroy(currentUser, currentUser.status.id, function (err, result) {
+      tapi.destroy(currentUser, newStatus.id, function (err, result) {
         should.not.exist(err);
         should.exist(result);
         done();
@@ -262,10 +258,17 @@ describe('tapi.js ' + blogtype + ' API', function () {
       });
     });
 
-    it('should remove the same status again', function (done) {
-      tapi.destroy(currentUser, currentUser.status.id, function (err, result) {
-        should.not.exist(err);
-        should.exist(result);
+    it('should error when remove the same status again', function (done) {
+      tapi.destroy(currentUser, newStatus.id, function (err, result) {
+        if (err) {
+          should.exist(err);
+          err.should.have.property('message', 'tweet has  been deleted');
+          err.should.have.property('name', 'DestroyError');
+          err.data.should.have.property('errcode', 20);
+          err.data.should.have.property('ret', 4);
+          should.not.exist(result);
+        }
+        // some time, remove has little delay.
         done();
       });
     });
@@ -273,12 +276,185 @@ describe('tapi.js ' + blogtype + ' API', function () {
   });
 
   describe('show()', function () {
-
     it('should get a status by id', function (done) {
       tapi.show(currentUser, '164652015311097', function (err, status) {
         should.not.exist(err);
         should.exist(status);
         check.checkStatus(status);
+        done();
+      });
+    });
+  });
+
+  describe('home_timeline()', function () {
+    it('should list recent 20 home timeline statuses with no cursor', function (done) {
+      tapi.home_timeline(currentUser, function (err, result) {
+        should.not.exist(err);
+        should.exist(result);
+        result.should.have.property('items').with.be.an.instanceof(Array);
+        result.items.should.be.an.instanceof(Array);
+        result.should.have.property('cursor').with.be.a('object');
+        result.items.length.should.above(0);
+        for (var i = 0; i < result.items.length; i++) {
+          check.checkStatus(result.items[i]);
+          // console.log(result.items[i])
+        }
+        done();
+      });
+    });
+
+    it('should list recent 1 home timeline statuses with {count: 1}', function (done) {
+      tapi.home_timeline(currentUser, {count: 1}, function (err, result) {
+        should.not.exist(err);
+        should.exist(result);
+        result.should.have.property('items').with.be.an.instanceof(Array);
+        result.items.should.be.an.instanceof(Array);
+        result.should.have.property('cursor').with.be.a('object');
+        result.items.should.length(1);
+        for (var i = 0; i < result.items.length; i++) {
+          check.checkStatus(result.items[i]);
+        }
+        done();
+      });
+    });
+  });
+
+  describe('public_timeline()', function () {
+    it('should list recent 20 public timeline statuses with no cursor', function (done) {
+      tapi.public_timeline(currentUser, function (err, result) {
+        should.not.exist(err);
+        should.exist(result);
+        result.should.have.property('items').with.be.an.instanceof(Array);
+        result.items.should.be.an.instanceof(Array);
+        result.should.have.property('cursor').with.be.a('object');
+        result.items.length.should.above(0);
+        for (var i = 0; i < result.items.length; i++) {
+          // console.log(result.items[i])
+          check.checkStatus(result.items[i]);
+        }
+        done();
+      });
+    });
+
+    it('should list recent 1 public timeline statuses with {count: 1}', function (done) {
+      tapi.public_timeline(currentUser, {count: 1}, function (err, result) {
+        should.not.exist(err);
+        should.exist(result);
+        result.should.have.property('items').with.be.an.instanceof(Array);
+        result.items.should.be.an.instanceof(Array);
+        result.should.have.property('cursor').with.be.a('object');
+        result.items.should.length(1);
+        for (var i = 0; i < result.items.length; i++) {
+          check.checkStatus(result.items[i]);
+        }
+        done();
+      });
+    });
+  });
+
+  describe('user_timeline()', function () {
+    it('should list recent 20 current user timeline statuses with no cursor', function (done) {
+      tapi.user_timeline(currentUser, function (err, result) {
+        should.not.exist(err);
+        should.exist(result);
+        result.should.have.property('items').with.be.an.instanceof(Array);
+        result.items.should.be.an.instanceof(Array);
+        result.should.have.property('cursor').with.be.a('object');
+        result.items.length.should.above(0);
+        for (var i = 0; i < result.items.length; i++) {
+          // console.log(result.items[i])
+          check.checkStatus(result.items[i]);
+        }
+        done();
+      });
+    });
+
+    var blogUser = userIDs[blogtype];
+
+    it('should list recent 20 ' + blogUser.id + '\'s timeline statuses by user.id {id: "' + blogUser.id + '"}',
+    function (done) {
+      tapi.user_timeline(currentUser, {id: blogUser.id}, function (err, result) {
+        should.not.exist(err);
+        should.exist(result);
+        result.should.have.property('items').with.be.an.instanceof(Array);
+        result.items.should.be.an.instanceof(Array);
+        result.should.have.property('cursor').with.be.a('object');
+        result.items.length.should.above(0);
+        for (var i = 0; i < result.items.length; i++) {
+          var status = result.items[i];
+          // console.log(status)
+          check.checkStatus(status);
+          status.user.id.should.equal(blogUser.id);
+          status.user.screen_name.should.equal(blogUser.screen_name);
+        }
+        done();
+      });
+    });
+  });
+
+  describe('mentions()', function () {
+    it('should list recent 20 @me statuses with no cursor', function (done) {
+      tapi.mentions(currentUser, function (err, result) {
+        should.not.exist(err);
+        should.exist(result);
+        result.should.have.property('items').with.be.an.instanceof(Array);
+        result.items.should.be.an.instanceof(Array);
+        result.should.have.property('cursor').with.be.a('object');
+        result.items.length.should.above(0);
+        for (var i = 0; i < result.items.length; i++) {
+          // console.log(result.items[i])
+          check.checkStatus(result.items[i]);
+        }
+        done();
+      });
+    });
+
+    it('should list recent 1 @me statuses with {count: 1}', function (done) {
+      tapi.mentions(currentUser, {count: 1}, function (err, result) {
+        should.not.exist(err);
+        should.exist(result);
+        result.should.have.property('items').with.be.an.instanceof(Array);
+        result.items.should.be.an.instanceof(Array);
+        result.should.have.property('cursor').with.be.a('object');
+        result.items.should.length(1);
+        for (var i = 0; i < result.items.length; i++) {
+          check.checkStatus(result.items[i]);
+        }
+        done();
+      });
+    });
+  });
+
+  describe('repost_timeline()', function () {
+    it('should list recent 8 status:164652015311097 repost statuses', function (done) {
+      tapi.repost_timeline(currentUser, '164652015311097', {count: 8}, function (err, result) {
+        should.not.exist(err);
+        should.exist(result);
+        result.should.have.property('items').with.be.an.instanceof(Array);
+        result.items.should.be.an.instanceof(Array);
+        result.should.have.property('cursor').with.be.a('object');
+        result.items.should.length(8);
+        for (var i = 0; i < result.items.length; i++) {
+          check.checkStatus(result.items[i]);
+        }
+        done();
+      });
+    });
+  });
+
+  describe('comments()', function () {
+    it('should list recent 9 status:164652015311097 comments', function (done) {
+      tapi.comments(currentUser, '164652015311097', {count: 9}, function (err, result) {
+        should.not.exist(err);
+        should.exist(result);
+        result.should.have.property('items').with.be.an.instanceof(Array);
+        result.items.should.be.an.instanceof(Array);
+        result.should.have.property('cursor').with.be.a('object');
+        result.items.should.length(9);
+        for (var i = 0; i < result.items.length; i++) {
+          // console.log(result.items[i])
+          check.checkComment(result.items[i]);
+        }
         done();
       });
     });

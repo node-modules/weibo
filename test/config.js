@@ -39,13 +39,13 @@ var user = users.tqq;
 //   console.log(error, auth_info);
 // });
 
-// http://open.t.qq.com/cgi-bin/oob?oauth_token=ac7b9a83fa1c476b814e87fec7970e76&oauth_verifier=372225&openid=EA68676D5E9DA465822CD0CEB2DC6EF5&openkey=059C41403DDD32977616BF38B568F873
+// http://open.t.qq.com/cgi-bin/oob?oauth_token=86e8a48c83904d918cad0d513d4bf99d&oauth_verifier=796840&openid=EA68676D5E9DA465822CD0CEB2DC6EF5&openkey=1E7DE375708D08ECCB665ACB0362BD05
 // weibo.get_access_token({ 
 //   blogtype: 'tqq',
 //   authtype: 'oauth', 
-//   oauth_verifier: '372225',
-//   oauth_token: 'ac7b9a83fa1c476b814e87fec7970e76',
-//   oauth_token_secret: 'cb8579142c4d2930d59125a40f3cf229',
+//   oauth_verifier: '796840',
+//   oauth_token: '86e8a48c83904d918cad0d513d4bf99d',
+//   oauth_token_secret: 'ec8d879a3835863bf230dae91ee104c8',
 // }, function (err, auth_user) {
 //   console.log(err, auth_user);
 // });

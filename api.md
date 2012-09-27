@@ -6,13 +6,18 @@ All apis and data in `node-weibo` will convert to this unity format.
 |---|-----------|
 | **[Status](#status) APIs** ||
 | Write ||
-|  * [update](#update)(user, data, callback)|Post a status|
+|  * [update](#update)(user, status, callback)|Post a status|
 |  * [upload](#upload)(user, status, pic, callback)|Post a status contain an image|
 |  * [repost](#repost)(user, id, status, callback)|Repost a status|
 |  * [destroy](#destroy)(user, id, callback)|Remove a status by id|
 | Read ||
 |  * [show](#show)(user, id, callback)|Get a status by id|
-|  * [home_timeline](#home_timeline)(user, callback)|User home timeline statuses|
+|  * [home_timeline](#home_timeline)(user[, cursor], callback)|List user home timeline statuses|
+|  * [user_timeline](#user_timeline)(user[, cursor], callback)|List user personal timeline statuses|
+|  * [public_timeline](#public_timeline)(user[, cursor], callback)|List public timeline statuses|
+|  * [mentions](#mentions)(user[, cursor], callback)|List @me timeline statuses|
+|  * [repost_timeline](#repost_timeline)(user, id[, cursor], callback)|List one status's reposted statuses|
+|  * [comments](#comments)(user, id[, cursor], callback)|List one status's comments|
 |  * [search](#search)(user, query, callback)|Search statues|
 | **[Comment](#comment) APIs** ||
 | Write ||
@@ -47,6 +52,154 @@ show(user, id, callback)
 ```
 
 ### home_timeline
+
+```js
+/**
+ * List home timeline statuses.
+ * 
+ * @param {User} user
+ * @param {Cursor} [cursor]
+ *  - {String} since_id
+ *  - {String} max_id
+ *  - {String} [since_time], only for tqq
+ *  - {String} [max_time], only for tqq
+ *  - {Number} count, default is `20`
+ *  - {Number} page
+ * @param {Function(err, result)} callback
+ *  {Object} result:
+ *   - {Array} items, [Status, ...]
+ *   - {Cursor} cursor
+ *   - ...
+ * @return {Context} this
+ */
+home_timeline(user, cursor, callback)
+```
+
+### public_timeline
+
+```js
+/**
+ * List public timeline statuses.
+ * 
+ * @param {User} user
+ * @param {Cursor} [cursor]
+ *  - {String} since_id
+ *  - {String} max_id
+ *  - {String} [since_time], only for tqq
+ *  - {String} [max_time], only for tqq
+ *  - {Number} count, default is `20`
+ *  - {Number} page
+ * @param {Function(err, result)} callback
+ *  {Object} result:
+ *   - {Array} items, [Status, ...]
+ *   - {Cursor} cursor
+ *   - ...
+ * @return {Context} this
+ */
+public_timeline(user, cursor, callback)
+```
+
+### user_timeline
+
+```js
+/**
+ * List user personal timeline statuses.
+ * 
+ * @param {User} user
+ * @param {Cursor} [cursor]
+ *  - {String} [uid], user id
+ *  - {String} [screen_name], `user.screen_name`, screen_name or uid must be set at least one.
+ *  - {String} since_id
+ *  - {String} max_id
+ *  - {String} [since_time], only for tqq
+ *  - {String} [max_time], only for tqq
+ *  - {Number} count, default is `20`
+ *  - {Number} page
+ * @param {Function(err, result)} callback
+ *  {Object} result:
+ *   - {Array} items, [Status, ...]
+ *   - {Cursor} cursor
+ *   - ...
+ * @return {Context} this
+ */
+user_timeline(user, cursor, callback)
+```
+
+### mentions
+
+```js
+/**
+ * List @me statuses.
+ * 
+ * @param {User} user
+ * @param {Cursor} [cursor]
+ *  - {String} since_id
+ *  - {String} max_id
+ *  - {String} [since_time], only for tqq
+ *  - {String} [max_time], only for tqq
+ *  - {Number} count, default is `20`
+ *  - {Number} page
+ * @param {Function(err, result)} callback
+ *  {Object} result:
+ *   - {Array} items, [Status, ...]
+ *   - {Cursor} cursor
+ *   - ...
+ * @return {Context} this
+ */
+mentions(user, cursor, callback)
+```
+### repost_timeline
+
+```js
+/**
+ * List one status's reposted statuses
+ * 
+ * @param {User} user
+ * @param {String} id, status's id
+ * @param {Cursor} [cursor]
+ *  - {String} since_id
+ *  - {String} max_id
+ *  - {String} [since_time], only for tqq
+ *  - {String} [max_time], only for tqq
+ *  - {Number} count, default is `20`
+ *  - {Number} page
+ *  - {Number} [filter_by_author], 0: all, 1: only I following、2: stranger, default is `0`.
+ * @param {Function(err, result)} callback
+ *  {Object} result:
+ *   - {Array} items, [Status, ...]
+ *   - {Cursor} cursor
+ *   - ...
+ * @return {Context} this
+ */
+repost_timeline(user, id[, cursor], callback) 
+```
+
+### comments
+
+```js
+/**
+ * List one status's comments
+ * 
+ * @param {User} user
+ * @param {String} id, status's id
+ * @param {Cursor} [cursor]
+ *  - {String} since_id
+ *  - {String} max_id
+ *  - {String} [since_time], only for tqq
+ *  - {String} [max_time], only for tqq
+ *  - {Number} count, default is `20`
+ *  - {Number} page
+ *  - {Number} [filter_by_author], 0: all, 1: only I following、2: stranger, default is `0`.
+ * @param {Function(err, result)} callback
+ *  {Object} result:
+ *   - {Array} items, [Status, ...]
+ *   - {Cursor} cursor
+ *   - ...
+ * @return {Context} this
+ */
+comments(user, id[, cursor], callback) {
+```
+
 ### search
 
 ## Write
@@ -140,7 +293,7 @@ Tweet in Twitter.
 |[favorited]|bool|favorited it not or, default is `false`|`false`|
 |[thumbnail_pic]|string|thumbnail size image url, `undefined` if empty|`'http://ww1.sinaimg.cn/thumbnail/61e63796gw1dx9o35biuwj.jpg'`|
 |[bmiddle_pic]|string|middle size image url, `undefined` if empty|`'http://ww1.sinaimg.cn/bmiddle/61e63796gw1dx9o35biuwj.jpg'`|
-|[original_pic]|string|original size image url, `undefined` if empty|`'http://ww1.sinaimg.cn/large/61e63796gw1dx9o35biuwj.jpg'`|
+|[original_pic]|string|original image url, `undefined` if empty|`'http://ww1.sinaimg.cn/large/61e63796gw1dx9o35biuwj.jpg'`|
 |[geo]|GEO|GEO infomation, see [GEO]|`{}` or `null`|
 |[user]|User|Status's author, see [User] |`{screen_name: 'fengmk2', ...}`|
 |reposts_count|Number|Reposts count|`1000`|
@@ -425,10 +578,10 @@ Pagging cursor.
 
 |Field name|Data Type|Description|Demo|
 |----------|---------|-----------|----|
-|since_id|string|return statues which id > this id|`"110111"`|
-|max_id|string|return statues which id <= this id|`"110111"`|
-|count|Number|record count per page, default is `20`|`100`|
-|page|Number|page number, default is `1`|`10`|
+|[since_id]|string|return statues which id > this id|`"110111"`|
+|[max_id]|string|return statues which id <= this id|`"110111"`|
+|[count]|Number|record count per page, default is `20`|`100`|
+|[page]|Number|page number, default is `1`|`10`|
 
 Demo:
 
@@ -445,9 +598,9 @@ Demo:
 |----------|---------|-----------|----|
 |longitude|string|Longitude|`"116.39794"`|
 |latitude|string|Latitude|`"39.90817"`|
-|city_name|string|City name|`"广州"`|
-|province_name|string|Province name|`"广东"`|
 |address|string|Address, maybe empty|`""`|
+|[city_name]|string|City name|`"广州"`|
+|[province_name]|string|Province name|`"广东"`|
 
 Demo:
 

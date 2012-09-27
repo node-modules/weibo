@@ -99,11 +99,15 @@ function checkStatus(status) {
 }
 
 function checkComment(comment) {
+  comment.id.should.be.a('string').with.match(/^\d+$/);
+  comment.should.have.property('created_at').with.be.an.instanceof(Date);
   comment.text.should.be.a('string');
   comment.source.should.be.a('string');
-  comment.id.should.match(/^\d+$/);
   checkUser(comment.user);
   checkStatus(comment.status);
+  if (comment.reply_comment) {
+    checkComment(comment.reply_comment);
+  }
 }
 
 function checkGEO(geo) {
