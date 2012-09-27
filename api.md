@@ -4,20 +4,20 @@ All apis and data in `node-weibo` will convert to this unity format.
 
 |API name|Description|
 |---|-----------|
-| **[Status] APIs** ||
+| **[Status](#status) APIs** ||
 | Write ||
-|  * [update](user, data, callback)|Post a status|
-|  * [upload](user, status, pic, callback)|Post a status contain an image|
-|  * [repost](user, id, status, callback)|Repost a status|
-|  * [destroy](user, id, callback)|Remove a status by id|
+|  * [update](#update)(user, data, callback)|Post a status|
+|  * [upload](#upload)(user, status, pic, callback)|Post a status contain an image|
+|  * [repost](#repost)(user, id, status, callback)|Repost a status|
+|  * [destroy](#destroy)(user, id, callback)|Remove a status by id|
 | Read ||
-|  * [show](user, id, callback)|Get a status by id|
-|  * [home_timeline](user, callback)|User home timeline statuses|
-|  * [search](user, query, callback)|Search statues|
-| **[Comment] APIs** ||
+|  * [show](#show)(user, id, callback)|Get a status by id|
+|  * [home_timeline](#home_timeline)(user, callback)|User home timeline statuses|
+|  * [search](#search)(user, query, callback)|Search statues|
+| **[Comment](#comment) APIs** ||
 | Write ||
 | Read ||
-| **[User] APIs** ||
+| **[User](#user) APIs** ||
 | Write ||
 | Read ||
 
@@ -401,13 +401,23 @@ Demo:
 
 |Field name|Data Type|Description|Demo|
 |----------|---------|-----------|----|
-|id|string|User ID|`"110111"`|
+|id|string|Message ID|`"110111"`|
+|text|string|content text|`"this is a message."`|
+|created_at|Date|message sent datetime|`new Date("Tue May 24 18:04:53 +0800 2011")`|
+|sender|[User]|message sender|`{screen_name: "fengmk2", ...}`|
+|recipient|[User]|message recipient|`{id: "1233", ...}`|
 
 Demo:
 
 ```js
+{
+  id: "123",
+  text: "This is a message",
+  created_at: new Date("Tue May 24 18:04:53 +0800 2011"),
+  sender: { ... },
+  recipient: { ... }
+}
 ```
-
 
 ### Cursor
 
@@ -452,3 +462,10 @@ Demo:
     "address": "中国北京市海淀区中关村"
 }
 ```
+
+  [Status]: #status
+  [User]: #user
+  [Comment]: #commnet
+  [Message]: #message
+  [GEO]: #geo
+  [Cursor]: #cursor
