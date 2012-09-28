@@ -6,46 +6,37 @@ var weibo = require('../');
 
 // init appkey
 weibo.init('tqq', '801196838', '9f1a88caa8709de7dccbe3cae4bdc962', 'oob');
-// test account 2490164202 fengmk2@163.com
+weibo.init('weibo', '1122960051', 'e678e06f627ffe0e60e2ba48abe3a1e3', 'http://localhost.nodeweibo.com/oauth/callback');
 
-// weibo.init('tsina', '4010445928', 'd119f62bfb70a4ba8d9b68bf14d6e45a', 'file:///Users/jb/Library/iPhone/www/index.html');
-// weibo.init('tsina', '3538199806', '18cf587d60e11e3c160114fd92dd1f2b', 'oob');
 // weibo.init('twitter', 'i1aAkHo2GkZRWbUOQe8zA', 'MCskw4dW5dhWAYKGl3laRVTLzT8jTonOIOpmzEY', 'oob');
 
 var users = exports.users = {
   tqq: {
     blogtype: 'tqq',
-    authtype: 'oauth',
     oauth_token: '2d746f8c91ae4baea7243a6867cf309f',
     oauth_token_secret: '2bec75e9ddad6b27067e384a84550e38',
     name: 'node-weibo'
+  },
+  weibo: { 
+    blogtype: 'weibo',
+    oauth_token: '2.00EkofzBtMpzNBb9bc3108d8MwDTTE',
+    uid: 1827455832,
   }
-  // tsina: { 
-  //   blogtype: 'tsina',
-  //   authtype: 'oauth',
-  //   // oauth_token_key: 'd1ef5fa9aa9fee08fdc6267193a59d6a',
-  //   // oauth_token_secret: '798722589f339cc4e9e0a66a9b53f693' 
-  // },
-  // twitter: {
-  //   blogtype: 'twitter',
-  //   authtype: 'oauth',
-  //   oauth_token_key: '21738641-mcEnrozo8SyJHG3l6mIoyf9Ri3yj8aG52g4dJAvSd',
-  //   oauth_token_secret: 'To2RwooMrr8paJ642D50BxcJBXsiWAoISfG65vRRa8'
-  // }
 };
 
-var user = users.tqq;
-// weibo.get_authorization_url(user, function (error, auth_info) {
-//   console.log(error, auth_info);
+// var user = users.tqq;
+// var user = users.weibo;
+// weibo.get_authorization_url(user, function (err, auth_info) {
+//   console.log(err, auth_info);
 // });
 
+// {"access_token":"2.00EkofzBtMpzNBb9bc3108d8MwDTTE","remind_in":"633971","expires_in":633971,"uid":"1827455832"}'
+// 
+// http://localhost.nodeweibo.com/oauth/callback?code=8c3ef76abed0eeb0c789f5fc56b568f8
 // http://open.t.qq.com/cgi-bin/oob?oauth_token=86e8a48c83904d918cad0d513d4bf99d&oauth_verifier=796840&openid=EA68676D5E9DA465822CD0CEB2DC6EF5&openkey=1E7DE375708D08ECCB665ACB0362BD05
 // weibo.get_access_token({ 
-//   blogtype: 'tqq',
-//   authtype: 'oauth', 
-//   oauth_verifier: '796840',
-//   oauth_token: '86e8a48c83904d918cad0d513d4bf99d',
-//   oauth_token_secret: 'ec8d879a3835863bf230dae91ee104c8',
+//   blogtype: 'weibo',
+//   oauth_verifier: '1e46b89e086abb71e3c7c6fa7e2a2bc0',
 // }, function (err, auth_user) {
 //   console.log(err, auth_user);
 // });

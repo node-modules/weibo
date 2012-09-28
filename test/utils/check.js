@@ -75,6 +75,9 @@ function checkUser(user) {
 
 function checkStatus(status) {
   status.should.have.property('id').with.match(/^\d+$/);
+  if (status.deleted) {
+    return;
+  }
   status.t_url.should.match(/^http:\/\//);
   status.should.have.property('created_at').with.be.an.instanceof(Date);
   should.ok(status.created_at);
@@ -90,7 +93,7 @@ function checkStatus(status) {
   }
   status.should.have.property('reposts_count').with.be.a('number');
   status.should.have.property('comments_count').with.be.a('number');
-  if (status.retweeted_status) {
+  if (status.retweeted_status && !status.retweeted_status.deleted) {
     checkStatus(status.retweeted_status);
   }
   if (status.geo) {
@@ -104,7 +107,9 @@ function checkComment(comment) {
   comment.text.should.be.a('string');
   comment.source.should.be.a('string');
   checkUser(comment.user);
-  checkStatus(comment.status);
+  if (comment.status) {
+    checkStatus(comment.status);
+  }
   if (comment.reply_comment) {
     checkComment(comment.reply_comment);
   }
@@ -113,7 +118,9 @@ function checkComment(comment) {
 function checkGEO(geo) {
   geo.should.have.property('longitude').with.be.a('string');
   geo.should.have.property('latitude').with.be.a('string');
-  geo.should.have.property('address').with.be.a('string');
+  if (geo.address) {
+    geo.should.have.property('address').with.be.a('string');
+  }
   if ('city_name' in geo) {
     geo.city_name.should.be.a('string');
   }

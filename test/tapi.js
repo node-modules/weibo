@@ -26,13 +26,12 @@ var userIDs = {
 };
 
 describe('tapi.js ' + blogtype + ' API', function () {
-  var api;
   var currentUser = users[blogtype];
 
   describe('api_dispatch()', function () {
     it('should return right type api', function () {
       var user = { blogtype: blogtype };
-      api = tapi.api_dispatch(user);
+      var api = tapi.api_dispatch(user);
       api.should.an.instanceof(tapi.TYPES[blogtype]);
     });
   });
@@ -40,11 +39,14 @@ describe('tapi.js ' + blogtype + ' API', function () {
   describe('get_authorization_url()', function () {
 
     it('should return login url and request token', function (done) {
-      tapi.get_authorization_url({ blogtype: blogtype }, function (err, info) {
+      var api = tapi.get_authorization_url({ blogtype: blogtype }, function (err, info) {
         should.not.exist(err);
-        info.oauth_token.should.length(32);
-        info.oauth_token_secret.should.length(32);
-        info.should.have.property('auth_url').with.include(api.config.oauth_host + api.config.oauth_authorize);
+        if (info.oauth_token) {
+          info.oauth_token.should.length(32);
+          info.oauth_token_secret.should.length(32);
+        }
+        var url = api.config.oauth_host + api.config.oauth_authorize;
+        info.should.have.property('auth_url').with.include(url);
         done();
       });
     });
@@ -53,9 +55,11 @@ describe('tapi.js ' + blogtype + ' API', function () {
       var user = { blogtype: blogtype, oauth_callback: 'http://localhost/oauth_callback' };
       tapi.get_authorization_url(user, function (err, info) {
         should.not.exist(err);
-        info.oauth_token.should.length(32);
-        info.oauth_token_secret.should.length(32);
-        info.auth_url.should.include('oauth_callback=' + encodeURIComponent(user.oauth_callback));
+        if (info.oauth_token) {
+          info.oauth_token.should.length(32);
+          info.oauth_token_secret.should.length(32);
+        }
+        info.auth_url.should.include(encodeURIComponent(user.oauth_callback));
         info.blogtype = blogtype;
         tapi.get_access_token(info, function (err, auth_user) {
           should.exist(err);
@@ -70,14 +74,44 @@ describe('tapi.js ' + blogtype + ' API', function () {
 
   describe('verify_credentials()', function () {
 
-    it('should return current user info', function (done) {
+    it('should get current user info', function (done) {
       tapi.verify_credentials(currentUser, function (err, user) {
         should.not.exist(err);
+        // console.log(user)
         check.checkUser(user);
         done();
       });
     });
 
+  });
+
+  describe('user_show()', function () {
+
+    it('should get a user info by uid', function (done) {
+      var uid = 'aichidemao2013';
+      if (blogtype === 'weibo') {
+        uid = '1640328892';
+      }
+      tapi.user_show(currentUser, uid, function (err, user) {
+        should.not.exist(err);
+        should.exist(user);
+        user.should.have.property('id', uid);
+        check.checkUser(user);
+        done();
+      });
+    });
+
+    if (blogtype === 'weibo') {
+      it('should get a user info by screen_name', function (done) {
+        tapi.user_show(currentUser, '123', 'Python发烧友', function (err, user) {
+          should.not.exist(err);
+          should.exist(user);
+          user.should.have.property('screen_name', 'Python发烧友');
+          check.checkUser(user);
+          done();
+        });
+      });
+    }
   });
 
   describe('update()', function () {
@@ -88,10 +122,11 @@ describe('tapi.js ' + blogtype + ' API', function () {
         should.not.exist(err);
         should.exist(status);
         status.should.have.property('id').with.match(/^\d+$/);
+        // console.log(status)
         if (status.text) {
           check.checkStatus(status);
         }
-        done();     
+        setTimeout(done, 5000);
       });
     });
 
@@ -105,10 +140,11 @@ describe('tapi.js ' + blogtype + ' API', function () {
         should.not.exist(err);
         should.exist(status);
         status.should.have.property('id').with.match(/^\d+$/);
+        // console.log(status)
         if (status.text) {
           check.checkStatus(status);
         }
-        done();
+        setTimeout(done, 5000);
       });
     });
 
@@ -131,7 +167,7 @@ describe('tapi.js ' + blogtype + ' API', function () {
         if (status.text) {
           check.checkStatus(status);
         }
-        done();
+        setTimeout(done, 5000);
       });
     });
 
@@ -153,7 +189,7 @@ describe('tapi.js ' + blogtype + ' API', function () {
         if (status.text) {
           check.checkStatus(status);
         }
-        done();
+        setTimeout(done, 5000);
       });
     });
 
@@ -165,11 +201,17 @@ describe('tapi.js ' + blogtype + ' API', function () {
       };
       tapi.upload(currentUser, text, pic, function (err, status) {
         should.exist(err);
-        err.should.have.property('message', 'error content len');
-        err.should.have.property('name', 'UploadError');
-        err.data.should.have.property('errcode', 2);
-        err.data.should.have.property('ret', 1);
         should.not.exist(status);
+        err.should.have.property('name', 'UploadError');
+        if (blogtype === 'tqq') {
+          err.should.have.property('message', 'error content len');
+          err.data.should.have.property('errcode', 2);
+          err.data.should.have.property('ret', 1);
+        } else if (blogtype === 'weibo') {
+          err.should.have.property('message', 'miss required parameter (status), see doc for more info.');
+          err.data.should.have.property('error_code', 10016);
+          err.data.should.have.property('request', '/2/statuses/upload.json');
+        }
         done();
       });
     });
@@ -184,7 +226,7 @@ describe('tapi.js ' + blogtype + ' API', function () {
         should.exist(status);
         status.should.have.property('id').with.match(/^\d+$/);
         newStatus = status;
-        done();
+        setTimeout(done, 5000);
       });
     });
 
@@ -202,7 +244,7 @@ describe('tapi.js ' + blogtype + ' API', function () {
         if (status.text) {
           check.checkStatus(status);
         }
-        done();
+        setTimeout(done, 5000);
       });
     });
 
@@ -213,13 +255,23 @@ describe('tapi.js ' + blogtype + ' API', function () {
         long: '113.421234',
         lat: 22.354231
       };
-      tapi.repost(currentUser, 12345, status, function (err, status) {
+      var id = 12315;
+      if (blogtype === 'weibo') {
+        id = '9223372036854775807';
+      }
+      tapi.repost(currentUser, id, status, function (err, status) {
         should.exist(err);
-        err.should.have.property('message', 'root node not exist');
-        err.should.have.property('name', 'RepostError');
-        err.data.should.have.property('errcode', 11);
-        err.data.should.have.property('ret', 4);
         should.not.exist(status);
+        err.should.have.property('name', 'RepostError');
+        if (blogtype === 'tqq') {
+          err.should.have.property('message', 'root node not exist');
+          err.data.should.have.property('errcode', 11);
+          err.data.should.have.property('ret', 4);
+        } else if (blogtype === 'weibo') {
+          err.should.have.property('message', 'target weibo does not exist!');
+          err.data.should.have.property('error_code', 20101);
+          err.data.should.have.property('request', '/2/statuses/repost.json');
+        }
         done();
       });
     });
@@ -247,13 +299,23 @@ describe('tapi.js ' + blogtype + ' API', function () {
     });
 
     it('should remove a not exists status', function (done) {
-      tapi.destroy(currentUser, 12345, function (err, result) {
+      var id = 12315;
+      if (blogtype === 'weibo') {
+        id = '9223372036854775807';
+      }
+      tapi.destroy(currentUser, id, function (err, result) {
         should.exist(err);
-        err.should.have.property('message', 'tweet has  been deleted');
         err.should.have.property('name', 'DestroyError');
-        err.data.should.have.property('errcode', 20);
-        err.data.should.have.property('ret', 4);
         should.not.exist(result);
+        if (blogtype === 'tqq') {
+          err.should.have.property('message', 'tweet has  been deleted');
+          err.data.should.have.property('errcode', 20);
+          err.data.should.have.property('ret', 4);
+        } else if (blogtype === 'weibo') {
+          err.should.have.property('message', 'target weibo does not exist!');
+          err.data.should.have.property('error_code', 20101);
+          err.data.should.have.property('request', '/2/statuses/destroy.json');
+        }
         done();
       });
     });
@@ -262,11 +324,17 @@ describe('tapi.js ' + blogtype + ' API', function () {
       tapi.destroy(currentUser, newStatus.id, function (err, result) {
         if (err) {
           should.exist(err);
-          err.should.have.property('message', 'tweet has  been deleted');
           err.should.have.property('name', 'DestroyError');
-          err.data.should.have.property('errcode', 20);
-          err.data.should.have.property('ret', 4);
           should.not.exist(result);
+          if (blogtype === 'tqq') {
+            err.should.have.property('message', 'tweet has  been deleted');
+            err.data.should.have.property('errcode', 20);
+            err.data.should.have.property('ret', 4);
+          } else if (blogtype === 'weibo') {
+            err.should.have.property('message', 'target weibo does not exist!');
+            err.data.should.have.property('error_code', 20101);
+            err.data.should.have.property('request', '/2/statuses/destroy.json');
+          }          
         }
         // some time, remove has little delay.
         done();
@@ -277,9 +345,14 @@ describe('tapi.js ' + blogtype + ' API', function () {
 
   describe('show()', function () {
     it('should get a status by id', function (done) {
-      tapi.show(currentUser, '164652015311097', function (err, status) {
+      var id = '164652015311097';
+      if (blogtype === 'weibo') {
+        id = '3495319633461422';
+      }
+      tapi.show(currentUser, id, function (err, status) {
         should.not.exist(err);
         should.exist(status);
+        // console.log(status)
         check.checkStatus(status);
         done();
       });
@@ -296,8 +369,8 @@ describe('tapi.js ' + blogtype + ' API', function () {
         result.should.have.property('cursor').with.be.a('object');
         result.items.length.should.above(0);
         for (var i = 0; i < result.items.length; i++) {
-          check.checkStatus(result.items[i]);
           // console.log(result.items[i])
+          check.checkStatus(result.items[i]);
         }
         done();
       });
@@ -375,7 +448,7 @@ describe('tapi.js ' + blogtype + ' API', function () {
 
     it('should list recent 20 ' + blogUser.id + '\'s timeline statuses by user.id {id: "' + blogUser.id + '"}',
     function (done) {
-      tapi.user_timeline(currentUser, {id: blogUser.id}, function (err, result) {
+      tapi.user_timeline(currentUser, {uid: blogUser.id}, function (err, result) {
         should.not.exist(err);
         should.exist(result);
         result.should.have.property('items').with.be.an.instanceof(Array);
@@ -461,14 +534,18 @@ describe('tapi.js ' + blogtype + ' API', function () {
   });
 
   describe('repost_timeline()', function () {
-    it('should list recent 8 status:164652015311097 repost statuses', function (done) {
-      tapi.repost_timeline(currentUser, '164652015311097', {count: 8}, function (err, result) {
+    var id = '164652015311097';
+    if (blogtype === 'weibo') {
+      id = '2830347985';
+    }
+    it('should list recent 8 status:' + id + ' repost statuses', function (done) {
+      tapi.repost_timeline(currentUser, id, {count: 8}, function (err, result) {
         should.not.exist(err);
         should.exist(result);
         result.should.have.property('items').with.be.an.instanceof(Array);
         result.items.should.be.an.instanceof(Array);
         result.should.have.property('cursor').with.be.a('object');
-        result.items.should.length(8);
+        result.items.length.should.above(0);
         for (var i = 0; i < result.items.length; i++) {
           check.checkStatus(result.items[i]);
         }
@@ -478,14 +555,18 @@ describe('tapi.js ' + blogtype + ' API', function () {
   });
 
   describe('comments()', function () {
-    it('should list recent 9 status:164652015311097 comments', function (done) {
-      tapi.comments(currentUser, '164652015311097', {count: 9}, function (err, result) {
+    var id = '164652015311097';
+    if (blogtype === 'weibo') {
+      id = '2830347985';
+    }
+    it('should list recent 9 status:' + id + ' comments', function (done) {
+      tapi.comments(currentUser, id, {count: 9}, function (err, result) {
         should.not.exist(err);
         should.exist(result);
         result.should.have.property('items').with.be.an.instanceof(Array);
         result.items.should.be.an.instanceof(Array);
         result.should.have.property('cursor').with.be.a('object');
-        result.items.should.length(9);
+        result.items.length.should.above(0);
         for (var i = 0; i < result.items.length; i++) {
           // console.log(result.items[i])
           check.checkComment(result.items[i]);
@@ -496,9 +577,13 @@ describe('tapi.js ' + blogtype + ' API', function () {
   });
 
   describe('comment_create()', function () {
-    it('should post a comment on status:70997003338788', function (done) {
+    var id = '70997003338788';
+    if (blogtype === 'weibo') {
+      id = '2830347985';
+    }
+    it('should post a comment on status:' + id, function (done) {
       var text = '这是一个 comment_create: function (user, id, comment, callback) 的测试 ++' + new Date();
-      tapi.comment_create(currentUser, '70997003338788', text, function (err, result) {
+      tapi.comment_create(currentUser, id, text, function (err, result) {
         should.not.exist(err);
         should.exist(result);
         result.should.have.property('id').with.match(/^\d+$/);
@@ -511,14 +596,25 @@ describe('tapi.js ' + blogtype + ' API', function () {
 
     it('should post a comment on not exists status', function (done) {
       var text = '这是一个 comment_create: function (user, id, comment, callback) 的测试 ++' + new Date();
-      tapi.comment_create(currentUser, 123, text, function (err, result) {
+      var id = 123;
+      if (blogtype === 'weibo') {
+        id = '9223372036854775807';
+      }
+      tapi.comment_create(currentUser, id, text, function (err, result) {
         should.exist(err);
-        err.should.have.property('name', 'CommentCreateError');
-        err.should.have.property('message', 'root node not exist');
-        err.should.have.property('data');
-        err.data.should.have.property('errcode', 11);
-        err.data.should.have.property('ret', 4);
         should.not.exist(result);
+        err.should.have.property('name', 'CommentCreateError');
+        if (blogtype === 'tqq') {
+          err.should.have.property('message', 'root node not exist');
+          err.should.have.property('data');
+          err.data.should.have.property('errcode', 11);
+          err.data.should.have.property('ret', 4);
+        } else if (blogtype === 'weibo') {
+          err.should.have.property('message', 'target weibo does not exist!');
+          err.should.have.property('data');
+          err.data.should.have.property('error_code', 20101);
+          err.data.should.have.property('request', '/2/comments/create.json');
+        }
         done();
       });
     });
@@ -526,23 +622,39 @@ describe('tapi.js ' + blogtype + ' API', function () {
     it('should post a empty comment', function (done) {
       tapi.comment_create(currentUser, '70997003338788', '', function (err, result) {
         should.exist(err);
-        err.should.have.property('name', 'CommentCreateError');
-        err.should.have.property('message', 'error content len');
-        err.should.have.property('data');
-        err.data.should.have.property('errcode', 2);
-        err.data.should.have.property('ret', 1);
         should.not.exist(result);
+        err.should.have.property('name', 'CommentCreateError');
+
+        if (blogtype === 'tqq') {
+          err.should.have.property('message', 'error content len');
+          err.should.have.property('data');
+          err.data.should.have.property('errcode', 2);
+          err.data.should.have.property('ret', 1);
+        } else if (blogtype === 'weibo') {
+          err.should.have.property('message', 'content is null!');
+          err.should.have.property('data');
+          err.data.should.have.property('error_code', 20008);
+          err.data.should.have.property('request', '/2/comments/create.json');
+        }
+        
         done();
       });
     });
   });
 
   describe('comment_reply()', function () {
-    it('should reply to comment:83231031553455', function (done) {
+    var cid = '83231031553455';
+    var id = '70997003338788';
+    if (blogtype === 'weibo') {
+      cid = '3495376428605830';
+      id = '2830347985';
+    }
+    it('should reply to comment:' + cid + ' status:' + id, function (done) {
       var text = '这是一个 comment_reply: function (user, cid, id, comment, callback) 的测试 ++' + new Date();
-      tapi.comment_reply(currentUser, '83231031553455', '70997003338788', text, function (err, result) {
+      tapi.comment_reply(currentUser, cid, id, text, function (err, result) {
         should.not.exist(err);
         should.exist(result);
+        // console.log(result)
         result.should.have.property('id').with.match(/^\d+$/);
         if (result.text) {
           check.checkComment(result);
@@ -551,32 +663,84 @@ describe('tapi.js ' + blogtype + ' API', function () {
       });
     });
 
-    it('should post a comment on not exists status', function (done) {
+    it('should reply a comment on not exists status', function (done) {
+      var cid = 123;
+      var id = 1234;
+      if (blogtype === 'weibo') {
+        cid = '2830347985';
+        id = '9223372036854775807';
+      }
       var text = '这是一个 comment_reply: function (user, cid, id, comment, callback) 的测试 ++' + new Date();
-      tapi.comment_reply(currentUser, 123, 1234, text, function (err, result) {
+      tapi.comment_reply(currentUser, cid, id, text, function (err, result) {
         should.exist(err);
-        err.should.have.property('name', 'CommentReplyError');
-        err.should.have.property('message', 'root node not exist');
-        err.should.have.property('data');
-        err.data.should.have.property('errcode', 11);
-        err.data.should.have.property('ret', 4);
         should.not.exist(result);
+        err.should.have.property('name', 'CommentReplyError');
+
+        if (blogtype === 'tqq') {
+          err.should.have.property('message', 'root node not exist');
+          err.should.have.property('data');
+          err.data.should.have.property('errcode', 11);
+          err.data.should.have.property('ret', 4);
+        } else if (blogtype === 'weibo') {
+          err.should.have.property('message', 'target weibo does not exist!');
+          err.should.have.property('data');
+          err.data.should.have.property('error_code', 20101);
+          err.data.should.have.property('request', '/2/comments/reply.json');
+        }
         done();
       });
     });
 
-    it('should post a empty comment', function (done) {
+    it('should reply empty content', function (done) {
       tapi.comment_reply(currentUser, '83231031553455', '70997003338788', '', function (err, result) {
         should.exist(err);
         err.should.have.property('name', 'CommentReplyError');
-        err.should.have.property('message', 'error content len');
-        err.should.have.property('data');
-        err.data.should.have.property('errcode', 2);
-        err.data.should.have.property('ret', 1);
         should.not.exist(result);
+
+        if (blogtype === 'tqq') {
+          err.should.have.property('message', 'error content len');
+          err.should.have.property('data');
+          err.data.should.have.property('errcode', 2);
+          err.data.should.have.property('ret', 1);
+        } else if (blogtype === 'weibo') {
+          err.should.have.property('message', 'content is null!');
+          err.should.have.property('data');
+          err.data.should.have.property('error_code', 20008);
+          err.data.should.have.property('request', '/2/comments/reply.json');
+        }
         done();
       });
     });
+  });
+
+  describe('comment_destroy()', function () {
+
+    var test = xit;
+    var newComment;
+    var id = '70997003338788';
+    if (blogtype === 'weibo') {
+      id = '2830347985';
+    }
+    if (tapi.support(currentUser, 'comment_destroy')) {
+      test = it;
+      before(function (done) {
+        var text = 'this comment 很快被删除! ++' + new Date();
+        tapi.comment_create(currentUser, id, text, function (err, comment) {
+          should.not.exist(err);
+          newComment = comment;
+          done();
+        });
+      });
+    }
+    test('should destroy a comment', function (done) {
+      tapi.comment_destroy(currentUser, newComment.id, function (err, result) {
+        should.not.exist(err);
+        should.exist(result);
+        result.should.have.property('id').with.match(/^\d+$/);
+        done();
+      });
+    });
+
   });
 
 });

@@ -6,29 +6,29 @@ All apis and data in `node-weibo` will convert to this unity format.
 |--------|-----------|:--------------:|
 | **[Status](#status) APIs** |||
 | Write |||
-|  * [update](#update)(user, status, callback)|Post a status|[tqq]|
-|  * [upload](#upload)(user, status, pic, callback)|Post a status contain an image|[tqq]|
-|  * [repost](#repost)(user, id, status, callback)|Repost a status|[tqq]|
-|  * [destroy](#destroy)(user, id, callback)|Remove a status by id|[tqq]|
+|  * [update](#update)(user, status, callback)|Post a status|[weibo], [tqq]|
+|  * [upload](#upload)(user, status, pic, callback)|Post a status contain an image|[weibo], [tqq]|
+|  * [repost](#repost)(user, id, status, callback)|Repost a status|[weibo], [tqq]|
+|  * [destroy](#destroy)(user, id, callback)|Remove a status by id|[weibo], [tqq]|
 | Read |||
-|  * [show](#show)(user, id, callback)|Get a status by id|[tqq]|
-|  * [home_timeline](#home_timeline)(user[, cursor], callback)|List user home timeline statuses|[tqq]|
-|  * [user_timeline](#user_timeline)(user[, cursor], callback)|List user personal timeline statuses|[tqq]|
-|  * [public_timeline](#public_timeline)(user[, cursor], callback)|List public timeline statuses|[tqq]|
-|  * [mentions](#mentions)(user[, cursor], callback)|List @me timeline statuses|[tqq]|
-|  * [repost_timeline](#repost_timeline)(user, id[, cursor], callback)|List one status's reposted statuses|[tqq]|
+|  * [show](#show)(user, id, callback)|Get a status by id|[weibo], [tqq]|
+|  * [home_timeline](#home_timeline)(user[, cursor], callback)|List user home timeline statuses|[weibo], [tqq]|
+|  * [user_timeline](#user_timeline)(user[, cursor], callback)|List user personal timeline statuses|[weibo], [tqq]|
+|  * [public_timeline](#public_timeline)(user[, cursor], callback)|List public timeline statuses|[weibo], [tqq]|
+|  * [mentions](#mentions)(user[, cursor], callback)|List @me timeline statuses|[weibo], [tqq]|
+|  * [repost_timeline](#repost_timeline)(user, id[, cursor], callback)|List one status's reposted statuses|[weibo], [tqq]|
 |  * [search](#search)(user, query, callback)|Search statues|-|
 | **[Comment](#comment) APIs** |||
 | Write |||
-|  * [comment_create](#comment_create)(user, id, comment, callback)|post a comment to a status|[tqq]|
-|  * [comment_destroy](#comment_destroy)(user, cid, callback)|remove a comment|-|
-|  * [comment_reply](#comment_reply)(user, cid, id, comment, callback)|reply to a comment|[tqq]|
+|  * [comment_create](#comment_create)(user, id, comment, callback)|post a comment to a status|[weibo], [tqq]|
+|  * [comment_destroy](#comment_destroy)(user, cid, callback)|remove a comment|[weibo]|
+|  * [comment_reply](#comment_reply)(user, cid, id, comment, callback)|reply to a comment|[weibo], [tqq]|
 | Read |||
-|  * [comments](#comments)(user, id[, cursor], callback)|List one status's comments|[tqq]|
+|  * [comments](#comments)(user, id[, cursor], callback)|List one status's comments|[weibo], [tqq]|
 |  * [comments_mentions](#comments_mentions)(user[, cursor], callback)|List @me comments|[weibo]|
-|  * [comments_timeline](#comments_timeline)(user[, cursor], callback)|List comments to my statues|[tqq]|
-|  * [comments_to_me](#comments_to_me)(user[, cursor], callback)|List comments to me|-|
-|  * [comments_by_me](#comments_by_me)(user[, cursor], callback)|List comments by me|-|
+|  * [comments_timeline](#comments_timeline)(user[, cursor], callback)|List comments to my statues|[weibo], [tqq]|
+|  * [comments_to_me](#comments_to_me)(user[, cursor], callback)|List comments to me|[weibo]|
+|  * [comments_by_me](#comments_by_me)(user[, cursor], callback)|List comments by me|[weibo]|
 | **[Message](#message) APIs** |||
 | Write |||
 |  * [message_create](#message_create)(user, text, id, callback)|post a message to some one|-|
@@ -36,12 +36,13 @@ All apis and data in `node-weibo` will convert to this unity format.
 | Read |||
 | **[User](#user) APIs** |||
 | Read |||
-|  * [verify_credentials](#verify_credentials)(user, callback)|get oauth user profile infomation|[tqq]|
+|  * [verify_credentials](#verify_credentials)(user, callback)|get oauth user profile infomation|[weibo], [tqq]|
+|  * [user_show](#user_show)(user, uid[, screen_name], callback)|get user profile infomation by uid|[weibo], [tqq]|
 | Write |||
 | **[OAuth](#oauth) APIs** |||
 | Read |||
 |  * [get_authorization_url](#get_authorization_url)(user, callback)|get the user oauth login url|[weibo], [tqq]|
-|  * [get_access_token](#get_access_token)(user, callback)|get oauth access token|[tqq]|
+|  * [get_access_token](#get_access_token)(user, callback)|get oauth access token|[weibo], [tqq]|
 
 |Data Structure|
 |--------------|
@@ -267,11 +268,31 @@ get_access_token: function (user, callback)
  * @param {Object} user
  *  - {String} blogtype
  *  - {String} oauth_token, access oauth token
- *  - {String} oauth_token_secret, access oauth token secret
+ *  - {String} [oauth_token_secret], access oauth token secret, oauth v2 don't need this param.
  * @param {Function(err, User)} callback
  * @return {Context} this
  */
 verify_credentials: function (user, callback)
+```
+
+### user_show
+
+```js
+/**
+* Get user profile infomation by uid or screen_name.
+*
+* @param {Object} user
+*  - {String} blogtype
+*  - {String} oauth_token, access token
+*  - {String} [oauth_token_secret], access oauth token secret, oauth v2 don't need this param.
+* @param {String} [uid], user id
+* @param {String} [screen_name], user screen_name
+*   uid and screen_name MUST set one. If set both, will use `screen_name`.
+*   `tqq` do not support `screen_name`.
+* @param {Function(err, User)} callback
+* @return {Context} this
+*/
+user_show: function (user, uid, screen_name, callback)
 ```
 
 ## Write
