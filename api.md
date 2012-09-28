@@ -53,7 +53,80 @@ All apis and data in `node-weibo` will convert to this unity format.
 |[GEO]|
 |[Cursor]|
 
-## Read
+## Status APIs
+
+### update
+
+```js
+/**
+ * Post a status
+ *
+ * @param {User} user, oauth user.
+ * @param {String|Object} status
+ *  - {String} status, content text.
+ *  - {Number} [lat], latitude.
+ *  - {Number} [long], longitude.
+ *  - {String} [annotations], addtional information.
+ * @param {Function(Error, Status)} callback
+ * @return {Context} this
+ */
+update(user, status, callback)
+```
+
+### upload
+
+```js
+/**
+ * Post a status contain an image.
+ * 
+ * @param {User} user, oauth user.
+ * @param {String|Object} status
+ *  - {String} status, content text.
+ *  - {Number} [lat], latitude.
+ *  - {Number} [long], longitude.
+ *  - {String} [annotations], addtional information.
+ * @param {Object} pic
+ *  - {Buffer|ReadStream} data
+ *  - {String} [name], image file name
+ *  - {String} [content_type], data content type
+ * @param {Function(Error, Status)} callback
+ * @return {Context} this
+ */
+upload(user, status, pic, callback)
+```
+
+### repost
+
+```js
+/**
+ * Repost a status.
+ * 
+ * @param {User} user
+ * @param {String|Number} id, need to repost status id.
+ * @param {String|Object} status
+ *  - {String} status, content text
+ *  - {Number} [lat], latitude.
+ *  - {Number} [long], longitude.
+ *  - {Boolean} isComment, is comment or not, default is `false`.
+ * @param {Function(Error, Status)} callback
+ * @return {Context} this
+ */
+repost(user, id, status, callback)
+```
+
+### destroy
+
+```js
+/**
+ * Remove a status by id.
+ * 
+ * @param {User} user
+ * @param {String|Number} id
+ * @param {Function(Error, Status)} callback
+ * @return {Context} this
+ */
+destroy(user, id, callback)
+```
 
 ### show
 
@@ -166,6 +239,7 @@ user_timeline(user, cursor, callback)
  */
 mentions(user, cursor, callback)
 ```
+
 ### repost_timeline
 
 ```js
@@ -192,33 +266,9 @@ mentions(user, cursor, callback)
 repost_timeline(user, id[, cursor], callback) 
 ```
 
-### comments
-
-```js
-/**
- * List one status's comments
- * 
- * @param {User} user
- * @param {String} id, status's id
- * @param {Cursor} [cursor]
- *  - {String} since_id
- *  - {String} max_id
- *  - {String} [since_time], only for tqq
- *  - {String} [max_time], only for tqq
- *  - {Number} count, default is `20`
- *  - {Number} page
- *  - {Number} [filter_by_author], 0: all, 1: only I following、2: stranger, default is `0`.
- * @param {Function(err, result)} callback
- *  {Object} result:
- *   - {Array} items, [Comment, ...]
- *   - {Cursor} cursor
- *   - ...
- * @return {Context} this
- */
-comments(user, id[, cursor], callback) {
-```
-
 ### search
+
+## OAuth APIs
 
 ### get_authorization_url
 
@@ -259,6 +309,8 @@ get_authorization_url: function (user, callback)
 get_access_token: function (user, callback)
 ```
 
+## User APIs
+
 ### verify_credentials
 
 ```js
@@ -295,79 +347,62 @@ verify_credentials: function (user, callback)
 user_show: function (user, uid, screen_name, callback)
 ```
 
-## Write
+## Comment APIs
 
-### update
+### comments_timeline
 
 ```js
 /**
- * Post a status
- *
- * @param {User} user, oauth user.
- * @param {String|Object} status
- *  - {String} status, content text.
- *  - {Number} [lat], latitude.
- *  - {Number} [long], longitude.
- *  - {String} [annotations], addtional information.
- * @param {Function(Error, Status)} callback
- * @return {Context} this
- */
-update(user, status, callback)
+* List comments to my statues
+* 
+* @param {User} user
+* @param {Cursor} [cursor]
+*  - {String} since_id
+*  - {String} max_id
+*  - {String} [since_time], only for tqq
+*  - {String} [max_time], only for tqq
+*  - {Number} count, default is `20`
+*  - {Number} page
+* @param {Function(err, result)} callback
+*  {Object} result:
+*   - {Array} items, [Comment, ...]
+*   - {Cursor} cursor
+*   - ...
+* @return {Context} this
+*/
+comments_timeline: function (user, cursor, callback)
 ```
 
-### upload
+### comments_mentions
+
+### comments_to_me
+
+### comments_by_me
+
+### comments
 
 ```js
 /**
- * Post a status contain an image.
- * 
- * @param {User} user, oauth user.
- * @param {String|Object} status
- *  - {String} status, content text.
- *  - {Number} [lat], latitude.
- *  - {Number} [long], longitude.
- *  - {String} [annotations], addtional information.
- * @param {Object} pic
- *  - {Buffer|ReadStream} data
- *  - {String} [name], image file name
- *  - {String} [content_type], data content type
- * @param {Function(Error, Status)} callback
- * @return {Context} this
- */
-upload(user, status, pic, callback)
-```
-
-### repost
-
-```js
-/**
- * Repost a status.
+ * List one status's comments
  * 
  * @param {User} user
- * @param {String|Number} id, need to repost status id.
- * @param {String|Object} status
- *  - {String} status, content text
- *  - {Number} [lat], latitude.
- *  - {Number} [long], longitude.
- *  - {Boolean} isComment, is comment or not, default is `false`.
- * @param {Function(Error, Status)} callback
+ * @param {String} id, status's id
+ * @param {Cursor} [cursor]
+ *  - {String} since_id
+ *  - {String} max_id
+ *  - {String} [since_time], only for tqq
+ *  - {String} [max_time], only for tqq
+ *  - {Number} count, default is `20`
+ *  - {Number} page
+ *  - {Number} [filter_by_author], 0: all, 1: only I following、2: stranger, default is `0`.
+ * @param {Function(err, result)} callback
+ *  {Object} result:
+ *   - {Array} items, [Comment, ...]
+ *   - {Cursor} cursor
+ *   - ...
  * @return {Context} this
  */
-repost(user, id, status, callback)
-```
-
-### destroy
-
-```js
-/**
- * Remove a status by id.
- * 
- * @param {User} user
- * @param {String|Number} id
- * @param {Function(Error, Status)} callback
- * @return {Context} this
- */
-destroy(user, id, callback)
+comments(user, id[, cursor], callback) {
 ```
 
 ### comment_create
