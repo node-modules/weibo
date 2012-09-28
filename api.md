@@ -20,9 +20,9 @@ All apis and data in `node-weibo` will convert to this unity format.
 |  * [search](#search)(user, query, callback)|Search statues|-|
 | **[Comment](#comment) APIs** |||
 | Write |||
-|  * [comment_create](#comment_create)(user, comment, id, callback)|post a comment to a status|-|
-|  * [comment_destroy](#comment_destroy)(user, comment, id, callback)|remove a comment|-|
-|  * [comment_reply](#comment_reply)(user, comment, id, callback)|reply to a comment|-|
+|  * [comment_create](#comment_create)(user, id, comment, callback)|post a comment to a status|[tqq]|
+|  * [comment_destroy](#comment_destroy)(user, cid, callback)|remove a comment|-|
+|  * [comment_reply](#comment_reply)(user, cid, id, comment, callback)|reply to a comment|[tqq]|
 | Read |||
 |  * [comments](#comments)(user, id[, cursor], callback)|List one status's comments|[tqq]|
 |  * [comments_mentions](#comments_mentions)(user[, cursor], callback)|List @me comments|[weibo]|
@@ -347,6 +347,59 @@ repost(user, id, status, callback)
  * @return {Context} this
  */
 destroy(user, id, callback)
+```
+
+### comment_create
+
+```js
+/**
+ * post a comment to a status
+ * 
+ * @param {AccessToken} user
+ * @param {String} id, status's id
+ * @param {String|Object} comment
+ *  - {String} comment
+ *  - {Number} [comment_ori], same comment to the original status when comment on a repost status,
+ *    0: no, 1: yes, default is `0`.
+ * @param {Function(err, result)} callback
+ *  - {Object} result
+ *   - {String} id, the comment id
+ * @return {Context} this
+ */
+comment_create: function (user, id, comment, callback)
+```
+
+### comment_reply
+
+```js
+/**
+ * reply to a comment
+ * @param {AccessToken} user
+ * @param {String} cid, comment's id
+ * @param {String} id, status's id
+ * @param {String|Object} comment
+ *  - {String} comment
+ *  - {Number} without_mention, don't auto add `'reply@username'` to comment text or not,
+ *    0: yes, 1: no, default is `0`, won't auto add.
+ *  - {Number} [comment_ori], same comment to the original status when comment on a repost status,
+ *    0: no, 1: yes, default is `0`.
+ * @param {Function(err, result)} callback
+ * @return {Context} this
+ */
+comment_reply: function (user, cid, id, comment, callback)
+```
+
+### comment_destroy
+
+```js
+/**
+ * remove a comment
+ * @param {AccessToken} user
+ * @param {String} cid, comment's id
+ * @param {Function(err, result)} callback
+ * @return {Context} this
+ */
+comment_destroy: function (user, cid, callback) {
 ```
 
 ## Data Structure

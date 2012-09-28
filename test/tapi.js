@@ -495,6 +495,90 @@ describe('tapi.js ' + blogtype + ' API', function () {
     });
   });
 
+  describe('comment_create()', function () {
+    it('should post a comment on status:70997003338788', function (done) {
+      var text = '这是一个 comment_create: function (user, id, comment, callback) 的测试 ++' + new Date();
+      tapi.comment_create(currentUser, '70997003338788', text, function (err, result) {
+        should.not.exist(err);
+        should.exist(result);
+        result.should.have.property('id').with.match(/^\d+$/);
+        if (result.text) {
+          check.checkComment(result);
+        }
+        done();
+      });
+    });
+
+    it('should post a comment on not exists status', function (done) {
+      var text = '这是一个 comment_create: function (user, id, comment, callback) 的测试 ++' + new Date();
+      tapi.comment_create(currentUser, 123, text, function (err, result) {
+        should.exist(err);
+        err.should.have.property('name', 'CommentCreateError');
+        err.should.have.property('message', 'root node not exist');
+        err.should.have.property('data');
+        err.data.should.have.property('errcode', 11);
+        err.data.should.have.property('ret', 4);
+        should.not.exist(result);
+        done();
+      });
+    });
+
+    it('should post a empty comment', function (done) {
+      tapi.comment_create(currentUser, '70997003338788', '', function (err, result) {
+        should.exist(err);
+        err.should.have.property('name', 'CommentCreateError');
+        err.should.have.property('message', 'error content len');
+        err.should.have.property('data');
+        err.data.should.have.property('errcode', 2);
+        err.data.should.have.property('ret', 1);
+        should.not.exist(result);
+        done();
+      });
+    });
+  });
+
+  describe('comment_reply()', function () {
+    it('should reply to comment:83231031553455', function (done) {
+      var text = '这是一个 comment_reply: function (user, cid, id, comment, callback) 的测试 ++' + new Date();
+      tapi.comment_reply(currentUser, '83231031553455', '70997003338788', text, function (err, result) {
+        should.not.exist(err);
+        should.exist(result);
+        result.should.have.property('id').with.match(/^\d+$/);
+        if (result.text) {
+          check.checkComment(result);
+        }
+        done();
+      });
+    });
+
+    it('should post a comment on not exists status', function (done) {
+      var text = '这是一个 comment_reply: function (user, cid, id, comment, callback) 的测试 ++' + new Date();
+      tapi.comment_reply(currentUser, 123, 1234, text, function (err, result) {
+        should.exist(err);
+        err.should.have.property('name', 'CommentReplyError');
+        err.should.have.property('message', 'root node not exist');
+        err.should.have.property('data');
+        err.data.should.have.property('errcode', 11);
+        err.data.should.have.property('ret', 4);
+        should.not.exist(result);
+        done();
+      });
+    });
+
+    it('should post a empty comment', function (done) {
+      tapi.comment_reply(currentUser, '83231031553455', '70997003338788', '', function (err, result) {
+        should.exist(err);
+        err.should.have.property('name', 'CommentReplyError');
+        err.should.have.property('message', 'error content len');
+        err.should.have.property('data');
+        err.data.should.have.property('errcode', 2);
+        err.data.should.have.property('ret', 1);
+        should.not.exist(result);
+        done();
+      });
+    });
+  });
+
 });
 
 });
