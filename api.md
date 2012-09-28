@@ -34,7 +34,7 @@ All apis and data in `node-weibo` will convert to this unity format.
 |  * [message_create](#message_create)(user, text, id, callback)|post a message to some one|-|
 |  * [message_destroy](#message_destroy)(user, text, id, callback)|remove a message|-|
 | Read |||
-| **[User](#user) APIs** |||
+| **[User] APIs** |||
 | Read |||
 |  * [verify_credentials](#verify_credentials)(user, callback)|get oauth user profile infomation|[weibo], [tqq]|
 |  * [user_show](#user_show)(user, uid[, screen_name], callback)|get user profile infomation by uid|[weibo], [tqq]|
@@ -655,6 +655,7 @@ Demo:
 }
 ```
 
+<a name="user_structure" />
 ### User
 
 |Field name|Data Type|Description|Demo|
@@ -779,7 +780,7 @@ Demo:
 |----------|---------|-----------|----|
 |longitude|string|Longitude|`"116.39794"`|
 |latitude|string|Latitude|`"39.90817"`|
-|address|string|Address, maybe empty|`""`|
+|[address]|string|Address, maybe empty|`""`|
 |[city_name]|string|City name|`"广州"`|
 |[province_name]|string|Province name|`"广东"`|
 
@@ -796,18 +797,6 @@ Demo:
     "address": "中国北京市海淀区中关村"
 }
 ```
-
-  [Status]: #status
-  [User]: #user
-  [Comment]: #commnet
-  [Message]: #message
-  [GEO]: #geo
-  [Cursor]: #cursor
-  [weibo]: http://open.weibo.com
-  [tqq]: http://dev.t.qq.com
-  [t163]: http://open.t.163.com
-  [tsohu]: http://open.t.sohu.com
-  [github]: http://dev.github.com
 
 ## OAuth
 
@@ -832,5 +821,20 @@ Demo:
 ### V2.0
 
 ![oauth v2.0](http://ww2.sinaimg.cn/large/6cfc7910jw1dxbms40ti8j.jpg)
+
+
+
+
+  [Status]: #status
+  [User]: #user_structure
+  [Comment]: #comment
+  [Message]: #message
+  [GEO]: #geo
+  [Cursor]: #cursor
+  [weibo]: http://open.weibo.com
+  [tqq]: http://dev.t.qq.com
+  [t163]: http://open.t.163.com
+  [tsohu]: http://open.t.sohu.com
+  [github]: http://dev.github.com
 
 
