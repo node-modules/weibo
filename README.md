@@ -25,20 +25,31 @@ $ npm install weibo
 
 ## How to use
 
+Demo on nodejs and browser just the same code.
+
+Thanks for [browserify](https://github.com/substack/node-browserify),
+let us to use the same code on nodejs and browser.
+
 ### Browser: `Phonegap`, `Chrome extension` or [node-webkit](https://github.com/rogerwang/node-webkit).
 
-browser must enable **cross-domain** request.
+NOTICE: browser must enable **cross-domain** request.
 
 ```js
-<script src="weibo.js"></script>
+<script src="https://raw.github.com/fengmk2/node-weibo/master/weibo.js"></script>
 <script>
-var tapi = weibo.TAPI;
-var appkey = 'your appkey', secret = 'your app secret';
+var weibo = require('weibo');
+
+// change appkey to yours
+var appkey = 'your appkey';
+var secret = 'your app secret';
 var oauth_callback_url = 'your callback url' || 'oob';
-tapi.init('tsina', appkey, secret, oauth_callback_url);
-tapi.public_timeline({ user: { blogType: 'tsina' } }, function (err, statuses) {
+weibo.init('tsina', appkey, secret, oauth_callback_url);
+
+var user = { blogtype: 'tsina' };
+var cursor = {count: 20};
+weibo.public_timeline(user, cursor, function (err, statuses) {
   if (err) {
-    console.error(error);
+    console.error(err);
   } else {
     console.log(statuses);
   }
@@ -163,15 +174,15 @@ Below is the output from `git-summary`.
 
 ```
  project: node-weibo
- commits: 102
- active : 49 days
- files  : 49
+ commits: 119
+ active : 55 days
+ files  : 46
  authors: 
-    91  fengmk2                 89.2%
-     7  hpf1908                 6.9%
-     2  QLeelulu                2.0%
-     1  mk2                     1.0%
-     1  xydudu                  1.0%
+   108  fengmk2                 90.8%
+     7  hpf1908                 5.9%
+     2  QLeelulu                1.7%
+     1  mk2                     0.8%
+     1  xydudu                  0.8%
 ```
 
 ## License 
