@@ -406,10 +406,12 @@ require.define("/lib/tapi.js",function(require,module,exports,__dirname,__filena
 var utils = require('./utils');
 var TSinaAPI = require('./tsina');
 var TQQAPI = require('./tqq');
+var WeiboAPI = require('./weibo');
 // var GithubAPI = require('./github');
 
 var TAPI = module.exports = {
   TYPES: {
+    weibo: WeiboAPI, // api v2.0
     // github: GithubAPI,
     tsina: TSinaAPI, // api v1.0
     // twitter: TwitterAPI,
@@ -449,9 +451,25 @@ var TAPI = module.exports = {
     return this.enables[apiType];
   },
   
-  // 获取配置信息
+  /**
+   * Get api instance config by user
+   * 
+   * @param {User} user
+   * @return {Object} config
+   */
   get_config: function (user) {
     return this.api_dispatch(user).config;
+  },
+
+  /**
+   * Check api support the method or not.
+   * 
+   * @param {User} user
+   * @param {String} method
+   * @return {Boolean} true or false
+   */
+  support: function (user, method) {
+    return this.get_config(user)['support_' + method] !== false;
   },
 
   /**
@@ -803,12 +821,85 @@ var TAPI = module.exports = {
    * @param {Object} user
    *  - {String} blogtype
    *  - {String} oauth_token, access oauth token
-   *  - {String} oauth_token_secret, access oauth token secret
+   *  - {String} [oauth_token_secret], access oauth token secret, oauth v2 don't need this param.
    * @param {Function(err, User)} callback
    * @return {Context} this
    */
   verify_credentials: function (user, callback) {
     return this.api_dispatch(user).verify_credentials(user, callback);
+  },
+
+  /**
+   * Get user profile infomation by uid.
+   * @param {Object} user
+   *  - {String} blogtype
+   *  - {String} oauth_token, access token
+   *  - {String} [oauth_token_secret], access oauth token secret, oauth v2 don't need this param.
+   * @param {String} [uid], user id
+   * @param {String} [screen_name], user screen_name
+   *   uid and screen_name MUST set one.
+   * @param {Function(err, User)} callback
+   * @return {Context} this
+   */
+  user_show: function (user, uid, screen_name, callback) {
+    if (typeof screen_name === 'function') {
+      callback = screen_name;
+      screen_name = null;
+    }
+    return this.api_dispatch(user).user_show(user, uid, screen_name, callback);
+  },
+
+  /**
+   * post a comment to a status
+   * 
+   * @param {AccessToken} user
+   * @param {String} id, status's id
+   * @param {String|Object} comment
+   *  - {String} comment
+   *  - {Number} [comment_ori], same comment to the original status when comment on a repost status,
+   *    0: no, 1: yes, default is `0`.
+   * @param {Function(err, result)} callback
+   *  - {Object} result
+   *   - {String} id, the comment id
+   * @return {Context} this
+   */
+  comment_create: function (user, id, comment, callback) {
+    if (typeof comment === 'string') {
+      comment = {comment: comment};
+    }
+    return this.api_dispatch(user).comment_create(user, id, comment, callback);
+  },
+  
+  /**
+   * reply to a comment
+   * @param {AccessToken} user
+   * @param {String} cid, comment's id
+   * @param {String} id, status's id
+   * @param {String|Object} comment
+   *  - {String} comment
+   *  - {Number} without_mention, don't auto add `'reply@username'` to comment text or not,
+   *    0: yes, 1: no, default is `0`, won't auto add.
+   *  - {Number} [comment_ori], same comment to the original status when comment on a repost status,
+   *    0: no, 1: yes, default is `0`.
+   * @param {Function(err, result)} callback
+   * @return {Context} this
+   */
+  comment_reply: function (user, cid, id, comment, callback) {
+    if (typeof comment === 'string') {
+      comment = {comment: comment};
+    }
+    return this.api_dispatch(user).comment_reply(user, cid, id, comment, callback);
+  },
+  
+  /**
+   * remove a comment
+   * @param {AccessToken} user
+   * @param {String} cid, comment's id
+   * @param {Function(err, result)} callback
+   * @return {Context} this
+   */
+  comment_destroy: function (user, cid, callback) {
+    return this.api_dispatch(user).comment_destroy(user, cid, callback);
   },
 
   /* 获取API的访问频率限制。返回当前小时内还能访问的次数。
@@ -857,11 +948,6 @@ var TAPI = module.exports = {
     return this.api_dispatch(data).counts(data, callback, context);
   },
   
-  // id
-  user_show: function (data, callback, context) {
-    return this.api_dispatch(data).user_show(data, callback, context);
-  },
-  
   // since_id, max_id, count, page 
   direct_messages: function (data, callback, context) {
     return this.api_dispatch(data).direct_messages(data, callback, context);
@@ -885,28 +971,6 @@ var TAPI = module.exports = {
     return this.api_dispatch(data).new_message(data, callback, context);
   },
   
-  /*
-   * id, comment, cid
-   * without_mention: 1：回复中不自动加入“回复@用户名”，0：回复中自动加入“回复@用户名”. 默认为0.
-   */
-  comment: function (data, callback, context) {
-    return this.api_dispatch(data).comment(data, callback, context);
-  },
-  
-  /*
-   * cid, comment
-   * id: 要评论的微博消息ID
-   * without_mention: 1：回复中不自动加入“回复@用户名”，0：回复中自动加入“回复@用户名”.默认为0.
-   */
-  reply: function (data, callback, context) {
-    return this.api_dispatch(data).reply(data, callback, context);
-  },
-  
-  
-  // id
-  comment_destroy: function (data, callback, context) {
-    return this.api_dispatch(data).comment_destroy(data, callback, context);
-  },
   
   /*
    * id, user_id, screen_name 这三个参数必填其一。
@@ -3295,8 +3359,7 @@ function TBase() {
     secret: '',
     oauth_host: '',
     oauth_callback: 'oob or url',
-    // google app key
-    google_appkey: 'AIzaSyAu4vq6sYO3WuKxP2G64fYg6T1LdIDu3pk',
+    oauth_version: '1.0',
     
     userinfo_has_counts: true, // 用户信息中是否包含粉丝数、微博数等信息
     support_counts: true, // 是否支持批量获取转发和评论数
@@ -3350,21 +3413,21 @@ function TBase() {
     favorites_destroy:    '/favorites/destroy/{{id}}',
     counts:               '/statuses/counts',
     
-    comment:              '/statuses/comment',
-    reply:                '/statuses/reply',
-    comment_destroy:      '/statuses/comment_destroy/{{id}}',
+    comment_create:       '/statuses/comment',
+    comment_reply:        '/statuses/reply',
+    comment_destroy:      '/statuses/comment_destroy',
     
     destroy_msg:          '/direct_messages/destroy/{{id}}',
     direct_messages:      '/direct_messages', 
     sent_direct_messages: '/direct_messages/sent', //自己发送的私信列表，我当时为什么要命名为sent_direct_messages捏，我擦
     new_message:          '/direct_messages/new',
     verify_credentials:   '/account/verify_credentials',
+    user_show:            '/users/show',
     rate_limit_status:    '/account/rate_limit_status',
     friendships_create:   '/friendships/create',
     friendships_destroy:  '/friendships/destroy',
     friendships_show:     '/friendships/show',
     reset_count:          '/statuses/reset_count',
-    user_show:            '/users/show/{{id}}',
     emotions:             '/emotions',
     
     // 用户标签
@@ -3457,18 +3520,10 @@ TBase.prototype.request = function (url, args, callback) {
     if (playload === 'string') {
       return callback(null, data);
     }
-
     callback(null, this.format_result(data, playload, args));
   }, this);
 };
 
-/**
- * when you do something before request, override this method
- */ 
-TBase.prototype.before_send_request = function (args, user) {
-  // override this
-};
-    
 TBase.prototype.send_request = function (url, params, callback) {
   var args = {
     type: 'GET', 
@@ -3492,8 +3547,6 @@ TBase.prototype.send_request = function (url, params, callback) {
     delete args.api_host;
   }
   
-  this.before_send_request(args, user);
-
   url = api + url.format(args.data);
   // delete the url params
   url.replace(utils.STRING_FORMAT_REGEX, function (match, key) {
@@ -3590,10 +3643,12 @@ TBase.prototype.get_authorization_url = function (user, callback) {
         oauth_callback: user.oauth_callback || self.config.oauth_callback
       };
       info = token;
+      info.blogtype = user.blogtype;
       info.auth_url = self.format_authorization_url(params);
     }
     callback(err, info);
   });
+  return this;
 };
 
 TBase.prototype.get_request_token = function (user, callback) {
@@ -3616,8 +3671,11 @@ TBase.prototype.get_request_token = function (user, callback) {
     if (err) {
       return callback(err);
     }
-    callback(null, querystring.parse(token));
+    token = querystring.parse(token);
+    token.blogtype = user.blogtype;
+    callback(null, token);
   });
+  return this;
 },
   
 // user must contain oauth_pin or oauth_verifier
@@ -3651,8 +3709,10 @@ TBase.prototype.get_access_token = function (user, callback) {
       return callback(err);
     }
     token = querystring.parse(token);
+    token.blogtype = user.blogtype;
     callback(null, token);
   });
+  return this;
 };
 
 TBase.prototype.verify_credentials = function (user, callback) {
@@ -3664,6 +3724,33 @@ TBase.prototype.verify_credentials = function (user, callback) {
   };
   var url = this.config.verify_credentials;
   this.send_request(url, params, callback);
+  return this;
+};
+
+TBase.prototype.convert_user = function (data) {
+  return data;
+};
+
+TBase.prototype.user_show = function (user, uid, screen_name, callback) {
+  var data = {};
+  if (uid) {
+    data.uid = uid;
+  }
+  if (screen_name) {
+    data.screen_name = screen_name;
+    delete data.uid; // only support one
+  }
+  data = this.convert_user(data);
+  var params = {
+    type: 'GET',
+    user: user,
+    data: data,
+    playload: 'user',
+    request_method: 'user_show'
+  };
+  var url = this.config.user_show;
+  this.send_request(url, params, callback);
+  return this;
 };
 
 TBase.prototype.url_encode = function (text) {
@@ -3739,6 +3826,10 @@ TBase.prototype.format_emotion = function (emotion, args) {
 
 TBase.prototype.convert_status = function (status) {
   return status;
+};
+
+TBase.prototype.convert_comment = function (comment) {
+  return comment;
 };
 
 TBase.prototype.update = function (user, status, callback) {
@@ -3911,12 +4002,12 @@ TBase.prototype.show = function (user, id, callback) {
   return this;
 };
 
-TBase.prototype.convert_cursor = function (cursor, request_method) {
+TBase.prototype.convert_cursor = function (cursor) {
   return cursor;
 };
 
 TBase.prototype._timeline = function (request_method, user, cursor, callback, playload) {
-  cursor = this.convert_cursor(cursor, request_method);
+  cursor = this.convert_cursor(cursor);
   var params = {
     type: 'GET',
     playload: playload || 'status[]',
@@ -3957,6 +4048,53 @@ TBase.prototype.comments = function (user, cursor, callback) {
   return this._timeline('comments', user, cursor, callback, 'comment[]');
 };
 
+/**
+ * Comment
+ */
+
+TBase.prototype.comment_create = function (user, id, comment, callback) {
+  comment.id = id;
+  comment = this.convert_comment(comment);
+  var params = {
+    type: 'POST',
+    playload: 'comment',
+    user: user,
+    data: comment,
+    request_method: 'comment_create'
+  };
+  var url = this.config.comment_create;
+  this.send_request(url, params, callback);
+  return this;
+};
+
+TBase.prototype.comment_reply = function (user, cid, id, comment, callback) {
+  comment.id = id;
+  comment.cid = cid;
+  comment = this.convert_comment(comment);
+  var params = {
+    type: 'POST',
+    playload: 'comment',
+    user: user,
+    data: comment,
+    request_method: 'comment_reply'
+  };
+  var url = this.config.comment_reply;
+  this.send_request(url, params, callback);
+  return this;
+};
+
+TBase.prototype.comment_destroy = function (user, cid, callback) {
+  var params = {
+    type: 'POST',
+    playload: 'comment',
+    user: user,
+    data: {cid: cid},
+    request_method: 'comment_destroy'
+  };
+  var url = this.config.comment_destroy;
+  this.send_request(url, params, callback);
+  return this;
+};
 
 
 });
@@ -6197,7 +6335,8 @@ function TQQAPI(options) {
     update:               '/t/add',
     upload:               '/t/add_pic',
     repost:               '/t/re_add',
-    comment:              '/t/comment',
+    comment_create:       '/t/comment',
+    comment_reply:        '/t/comment',
     comments:             '/t/re_list',
     destroy:              '/t/del',
     destroy_msg:          '/private/del',
@@ -6222,7 +6361,10 @@ function TQQAPI(options) {
     user_search:          '/search/user',
     verify_credentials:   '/user/info',
     
-    gender_map: {0: 'n', 1: 'm', 2: 'f'}
+    gender_map: {0: 'n', 1: 'm', 2: 'f'},
+
+    // support apis
+    support_comment_destroy: false,
   });
 
   this.init(config);
@@ -6552,6 +6694,15 @@ TQQAPI.prototype.format_emotion = function (emotion, args) {
   throw new Error('Must override this method.');
 };
 
+TQQAPI.prototype.convert_comment = function (comment) {
+  // http://wiki.open.t.qq.com/index.php/%E5%BE%AE%E5%8D%9A%E7%9B%B8%E5%85%B3/%E7%82%B9%E8%AF%84%E4%B8%80%E6%9D%A1%E5%BE%AE%E5%8D%9A
+  var data = {
+    content: comment.comment,
+    reid: comment.id
+  };
+  return data;
+};
+
 TQQAPI.prototype.convert_status = function (status) {
   // syncflag 微博同步到空间分享标记（可选，0-同步，1-不同步，默认为0），目前仅支持oauth1.0鉴权方式
   var data = {
@@ -6564,6 +6715,13 @@ TQQAPI.prototype.convert_status = function (status) {
   if (status.id) {
     data.reid = status.id;
   }
+  return data;
+};
+
+TQQAPI.prototype.convert_user = function (user) {
+  var data = {
+    name: user.uid || user.screen_name
+  };
   return data;
 };
 
@@ -6582,13 +6740,10 @@ TQQAPI.prototype.convert_status = function (status) {
   建议不使用contenttype为1的类型，如果要拉取只有文本的微博，建议使用0x80
  * 
  */
-TQQAPI.prototype.convert_cursor = function (cursor, request_method) {
+TQQAPI.prototype.convert_cursor = function (cursor) {
   var data = {};
   // type: 拉取类型, 0x1 原创发表 0x2 转载 0x8 回复 0x10 空回 0x20 提及 0x40 点评
   data.type = String(0x1 | 0x2 | 0x8 | 0x10 | 0x20);
-  if (request_method === 'comments_timeline') {
-    data.type = String(0x40);
-  }
   data.contenttype = '0';
   data.reqnum = cursor.count;
   if (cursor.max_id) {
@@ -6608,29 +6763,270 @@ TQQAPI.prototype.convert_cursor = function (cursor, request_method) {
     data.pagetime = '0';
     data.lastid = '0';
   }
-  if (request_method === 'user_timeline') {
-    if (cursor.id || cursor.screen_name) {
-      data.name = cursor.id || cursor.screen_name;
+  if (typeof cursor.callback === 'function') {
+    data = cursor.callback(data);
+  }
+  return data;
+};
+
+TQQAPI.prototype.user_timeline = function (user, cursor, callback) {
+  cursor.callback = function (data) {
+    if (cursor.uid || cursor.screen_name) {
+      data.name = cursor.uid || cursor.screen_name;
     }
-  } else if (request_method === 'repost_timeline') {
+    return data;
+  };
+  return TQQAPI.super_.prototype.user_timeline.call(this, user, cursor, callback);
+};
+
+TQQAPI.prototype.comments_timeline = function (user, cursor, callback) {
+  cursor.callback = function (data) {
+    data.type = String(0x40);
+    return data;
+  };
+  return TQQAPI.super_.prototype.comments_timeline.call(this, user, cursor, callback);
+};
+
+TQQAPI.prototype.repost_timeline = function (user, cursor, callback) {
+  cursor.callback = function (data) {
     data.rootid = cursor.id;
     data.flag = '0';
     // twitterid 微博id，与pageflag、pagetime共同使用，实现翻页功能（第1页填0，继续向下翻页，填上一次请求返回的最后一条记录id）
     if (data.lastid) {
       data.twitterid = data.lastid;
+      delete data.lastid;
     }
-  } else if (request_method === 'comments') {
+    return data;
+  };
+  return TQQAPI.super_.prototype.repost_timeline.call(this, user, cursor, callback);
+};
+
+TQQAPI.prototype.comments = function (user, cursor, callback) {
+  cursor.callback = function (data) {
     data.rootid = cursor.id;
     data.flag = '1';
     if (data.lastid) {
       data.twitterid = data.lastid;
+      delete data.lastid;
     }
-  }
-  return data;
+    return data;
+  };
+  return TQQAPI.super_.prototype.comments.call(this, user, cursor, callback);
+};
+
+TQQAPI.prototype.comment_destroy = function (user, cid, callback) {
+  callback(new TypeError('comment_destroy not support.'));
 };
 
 TQQAPI.prototype.url_encode = function (text) {
   return text;
+};
+
+
+});
+
+require.define("/lib/weibo.js",function(require,module,exports,__dirname,__filename,process,global){/*!
+ * node-weibo - lib/weibo.js
+ * Copyright(c) 2012 fengmk2 <fengmk2@gmail.com>
+ * MIT Licensed
+ */
+
+"use strict";
+
+/**
+ * Module dependencies.
+ */
+
+var TBaseOauthV2 = require('./tbase_oauth_v2');
+var inherits = require('util').inherits;
+var utils = require('./utils');
+var weiboutil = require('./weibo_util');
+
+
+function WeiboAPI(options) {
+  WeiboAPI.super_.call(this);
+
+  var config = utils.extend({}, options, {
+    host:                 'https://api.weibo.com/2',
+    oauth_host:           'https://api.weibo.com/oauth2',
+    oauth_authorize:      '/authorize',
+    oauth_access_token:   '/access_token',
+    verify_credentials:   '/users/show',
+
+    comments:             '/comments/show',
+    comment_create:       '/comments/create',
+    comment_reply:        '/comments/reply',
+    comment_destroy:      '/comments/destroy',
+  });
+
+  this.init(config);
+}
+
+inherits(WeiboAPI, TBaseOauthV2);
+module.exports = WeiboAPI;
+
+WeiboAPI.prototype.format_search_status = function (status, args) {
+  return status;
+};
+
+WeiboAPI.prototype.format_status = function (status, args) {
+  status.id = status.idstr;
+  status.created_at = new Date(status.created_at);
+  if (status.user) {
+    status.user = this.format_user(status.user, args);
+    status.t_url = 'http://weibo.com/' + status.user.id + '/' + weiboutil.mid2url(status.mid);
+  }
+
+  // geo: { type: 'Point', coordinates: [ 22.354231, 113.421234 ] } latitude, longitude
+  if (status.geo && status.geo.type === 'Point' && status.geo.coordinates) {
+    var geo = {
+      latitude: String(status.geo.coordinates[0]),
+      longitude: String(status.geo.coordinates[1]),
+    };
+    status.geo = geo;
+  }
+
+  if (status.retweeted_status) {
+    status.retweeted_status = this.format_status(status.retweeted_status, args);
+    if (!status.retweeted_status.t_url) {
+      status.retweeted_status.t_url =
+        'http://weibo.com/' + status.user.id + '/' + weiboutil.mid2url(status.retweeted_status.mid);
+    }
+  }
+  return status;
+};
+
+WeiboAPI.prototype.format_user = function (user, args) {
+  user.id = user.idstr;
+  user.created_at = new Date(user.created_at);
+  user.t_url = 'http://weibo.com/' + (user.domain || user.id);
+  if (user.status) {
+    user.status = this.format_status(user.status, args);
+    if (!user.status.t_url) {
+      user.status.t_url = user.t_url + '/' + weiboutil.mid2url(user.status.mid || user.status.id);
+    }
+  }
+  return user;
+};
+
+WeiboAPI.prototype.get_result_items = function (data, playload, args) {
+  return data.statuses || data.comments || data.reposts || data.messages || data;
+};
+
+WeiboAPI.prototype.format_comment = function (comment, args) {
+  comment.id = comment.idstr;
+  comment.created_at = new Date(comment.created_at);
+  if (comment.user) {
+    comment.user = this.format_user(comment.user, args);
+  }
+  if (comment.status) {
+    comment.status = this.format_status(comment.status, args);
+  }
+  if (comment.reply_comment) {
+    comment.reply_comment = this.format_comment(comment.reply_comment, args);
+  }
+  return comment;
+};
+
+WeiboAPI.prototype.format_message = function (message, args) {
+  return message;
+};
+
+WeiboAPI.prototype.format_emotion = function (emotion, args) {
+  return emotion;
+};
+
+
+});
+
+require.define("/lib/tbase_oauth_v2.js",function(require,module,exports,__dirname,__filename,process,global){/*!
+ * node-weibo - lib/tbase_oauth_v2.js
+ * Copyright(c) 2012 fengmk2 <fengmk2@gmail.com>
+ * MIT Licensed
+ */
+
+"use strict";
+
+/**
+ * Module dependencies.
+ */
+
+var TBase = require('./tbase');
+var inherits = require('util').inherits;
+var utils = require('./utils');
+var querystring = require('querystring');
+
+
+function TBaseOauthV2() {
+  TBaseOauthV2.super_.call(this);
+  this.config.oauth_version = '2.0';
+}
+
+inherits(TBaseOauthV2, TBase);
+module.exports = TBaseOauthV2;
+
+TBaseOauthV2.prototype.get_authorization_url = function (user, callback) {
+  var params = {
+    redirect_uri: user.oauth_callback || this.config.oauth_callback,
+    client_id: this.config.appkey,
+    response_type: 'code',
+  };
+  params = utils.extend(params, this.config.oauth_params);
+  var info = {
+    blogtype: user.blogtype,
+    auth_url: this.format_authorization_url(params)
+  };
+  process.nextTick(function () {
+    callback(null, info);
+  });
+  return this;
+};
+
+// http://localhost.nodeweibo.com/oauth/callback?code=0a80cb1382594e49a467b6c1e19473ec
+TBaseOauthV2.prototype.get_access_token = function (user, callback) {
+  var oauth_verifier = user.code || user.oauth_pin || user.oauth_verifier || 'no_verifier';
+  // $oauth_host/$access_token?client_id=YOUR_CLIENT_ID
+  //  &client_secret=YOUR_CLIENT_SECRET&grant_type=authorization_code
+  //  &redirect_uri=YOUR_REGISTERED_REDIRECT_URI&code=CODE
+  var params = {
+    type: 'POST',
+    user: user,
+    playload: 'string',
+    api_host: this.config.oauth_host,
+    request_method: 'get_access_token'
+  };
+  var data = {
+    redirect_uri: user.oauth_callback || this.config.oauth_callback,
+    client_id: this.config.appkey,
+    client_secret: this.config.secret,
+    grant_type: 'authorization_code',
+    code: oauth_verifier,
+  };
+  params.data = data;
+  var url = this.config.oauth_access_token;
+  this.send_request(url, params, function (err, token) {
+    if (err) {
+      return callback(err);
+    }
+    // { access_token: '2.00EkofzBtMpzNBb9bc3108d8MwDTTE',
+    // remind_in: '633971',
+    // expires_in: 633971,
+    // uid: '1827455832' }
+    token = JSON.parse(token);
+    token.oauth_token = token.access_token;
+    token.blogtype = user.blogtype;
+    callback(null, token);
+  });
+};
+
+TBaseOauthV2.prototype.apply_auth = function (url, args, user) {
+  args.data = args.data || {};
+  args.data.access_token = user.oauth_token || user.access_token;
+};
+
+TBaseOauthV2.prototype.verify_credentials = function (user, callback) {
+  var uid = user.uid || user.id;
+  this.user_show(user, uid, null, callback);
 };
 
 
@@ -6672,16 +7068,15 @@ function login(req, res, next, options) {
   }
   var authCallback = options.homeUrl + options.callbackPath +
     '?' + blogtypeField + '=' + blogtype;
-  var user = { blogType: blogtype, oauth_callback: authCallback };
+  var user = {
+    blogtype: blogtype,
+    oauth_callback: authCallback
+  };
   tapi.get_authorization_url(user, function (err, authInfo) {
     if (err) {
       return next(err);
     }
-    if (typeof authInfo === 'string') {
-      authInfo = {
-        auth_url: authInfo
-      };
-    }
+    authInfo.blogtype = blogtype;
     authInfo.referer = referer;
     req.session.oauthInfo = authInfo;
     redirect(res, authInfo.auth_url);
@@ -6700,19 +7095,28 @@ function logout(req, res, next, options) {
 }
 
 function oauthCallback(req, res, next, options) {
-  var blogType = req.query[options.blogtypeField];
   var oauthInfo = req.session.oauthInfo || {};
+  var blogtype = req.query[options.blogtypeField] || oauthInfo.blogtype;
   req.session.oauthInfo = null;
-  var oauth_token = req.query.oauth_token || req.query.code;
-  var user = {
-    blogType: blogType,
-    oauth_token_key: oauth_token,
-    oauth_verifier: req.query.oauth_verifier,
-    oauth_token_secret: oauthInfo.oauth_token_secret,
-    state: req.query.state,
-  };
+  var token = req.query;
+  token.blogtype = blogtype;
+  if (oauthInfo.oauth_token_secret) {
+    token.oauth_token_secret = oauthInfo.oauth_token_secret;
+  }
+  // var oauth_token = req.query.oauth_token;
+  // var oauth_verifier = req.query.oauth_verifier || req.query.code || req.query.oauth_pin;
+  // var user = {
+  //   blogtype: blogtype,
+  //   oauth_token: oauth_token,
+  //   oauth_verifier: oauth_verifier,
+  //   oauth_token_secret: oauthInfo.oauth_token_secret,
+  //   state: req.query.state,
+  // };
+  // if (req.query.state) {
+  //   user.state = req.query.state;
+  // }
   var referer = oauthInfo.referer;
-  tapi.get_access_token(user, function (err, accessToken) {
+  tapi.get_access_token(token, function (err, accessToken) {
     if (err) {
       return next(err);
     }
