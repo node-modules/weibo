@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <title>node-weibo by fengmk2</title>
+  </head>
+
+  <body>
+    <header>
+      <div class="inner">
+        <h1>node-weibo</h1>
+        <h2>A [weibo](http://weibo.com)(like [twitter](http://twitter.com)) API SDK, use on browser client and nodejs server.</h2>
+        <a href="https://github.com/fengmk2/node-weibo" class="button"><small>View project on</small>GitHub</a>
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <h1>node-weibo <a href="http://travis-ci.org/fengmk2/node-weibo"><img src="https://secure.travis-ci.org/fengmk2/node-weibo.png" alt="Build Status"></a>
+</h1>
+
+<p>A <a href="http://weibo.com">weibo</a>(like <a href="http://twitter.com">twitter</a>) API SDK, use on browser client and nodejs server.</p>
+
+<p>Please see the <a href="https://github.com/fengmk2/node-weibo/blob/master/api.md">API Documents</a> first.</p>
+
+<h2>Supports APIs</h2>
+
+<ul>
+<li>weibo: <a href="http://weibo.com/">http://t.sina.com.cn/</a>
+</li>
+<li>github: <a href="http://github.com">http://github.com</a>, only <code>oauth</code> for now.</li>
+<li>twitter(unavailable): <a href="http://twitter.com/">http://twitter.com/</a>
+</li>
+<li>facebook(unavailable): <a href="http://facebook.com/">http://facebook.com/</a>
+</li>
+<li>fanfou(unavailable): <a href="http://fanfou.com/">http://fanfou.com/</a>
+</li>
+<li>digu(unavailable): <a href="http://digu.com/">http://digu.com/</a>
+</li>
+<li>tqq: <a href="http://t.qq.com/">http://t.qq.com/</a>
+</li>
+<li>tsohu(unavailable): <a href="http://t.sohu.com/">http://t.sohu.com/</a>
+</li>
+<li>t163(unavailable): <a href="http://t.163.com/">http://t.163.com/</a>
+</li>
+<li>plurk(unavailable): <a href="http://plurk.com/">http://plurk.com/</a>
+</li>
+</ul><h2>Nodejs Install</h2>
+
+<div class="highlight"><pre><span class="nv">$ </span>npm install weibo
+</pre></div>
+
+<h2>How to use</h2>
+
+<p>Demo on nodejs and browser just the same code.</p>
+
+<p>Thanks for <a href="https://github.com/substack/node-browserify">browserify</a>,
+let us to use the same code on nodejs and browser.</p>
+
+<h3>Browser: <code>Phonegap</code>, <code>Chrome extension</code> or <a href="https://github.com/rogerwang/node-webkit">node-webkit</a>.</h3>
+
+<p>NOTICE: browser must enable <strong>cross-domain</strong> request.</p>
+
+<div class="highlight"><pre><span class="o">&lt;</span><span class="nx">script</span> <span class="nx">src</span><span class="o">=</span><span class="s2">"https://raw.github.com/fengmk2/node-weibo/master/weibo.js"</span><span class="o">&gt;&lt;</span><span class="err">/script&gt;</span>
+<span class="o">&lt;</span><span class="nx">script</span><span class="o">&gt;</span>
+<span class="kd">var</span> <span class="nx">weibo</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'weibo'</span><span class="p">);</span>
+
+<span class="c1">// change appkey to yours</span>
+<span class="kd">var</span> <span class="nx">appkey</span> <span class="o">=</span> <span class="s1">'your appkey'</span><span class="p">;</span>
+<span class="kd">var</span> <span class="nx">secret</span> <span class="o">=</span> <span class="s1">'your app secret'</span><span class="p">;</span>
+<span class="kd">var</span> <span class="nx">oauth_callback_url</span> <span class="o">=</span> <span class="s1">'your callback url'</span> <span class="o">||</span> <span class="s1">'oob'</span><span class="p">;</span>
+<span class="nx">weibo</span><span class="p">.</span><span class="nx">init</span><span class="p">(</span><span class="s1">'tsina'</span><span class="p">,</span> <span class="nx">appkey</span><span class="p">,</span> <span class="nx">secret</span><span class="p">,</span> <span class="nx">oauth_callback_url</span><span class="p">);</span>
+
+<span class="kd">var</span> <span class="nx">user</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">blogtype</span><span class="o">:</span> <span class="s1">'tsina'</span> <span class="p">};</span>
+<span class="kd">var</span> <span class="nx">cursor</span> <span class="o">=</span> <span class="p">{</span><span class="nx">count</span><span class="o">:</span> <span class="mi">20</span><span class="p">};</span>
+<span class="nx">weibo</span><span class="p">.</span><span class="nx">public_timeline</span><span class="p">(</span><span class="nx">user</span><span class="p">,</span> <span class="nx">cursor</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">statuses</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="nx">err</span><span class="p">);</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">statuses</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+<span class="o">&lt;</span><span class="err">/script&gt;</span>
+</pre></div>
+
+<h3>Server</h3>
+
+<div class="highlight"><pre><span class="kd">var</span> <span class="nx">weibo</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'weibo'</span><span class="p">);</span>
+
+<span class="c1">// change appkey to yours</span>
+<span class="kd">var</span> <span class="nx">appkey</span> <span class="o">=</span> <span class="s1">'your appkey'</span><span class="p">;</span>
+<span class="kd">var</span> <span class="nx">secret</span> <span class="o">=</span> <span class="s1">'your app secret'</span><span class="p">;</span>
+<span class="kd">var</span> <span class="nx">oauth_callback_url</span> <span class="o">=</span> <span class="s1">'your callback url'</span> <span class="o">||</span> <span class="s1">'oob'</span><span class="p">;</span>
+<span class="nx">weibo</span><span class="p">.</span><span class="nx">init</span><span class="p">(</span><span class="s1">'tsina'</span><span class="p">,</span> <span class="nx">appkey</span><span class="p">,</span> <span class="nx">secret</span><span class="p">,</span> <span class="nx">oauth_callback_url</span><span class="p">);</span>
+
+<span class="kd">var</span> <span class="nx">user</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">blogtype</span><span class="o">:</span> <span class="s1">'tsina'</span> <span class="p">};</span>
+<span class="kd">var</span> <span class="nx">cursor</span> <span class="o">=</span> <span class="p">{</span><span class="nx">count</span><span class="o">:</span> <span class="mi">20</span><span class="p">};</span>
+<span class="nx">weibo</span><span class="p">.</span><span class="nx">public_timeline</span><span class="p">(</span><span class="nx">user</span><span class="p">,</span> <span class="nx">cursor</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">statuses</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="nx">err</span><span class="p">);</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">statuses</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+</pre></div>
+
+<h3>Use <code>weibo.oauth</code> middleware</h3>
+
+<p>handler oauth login middleware, use on connect, express.</p>
+
+<div class="highlight"><pre><span class="cm">/**</span>
+<span class="cm"> * oauth middleware for connect</span>
+<span class="cm"> *</span>
+<span class="cm"> * example:</span>
+<span class="cm"> *</span>
+<span class="cm"> *  connect(</span>
+<span class="cm"> *    connect.query(),</span>
+<span class="cm"> *    connect.cookieParser('I\'m cookie secret.'),</span>
+<span class="cm"> *    connect.session({ secret: "oh year a secret" }),</span>
+<span class="cm"> *    weibo.oauth()</span>
+<span class="cm"> *  );</span>
+<span class="cm"> *</span>
+<span class="cm"> * @param {Object} [options]</span>
+<span class="cm"> *   - {String} [homeUrl], use to create login success oauth_callback url with referer header, </span>
+<span class="cm"> *     default is `'http://' + req.headers.host`;</span>
+<span class="cm"> *   - {String} [loginPath], login url, default is '/oauth'</span>
+<span class="cm"> *   - {String} [logoutPath], default is '/oauth/logout'</span>
+<span class="cm"> *   - {String} [callbackPath], default is login_path + '/callback'</span>
+<span class="cm"> *   - {String} [blogtypeField], default is 'type', </span>
+<span class="cm"> *       if you want to connect weibo, login url should be '/oauth?type=weibo'</span>
+<span class="cm"> *   - {Function(req, res, callback)} [afterLogin], when oauth login success, will call this function.</span>
+<span class="cm"> *   - {Function(req, res, callback)} [beforeLogout], will call this function before user logout.</span>
+<span class="cm"> */</span>
+</pre></div>
+
+<p>Example: A simple web with oauth login.</p>
+
+<div class="highlight"><pre><span class="kd">var</span> <span class="nx">connect</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'connect'</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">weibo</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'../'</span><span class="p">);</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * init weibo api settings</span>
+<span class="cm"> */</span> 
+
+<span class="nx">weibo</span><span class="p">.</span><span class="nx">init</span><span class="p">(</span><span class="s1">'weibo'</span><span class="p">,</span> <span class="s1">'$appkey'</span><span class="p">,</span> <span class="s1">'$secret'</span><span class="p">);</span>
+<span class="nx">weibo</span><span class="p">.</span><span class="nx">init</span><span class="p">(</span><span class="s1">'tqq'</span><span class="p">,</span> <span class="s1">'$appkey'</span><span class="p">,</span> <span class="s1">'$secret'</span><span class="p">);</span>
+<span class="nx">weibo</span><span class="p">.</span><span class="nx">init</span><span class="p">(</span><span class="s1">'github'</span><span class="p">,</span> <span class="s1">'$ClientID'</span><span class="p">,</span> <span class="s1">'$ClientSecret'</span><span class="p">);</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * Create a web application.</span>
+<span class="cm"> */</span>
+
+<span class="kd">var</span> <span class="nx">app</span> <span class="o">=</span> <span class="nx">connect</span><span class="p">(</span>
+  <span class="nx">connect</span><span class="p">.</span><span class="nx">query</span><span class="p">(),</span>
+  <span class="nx">connect</span><span class="p">.</span><span class="nx">cookieParser</span><span class="p">(</span><span class="s1">'oh year a cookie secret'</span><span class="p">),</span>
+  <span class="nx">connect</span><span class="p">.</span><span class="nx">session</span><span class="p">({</span> <span class="nx">secret</span><span class="o">:</span> <span class="s2">"oh year a secret"</span> <span class="p">}),</span>
+  <span class="c1">// using weibo.oauth middleware for use login</span>
+  <span class="c1">// will auto save user in req.session.oauthUser</span>
+  <span class="nx">weibo</span><span class="p">.</span><span class="nx">oauth</span><span class="p">({</span>
+    <span class="nx">loginPath</span><span class="o">:</span> <span class="s1">'/login'</span><span class="p">,</span>
+    <span class="nx">logoutPath</span><span class="o">:</span> <span class="s1">'/logout'</span><span class="p">,</span>
+    <span class="nx">blogtypeField</span><span class="o">:</span> <span class="s1">'type'</span><span class="p">,</span>
+    <span class="nx">afterLogin</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">req</span><span class="p">.</span><span class="nx">session</span><span class="p">.</span><span class="nx">oauthUser</span><span class="p">.</span><span class="nx">screen_name</span><span class="p">,</span> <span class="s1">'login success'</span><span class="p">);</span>
+      <span class="nx">process</span><span class="p">.</span><span class="nx">nextTick</span><span class="p">(</span><span class="nx">callback</span><span class="p">);</span>
+    <span class="p">},</span>
+    <span class="nx">beforeLogout</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">req</span><span class="p">.</span><span class="nx">session</span><span class="p">.</span><span class="nx">oauthUser</span><span class="p">.</span><span class="nx">screen_name</span><span class="p">,</span> <span class="s1">'loging out'</span><span class="p">);</span>
+      <span class="nx">process</span><span class="p">.</span><span class="nx">nextTick</span><span class="p">(</span><span class="nx">callback</span><span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">}),</span>
+  <span class="nx">connect</span><span class="p">.</span><span class="nx">errorHandler</span><span class="p">({</span> <span class="nx">stack</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span> <span class="nx">dump</span><span class="o">:</span> <span class="kc">true</span> <span class="p">})</span>
+<span class="p">);</span>
+
+<span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="s1">'/'</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">,</span> <span class="nx">next</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">user</span> <span class="o">=</span> <span class="nx">req</span><span class="p">.</span><span class="nx">session</span><span class="p">.</span><span class="nx">oauthUser</span><span class="p">;</span>
+  <span class="nx">res</span><span class="p">.</span><span class="nx">writeHeader</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="p">{</span> <span class="s1">'Content-Type'</span><span class="o">:</span> <span class="s1">'text/html'</span> <span class="p">});</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">res</span><span class="p">.</span><span class="nx">end</span><span class="p">(</span><span class="s1">'Login with &lt;a href="/login?type=weibo"&gt;Weibo&lt;/a&gt; | \</span>
+<span class="s1">      &lt;a href="/login?type=tqq"&gt;QQ&lt;/a&gt; | \</span>
+<span class="s1">      &lt;a href="/login?type=github"&gt;Github&lt;/a&gt;'</span><span class="p">);</span>
+    <span class="k">return</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="nx">res</span><span class="p">.</span><span class="nx">end</span><span class="p">(</span><span class="s1">'Hello, &lt;img src="'</span> <span class="o">+</span> <span class="nx">user</span><span class="p">.</span><span class="nx">profile_image_url</span> <span class="o">+</span> <span class="s1">'" /&gt;\</span>
+<span class="s1">    &lt;a href="'</span> <span class="o">+</span> <span class="nx">user</span><span class="p">.</span><span class="nx">t_url</span> <span class="o">+</span> 
+    <span class="s1">'" target="_blank"&gt;@'</span> <span class="o">+</span> <span class="nx">user</span><span class="p">.</span><span class="nx">screen_name</span> <span class="o">+</span> <span class="s1">'&lt;/a&gt;. '</span> <span class="o">+</span> 
+    <span class="s1">'&lt;a href="/logout"&gt;Logout&lt;/a&gt;'</span><span class="p">);</span>
+<span class="p">});</span>
+
+<span class="nx">app</span><span class="p">.</span><span class="nx">listen</span><span class="p">(</span><span class="mi">8088</span><span class="p">);</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Server start on http://localhost:8088/'</span><span class="p">);</span>
+</pre></div>
+
+<h2>Authors</h2>
+
+<p>Below is the output from <code>git-summary</code>.</p>
+
+<pre><code> project: node-weibo
+ commits: 119
+ active : 55 days
+ files  : 46
+ authors: 
+   108  fengmk2                 90.8%
+     7  hpf1908                 5.9%
+     2  QLeelulu                1.7%
+     1  mk2                     0.8%
+     1  xydudu                  0.8%
+</code></pre>
+
+<h2>License</h2>
+
+<p>(The MIT License)</p>
+
+<p>Copyright (c) 2011-2012 fengmk2 &lt;<a href="mailto:fengmk2@gmail.com">fengmk2@gmail.com</a>&gt;</p>
+
+<p>Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+'Software'), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:</p>
+
+<p>The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.</p>
+
+<p>THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/fengmk2/node-weibo/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/fengmk2/node-weibo/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/fengmk2/node-weibo"></a> is maintained by <a href="https://github.com/fengmk2">fengmk2</a>.</p>
+
+          <p>This page was generated by <a href="pages.github.com">GitHub Pages</a> using the Architect theme by <a href="http://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
+    </div>
+
+  
+  </body>
+</html>
