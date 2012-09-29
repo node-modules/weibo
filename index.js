@@ -8,6 +8,7 @@
  * Module dependencies.
  */
 
-var libpath = process.env.WEIBO_COV ? './lib-cov' : './lib';
-module.exports = require(libpath + '/tapi');
-module.exports.oauth = require(libpath + '/oauth_middleware');
+var weibo = require('./lib/tapi');
+weibo.oauth = require('./lib/oauth_middleware');
+
+module.exports = weibo;
