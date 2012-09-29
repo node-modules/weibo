@@ -25,6 +25,28 @@ $ npm install weibo
 
 ## How to use
 
+`entry.js`
+
+```js
+var weibo = require('weibo');
+
+// change appkey to yours
+var appkey = 'your appkey';
+var secret = 'your app secret';
+var oauth_callback_url = 'your callback url';
+weibo.init('weibo', appkey, secret, oauth_callback_url);
+
+var user = { blogtype: 'weibo' };
+var cursor = {count: 20};
+weibo.public_timeline(user, cursor, function (err, statuses) {
+  if (err) {
+    console.error(err);
+  } else {
+    console.log(statuses);
+  }
+});
+```
+
 Demo on nodejs and browser just the same code.
 
 Thanks for [browserify](https://github.com/substack/node-browserify),
@@ -34,49 +56,24 @@ let us to use the same code on nodejs and browser.
 
 NOTICE: browser must enable **cross-domain** request.
 
-```js
-<script src="https://raw.github.com/fengmk2/node-weibo/master/weibo.js"></script>
-<script>
-var weibo = require('weibo');
+browserify to `bundle.js`
 
-// change appkey to yours
-var appkey = 'your appkey';
-var secret = 'your app secret';
-var oauth_callback_url = 'your callback url' || 'oob';
-weibo.init('tsina', appkey, secret, oauth_callback_url);
-
-var user = { blogtype: 'tsina' };
-var cursor = {count: 20};
-weibo.public_timeline(user, cursor, function (err, statuses) {
-  if (err) {
-    console.error(err);
-  } else {
-    console.log(statuses);
-  }
-});
-</script>
+```bash
+$ browserify entry.js -o bundle.js
 ```
 
-### Server
+Include `bundle.js` to your html.
 
-```js
-var weibo = require('weibo');
-
-// change appkey to yours
-var appkey = 'your appkey';
-var secret = 'your app secret';
-var oauth_callback_url = 'your callback url' || 'oob';
-weibo.init('tsina', appkey, secret, oauth_callback_url);
-
-var user = { blogtype: 'tsina' };
-var cursor = {count: 20};
-weibo.public_timeline(user, cursor, function (err, statuses) {
-  if (err) {
-    console.error(err);
-  } else {
-    console.log(statuses);
-  }
-});
+```html
+<html>
+  <head>
+    <title>Weibo Hello world</title>
+    <script src="bundle.js"></script>
+  </head>
+  <body>
+    Hello world.
+  </body>
+</html>
 ```
     
 ### Use `weibo.oauth` middleware

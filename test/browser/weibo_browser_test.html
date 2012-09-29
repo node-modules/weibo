@@ -1,38 +1,14 @@
 <html>
 <head>
-    <title>Weibo SDK test</title>
-    <script type="text/javascript" src="jquery-1.6.min.js"></script>
-    <script type="text/javascript" src="../../weibo.js"></script>
-    <script type="text/javascript">
-    weibo.load('../../');
-	function start_test() {
-	    var keys = [
-	        'sha1', 'oauth', 'base64', 
-	        'urllib',
-	        'tapi', 'tsina', 'tqq', 'twitter'
-	    ];
-	    var $console = $('#console');
-	    var html = $console.html();
-	    for(var i = 0; i < keys.length; i++) {
-	        var lib = weibo[keys[i]];
-	        if(!lib) {
-	            html += '<li style="color: red;">' + keys[i] + ' error.</li>';
-	        } else {
-	            html += '<li style="color: green;">' + keys[i] + ' success.</li>';
-	        }
-	    }
-	    $console.html(html);
-	}
-	$(document).ready(function() {
-	    start_test();
-	});
-	</script>
+<title>Weibo SDK test</title>
+<script src="./jquery-1.6.min.js"></script>
+<script src="./bundle.js"></script>
 </head>
+
 <body style="margin:0">
 <div style="border-top:1px solid #404040">
-	<div style="padding:10px">Weibo SDK test</div>
-	<ul id="console"></ul>
+  <div style="padding:10px">Weibo SDK test</div>
+  <ul id="console"></ul>
 </div>
-
 </body>
 </html>

@@ -1,3 +1,9 @@
+## 0.6.2 / 2012-09-29
+
+* remove mime dependency.
+* add browser env demo on examples/browser
+* add browser test on test/browser/weibo_browser_test.html
+
 ## 0.6.1 / 2012-09-29
 
 * Refactor core code.

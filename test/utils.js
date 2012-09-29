@@ -26,12 +26,6 @@ describe('utils.js', function () {
     });
   });
 
-  describe('Date.format()', function () {
-    it('should format success', function () {
-      new Date().format('yyyy-MM-dd hh:mm:ss').should.match(/^\d{4}\-\d{2}\-\d{2}\s\d{2}\:\d{2}\:\d{2}$/);
-    });
-  });
-
   describe('utils.querystring.parse()', function () {
 
     it('should parse success', function () {
@@ -104,6 +98,27 @@ describe('utils.js', function () {
       var hash = 'ZM+ttA9KMRSl+XfT9CJrMfnRf14=';
       utils.base64HmacSha1(bs, key).should.equal(hash);
       require('../lib/sha1').b64_hmac_sha1(key, bs).should.equal(hash);
+    });
+  });
+
+  describe('mimeLookup()', function () {
+    var cases = [
+      ['', 'application/octet-stream'],
+      ['image.jpg2', 'application/octet-stream'],
+      ['image', 'application/octet-stream'],
+      ['image哈哈', 'application/octet-stream'],
+      ['jpg', 'image/jpeg'],
+      ['image.jpg', 'image/jpeg'],
+      ['中文.jpg', 'image/jpeg'],
+      ['/a/b/c/d/image.jpg', 'image/jpeg'],
+      ['../../../../../image.jpg', 'image/jpeg'],
+      ['jpeg', 'image/jpeg'],
+      ['gif', 'image/gif'],
+      ['png', 'image/png'],
+      ['bmp', 'image/bmp'],
+    ];
+    cases.forEach(function (item) {
+      utils.mimeLookup(item[0]).should.equal(item[1]);
     });
   });
 

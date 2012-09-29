@@ -391,6 +391,25 @@ process.binding = function (name) {
 
 });
 
+require.define("/package.json",function(require,module,exports,__dirname,__filename,process,global){module.exports = {"main":"index"}
+});
+
+require.define("/index.js",function(require,module,exports,__dirname,__filename,process,global){/*!
+ * node-weibo - index.js
+ * Copyright(c) 2012 fengmk2 <fengmk2@gmail.com>
+ * MIT Licensed
+ */
+
+/**
+ * Module dependencies.
+ */
+
+var weibo = require('./lib/tapi');
+weibo.oauth = require('./lib/oauth_middleware');
+
+module.exports = weibo;
+});
+
 require.define("/lib/tapi.js",function(require,module,exports,__dirname,__filename,process,global){/*!
  * node-weibo - lib/tapi.js
  * Copyright(c) 2012 fengmk2 <fengmk2@gmail.com>
@@ -1147,7 +1166,19 @@ var TAPI = module.exports = {
 
 });
 
-require.define("/lib/utils.js",function(require,module,exports,__dirname,__filename,process,global){/**
+require.define("/lib/utils.js",function(require,module,exports,__dirname,__filename,process,global){/*!
+ * node-weibo - lib/utils.js
+ * Copyright(c) 2012 fengmk2 <fengmk2@gmail.com>
+ * MIT Licensed
+ */
+
+"use strict";
+
+/**
+ * Module dependencies.
+ */
+
+/**
  * 格式化字符串
  * eg:
  *  '{0}天有{1}个小时'.format([1, 24]) 
@@ -1160,30 +1191,6 @@ String.prototype.format = function (values) {
   return this.replace(STRING_FORMAT_REGEX, function(match, key) {
     return values[key];
   });
-};
-
-// 格式化时间输出。示例：new Date().format("yyyy-MM-dd hh:mm:ss");
-Date.prototype.format = function (format) {
-  format = format || "yyyy-MM-dd hh:mm:ss";
-  var o = {
-    "M+" : this.getMonth() + 1, //month
-    "d+" : this.getDate(),    //day
-    "h+" : this.getHours(),   //hour
-    "m+" : this.getMinutes(), //minute
-    "s+" : this.getSeconds(), //second
-    "q+" : Math.floor((this.getMonth() + 3) / 3), //quarter
-    "S" : this.getMilliseconds() //millisecond
-  };
-  if (/(y+)/.test(format)) {
-    format = format.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
-  }
-
-  for (var k in o) {
-    if (new RegExp("("+ k +")").test(format)) {
-      format = format.replace(RegExp.$1, RegExp.$1.length === 1 ? o[k] : ("00" + o[k]).substr(("" + o[k]).length));
-    }
-  }
-  return format;
 };
 
 var b64_hmac_sha1 = require('./sha1').b64_hmac_sha1;
@@ -1266,6 +1273,23 @@ exports.querystring = querystring;
 exports.base64HmacSha1 = base64HmacSha1;
 exports.urljoin = urljoin;
 exports.htmlencode = htmlencode;
+
+var MIME_TYPES = {
+  'jpg': 'image/jpeg',
+  'jpeg': 'image/jpeg',
+  'gif': 'image/gif',
+  'png': 'image/png',
+  'bmp': 'image/bmp',
+};
+
+var BIN_TYPE = 'application/octet-stream';
+
+exports.mimeLookup = function (name, fallback) {
+  var ext = name.replace(/.*[\.\/]/, '').toLowerCase();
+  return MIME_TYPES[ext] || fallback || BIN_TYPE;
+};
+
+
 });
 
 require.define("/lib/sha1.js",function(require,module,exports,__dirname,__filename,process,global){/*
@@ -3470,7 +3494,6 @@ var querystring = require('querystring');
 var urllib = require('urllib');
 var utils = require('./utils');
 var OAuth = require('./oauth');
-var mime = require('mime');
 
 /**
  * TAPI Base class, support OAuth v1.0
@@ -4013,7 +4036,7 @@ TBase.prototype.upload = function (user, status, pic, callback) {
   status = this.convert_status(status);
   pic.name = pic.name || 'node-weibo-upload-image.jpg';
   if (!pic.content_type) {
-    pic.content_type = mime.lookup(pic.name);
+    pic.content_type = utils.mimeLookup(pic.name);
   }
   if (Buffer.isBuffer(pic.data)) {
     this._upload(user, status, pic, callback);
@@ -4529,8 +4552,7 @@ function lastBraceInKey(str) {
 require.define("/node_modules/urllib/package.json",function(require,module,exports,__dirname,__filename,process,global){module.exports = {"main":"index.js"}
 });
 
-require.define("/node_modules/urllib/index.js",function(require,module,exports,__dirname,__filename,process,global){
-module.exports = require('./lib/urllib');
+require.define("/node_modules/urllib/index.js",function(require,module,exports,__dirname,__filename,process,global){module.exports = require('./lib/urllib');
 });
 
 require.define("/node_modules/urllib/lib/urllib.js",function(require,module,exports,__dirname,__filename,process,global){/**
@@ -4573,13 +4595,15 @@ exports.TIMEOUT = 5000;
  * urllib.request('http://httptest.cnodejs.net/test/post', args, function(err, data, res) {});
  * 
  * @param {String} url
- * @param {Object} args
- *   - {Object} data: request data
- *   - {String|Buffer} content: optional, if set content, `data` will ignore
- *   - {String} type: optional, could be GET | POST | DELETE | PUT, default is GET
- *   - {String} dataType: `text` or `json`, default is text
- *   - {Object} headers: 
- *   - {Number} timeout: request timeout(in milliseconds), default is `exports.TIMEOUT`
+ * @param {Object} [args], optional
+ *   - {Object} [data]: request data
+ *   - {String|Buffer} [content]: optional, if set content, `data` will ignore
+ *   - {String} [type]: optional, could be GET | POST | DELETE | PUT, default is GET
+ *   - {String} [dataType]: optional, `text` or `json`, default is text
+ *   - {Object} [headers]: optional, request headers
+ *   - {Number} [timeout]: request timeout(in milliseconds), default is `exports.TIMEOUT`
+ *   - {Agent} [agent]: optional, http agent
+ *   - {Agent} [httpsAgent]: optional, https agent
  * @param {Function} callback, callback(error, data, res)
  * @param {Object} optional context of callback, callback.call(context, error, data, res)
  * @api public
@@ -4597,10 +4621,10 @@ exports.request = function (url, args, callback, context) {
   var method = args.type;
   var port = info.port || 80;
   var httplib = http;
-  var agent = exports.agent;
+  var agent = args.agent || exports.agent;
   if (info.protocol === 'https:') {
     httplib = https;
-    agent = exports.httpsAgent;
+    agent = args.httpsAgent || exports.httpsAgent;
     if (!info.port) {
       port = 443;
     }
@@ -4615,7 +4639,7 @@ exports.request = function (url, args, callback, context) {
   };
   var body = args.content || args.data;
   if (!args.content) {
-    if (body && !(body instanceof String || body instanceof Buffer)) {
+    if (body && !(body instanceof String || Buffer.isBuffer(body))) {
       body = qs.stringify(body);
     }
   }
@@ -6247,116 +6271,6 @@ if (typeof module === 'undefined') {
 
 });
 
-require.define("/node_modules/mime/package.json",function(require,module,exports,__dirname,__filename,process,global){module.exports = {"main":"mime.js"}
-});
-
-require.define("/node_modules/mime/mime.js",function(require,module,exports,__dirname,__filename,process,global){var path = require('path');
-var fs = require('fs');
-
-function Mime() {
-  // Map of extension -> mime type
-  this.types = Object.create(null);
-
-  // Map of mime type -> extension
-  this.extensions = Object.create(null);
-}
-
-/**
- * Define mimetype -> extension mappings.  Each key is a mime-type that maps
- * to an array of extensions associated with the type.  The first extension is
- * used as the default extension for the type.
- *
- * e.g. mime.define({'audio/ogg', ['oga', 'ogg', 'spx']});
- *
- * @param map (Object) type definitions
- */
-Mime.prototype.define = function (map) {
-  for (var type in map) {
-    var exts = map[type];
-
-    for (var i = 0; i < exts.length; i++) {
-      this.types[exts[i]] = type;
-    }
-
-    // Default extension is the first one we encounter
-    if (!this.extensions[type]) {
-      this.extensions[type] = exts[0];
-    }
-  }
-};
-
-/**
- * Load an Apache2-style ".types" file
- *
- * This may be called multiple times (it's expected).  Where files declare
- * overlapping types/extensions, the last file wins.
- *
- * @param file (String) path of file to load.
- */
-Mime.prototype.load = function(file) {
-  // Read file and split into lines
-  var map = {},
-      content = fs.readFileSync(file, 'ascii'),
-      lines = content.split(/[\r\n]+/);
-
-  lines.forEach(function(line) {
-    // Clean up whitespace/comments, and split into fields
-    var fields = line.replace(/\s*#.*|^\s*|\s*$/g, '').split(/\s+/);
-    map[fields.shift()] = fields;
-  });
-
-  this.define(map);
-};
-
-/**
- * Lookup a mime type based on extension
- */
-Mime.prototype.lookup = function(path, fallback) {
-  var ext = path.replace(/.*[\.\/]/, '').toLowerCase();
-
-  return this.types[ext] || fallback || this.default_type;
-};
-
-/**
- * Return file extension associated with a mime type
- */
-Mime.prototype.extension = function(mimeType) {
-  return this.extensions[mimeType];
-};
-
-// Default instance
-var mime = new Mime();
-
-// Load local copy of
-// http://svn.apache.org/repos/asf/httpd/httpd/trunk/docs/conf/mime.types
-mime.load(path.join(__dirname, 'types/mime.types'));
-
-// Load additional types from node.js community
-mime.load(path.join(__dirname, 'types/node.types'));
-
-// Default type
-mime.default_type = mime.lookup('bin');
-
-//
-// Additional API specific to the default instance
-//
-
-mime.Mime = Mime;
-
-/**
- * Lookup a charset based on mime type.
- */
-mime.charsets = {
-  lookup: function(mimeType, fallback) {
-    // Assume text types are utf8
-    return (/^text\//).test(mimeType) ? 'UTF-8' : fallback;
-  }
-}
-
-module.exports = mime;
-
-});
-
 require.define("/lib/weibo_util.js",function(require,module,exports,__dirname,__filename,process,global){/**
  * 新浪微博mid与url互转实用工具
  * 作者: XiNGRZ (http://weibo.com/xingrz)
@@ -7569,20 +7483,23 @@ module.exports = function oauth(options) {
 
 });
 
-require.define("/index.js",function(require,module,exports,__dirname,__filename,process,global){/*!
- * node-weibo - index.js
- * Copyright(c) 2012 fengmk2 <fengmk2@gmail.com>
- * MIT Licensed
- */
+require.define("/examples/browser/entry.js",function(require,module,exports,__dirname,__filename,process,global){var weibo = require('../../');
 
-/**
- * Module dependencies.
- */
+// change appkey to yours
+var appkey = 'your appkey';
+var secret = 'your app secret';
+var oauth_callback_url = 'your callback url';
+weibo.init('weibo', appkey, secret, oauth_callback_url);
 
-var weibo = require('./lib/tapi');
-weibo.oauth = require('./lib/oauth_middleware');
-
-module.exports = weibo;
+var user = { blogtype: 'weibo' };
+var cursor = {count: 20};
+weibo.public_timeline(user, cursor, function (err, statuses) {
+  if (err) {
+    console.error(err);
+  } else {
+    console.log(statuses);
+  }
 });
-require("/index.js");
+});
+require("/examples/browser/entry.js");
 })();

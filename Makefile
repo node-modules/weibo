@@ -25,7 +25,8 @@ lib-cov:
 	@jscoverage lib $@
 
 build:
-	./node_modules/browserify/bin/cmd.js index.js -o weibo.js
+	./node_modules/browserify/bin/cmd.js examples/browser/entry.js -o examples/browser/bundle.js
+	./node_modules/browserify/bin/cmd.js test/browser/entry.js -o test/browser/bundle.js
 
 publish: build
 	npm publish
