@@ -501,6 +501,7 @@ describe('tapi.js ' + blogtype + ' API', function () {
   });
 
   describe('comments_timeline()', function () {
+
     it('should list recent 20 comments to my statuses with no cursor', function (done) {
       tapi.comments_timeline(currentUser, function (err, result) {
         should.not.exist(err);
@@ -517,8 +518,122 @@ describe('tapi.js ' + blogtype + ' API', function () {
       });
     });
 
-    it('should list recent 1 comments to my statuses with {count: 1}', function (done) {
+    it('should list recent 1 comment to my statuses with {count: 1}', function (done) {
       tapi.comments_timeline(currentUser, {count: 1}, function (err, result) {
+        should.not.exist(err);
+        should.exist(result);
+        result.should.have.property('items').with.be.an.instanceof(Array);
+        result.items.should.be.an.instanceof(Array);
+        result.should.have.property('cursor').with.be.a('object');
+        result.items.should.length(1);
+        for (var i = 0; i < result.items.length; i++) {
+          check.checkComment(result.items[i]);
+        }
+        done();
+      });
+    });
+  });
+  
+  describe('comments_mentions()', function () {
+    var test = xit;
+    if (tapi.support(currentUser, 'comments_mentions')) {
+      test = it;
+    }
+
+    test('should list recent 20 @me comments', function (done) {
+      tapi.comments_mentions(currentUser, function (err, result) {
+        should.not.exist(err);
+        should.exist(result);
+        result.should.have.property('items').with.be.an.instanceof(Array);
+        result.items.should.be.an.instanceof(Array);
+        result.should.have.property('cursor').with.be.a('object');
+        result.items.length.should.above(0);
+        for (var i = 0; i < result.items.length; i++) {
+          // console.log(result.items[i])
+          check.checkComment(result.items[i]);
+        }
+        done();
+      });
+    });
+
+    test('should list recent 1 @me comment with {count: 1}', function (done) {
+      tapi.comments_mentions(currentUser, {count: 1}, function (err, result) {
+        should.not.exist(err);
+        should.exist(result);
+        result.should.have.property('items').with.be.an.instanceof(Array);
+        result.items.should.be.an.instanceof(Array);
+        result.should.have.property('cursor').with.be.a('object');
+        result.items.should.length(1);
+        for (var i = 0; i < result.items.length; i++) {
+          check.checkComment(result.items[i]);
+        }
+        done();
+      });
+    });
+  });
+
+  describe('comments_to_me()', function () {
+    var test = xit;
+    if (tapi.support(currentUser, 'comments_to_me')) {
+      test = it;
+    }
+
+    test('should list recent 20 to me comments', function (done) {
+      tapi.comments_to_me(currentUser, function (err, result) {
+        should.not.exist(err);
+        should.exist(result);
+        result.should.have.property('items').with.be.an.instanceof(Array);
+        result.items.should.be.an.instanceof(Array);
+        result.should.have.property('cursor').with.be.a('object');
+        result.items.length.should.above(0);
+        for (var i = 0; i < result.items.length; i++) {
+          // console.log(result.items[i])
+          check.checkComment(result.items[i]);
+        }
+        done();
+      });
+    });
+
+    test('should list recent 1 to me comment with {count: 1}', function (done) {
+      tapi.comments_to_me(currentUser, {count: 1}, function (err, result) {
+        should.not.exist(err);
+        should.exist(result);
+        result.should.have.property('items').with.be.an.instanceof(Array);
+        result.items.should.be.an.instanceof(Array);
+        result.should.have.property('cursor').with.be.a('object');
+        result.items.should.length(1);
+        for (var i = 0; i < result.items.length; i++) {
+          check.checkComment(result.items[i]);
+        }
+        done();
+      });
+    });
+  });
+
+  describe('comments_by_me()', function () {
+    var test = xit;
+    if (tapi.support(currentUser, 'comments_by_me')) {
+      test = it;
+    }
+
+    test('should list recent 20 by me comments', function (done) {
+      tapi.comments_by_me(currentUser, function (err, result) {
+        should.not.exist(err);
+        should.exist(result);
+        result.should.have.property('items').with.be.an.instanceof(Array);
+        result.items.should.be.an.instanceof(Array);
+        result.should.have.property('cursor').with.be.a('object');
+        result.items.length.should.above(0);
+        for (var i = 0; i < result.items.length; i++) {
+          // console.log(result.items[i])
+          check.checkComment(result.items[i]);
+        }
+        done();
+      });
+    });
+
+    test('should list recent 1 by me comment with {count: 1}', function (done) {
+      tapi.comments_by_me(currentUser, {count: 1}, function (err, result) {
         should.not.exist(err);
         should.exist(result);
         result.should.have.property('items').with.be.an.instanceof(Array);

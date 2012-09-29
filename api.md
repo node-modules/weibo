@@ -375,9 +375,75 @@ comments_timeline: function (user, cursor, callback)
 
 ### comments_mentions
 
+```js
+/**
+* List @me comments
+* 
+* @param {User} user
+* @param {Cursor} [cursor]
+*  - {String} since_id
+*  - {String} max_id
+*  - {Number} count, default is `20`
+*  - {Number} page
+* @param {Function(err, result)} callback
+*  {Object} result:
+*   - {Array} items, [Comment, ...]
+*   - {Cursor} cursor
+*   - ...
+* @return {Context} this
+*/
+comments_mentions: function (user, cursor, callback)
+```
+
 ### comments_to_me
 
+```js
+/**
+* List comments to me
+* 
+* @param {User} user
+* @param {Cursor} [cursor]
+*  - {String} [since_id]
+*  - {String} [max_id]
+*  - {Number} [count], default is `20`
+*  - {Number} [page]
+*  - {Number} [filter_by_author], only support by `weibo`;
+*    Filter comments by author type, 0: all, 1: I following, 2: stranger, default is `0`.
+*  - {Number} [filter_by_source], only support by `weibo`;
+*    Filter comments by source type, 0: all, 1: come from weibo, 2: come from weiqun, default is `0`.
+* @param {Function(err, result)} callback
+*  {Object} result:
+*   - {Array} items, [Comment, ...]
+*   - {Cursor} cursor
+*   - ...
+* @return {Context} this
+*/
+comments_to_me: function (user, cursor, callback)
+```
+
 ### comments_by_me
+
+```js
+/**
+* List comments post by me
+* 
+* @param {User} user
+* @param {Cursor} [cursor]
+*  - {String} since_id
+*  - {String} max_id
+*  - {Number} count, default is `20`
+*  - {Number} page
+*  - {Number} [filter_by_source], only support by `weibo`;
+*    Filter comments by source type, 0: all, 1: come from weibo, 2: come from weiqun, default is `0`.
+* @param {Function(err, result)} callback
+*  {Object} result:
+*   - {Array} items, [Comment, ...]
+*   - {Cursor} cursor
+*   - ...
+* @return {Context} this
+*/
+comments_by_me: function (user, cursor, callback)
+```
 
 ### comments
 
