@@ -500,6 +500,29 @@ describe('tapi.js ' + blogtype + ' API', function () {
     });
   });
 
+  describe('search()', function () {
+
+    var test = xit;
+    if (tapi.support(currentUser, 'search')) {
+      test = it;
+    }
+
+    test('should search with keyword:fawave', function (done) {
+      tapi.search(currentUser, 'fawave', function (err, result) {
+        should.not.exist(err);
+        should.exist(result);
+        result.should.have.property('items').with.be.an.instanceof(Array);
+        result.items.should.be.an.instanceof(Array).with.length(20);
+        for (var i = 0; i < result.items.length; i++) {
+          check.checkStatus(result.items[i]);
+        }
+        result.should.have.property('cursor').with.be.a('object');
+        done();
+      });
+    });
+
+  });
+
   describe('comments_timeline()', function () {
 
     it('should list recent 20 comments to my statuses with no cursor', function (done) {

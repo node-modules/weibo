@@ -17,7 +17,7 @@ All apis and data in `node-weibo` will convert to this unity format.
 |  * [public_timeline](#public_timeline)(user[, cursor], callback)|List public timeline statuses|[weibo], [tqq]|
 |  * [mentions](#mentions)(user[, cursor], callback)|List @me timeline statuses|[weibo], [tqq]|
 |  * [repost_timeline](#repost_timeline)(user, id[, cursor], callback)|List one status's reposted statuses|[weibo], [tqq]|
-|  * [search](#search)(user, query, callback)|Search statues|-|
+|  * [search](#search-statuses)(user, query, cursor, callback)|Search statues|[tqq]|
 | **[Comment](#comment) APIs** |||
 | Write |||
 |  * [comment_create](#comment_create)(user, id, comment, callback)|post a comment to a status|[weibo], [tqq]|
@@ -266,7 +266,27 @@ mentions(user, cursor, callback)
 repost_timeline(user, id[, cursor], callback) 
 ```
 
+<a name="search-statuses" />
 ### search
+
+```js
+/**
+ * Search statuses by query.
+ * 
+ * @param {AccessToken} user
+ * @param {String|Object} query
+ *  - {String} q, query keyword
+ *  - {String} [long], longitude
+ *  - {String} [lat], latitude
+ *  - {String} [radius], radius for longitude and latitude.
+ * @param {Cursor} [cursor]
+ *  - {Number} [count], default is `20`
+ *  - {Number} [page], default is the first page.
+ * @param {Function(err, result)} callback
+ * @return {Context} this
+ */
+search: function (user, query, cursor, callback)
+```
 
 ## OAuth APIs
 
