@@ -27,4 +27,7 @@ lib-cov:
 build:
 	./node_modules/browserify/bin/cmd.js index.js -o weibo.js
 
-.PHONY: test-cov test test-cov build
+publish: build
+	npm publish
+
+.PHONY: test-cov test test-cov build test-g publish

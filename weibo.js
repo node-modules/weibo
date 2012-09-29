@@ -407,12 +407,12 @@ var utils = require('./utils');
 var TSinaAPI = require('./tsina');
 var TQQAPI = require('./tqq');
 var WeiboAPI = require('./weibo');
-// var GithubAPI = require('./github');
+var GithubAPI = require('./github');
 
 var TAPI = module.exports = {
   TYPES: {
     weibo: WeiboAPI, // api v2.0
-    // github: GithubAPI,
+    github: GithubAPI,
     tsina: TSinaAPI, // api v1.0
     // twitter: TwitterAPI,
     tqq: TQQAPI,
@@ -421,22 +421,39 @@ var TAPI = module.exports = {
   
   enables: {},
   
-  init: function (blogtype, appkey, secret, oauth_callback_url) {
+  /**
+   * Init API options, must init before use it.
+   * 
+   * @param {String} blogtype, blog api type, e.g.: 'weibo', 'tqq', 'github' and so on.
+   * @param {String} appkey
+   * @param {String} secret
+   * @param {String|Object} [oauth_callback] or [oauth_options]
+   *  - {String} [oauth_callback], oauth callback redirect uri.
+   *  - {String} [oauth_scope], comma separated list of scopes. e.g.: `status, user`
+   * @return {[type]} [description]
+   */
+  init: function (blogtype, appkey, secret, oauth_options) {
     if (!appkey) {
       throw new TypeError('appkey must be set');
     }
     if (!secret) {
       throw new TypeError('secret must be set');
     }
+    if (typeof oauth_options === 'string') {
+      oauth_options = {
+        oauth_callback: oauth_options
+      };
+    }
     var TypeAPI = this.TYPES[blogtype];
     if (!TypeAPI) {
       throw new TypeError(blogtype + ' api not exists');
     }
-    var instance = new TypeAPI({
+    var options = {
       appkey: appkey,
-      secret: secret,
-      oauth_callback: oauth_callback_url
-    });
+      secret: secret
+    };
+    options = utils.extend(options, oauth_options);
+    var instance = new TypeAPI(options);
     this.enables[blogtype] = instance;
   },
 
@@ -471,6 +488,43 @@ var TAPI = module.exports = {
   support: function (user, method) {
     return this.get_config(user)['support_' + method] !== false;
   },
+
+  /**
+   * Utils methods
+   */
+  
+  _timeline: function (method, user, cursor, callback) {
+    if (typeof cursor === 'function') {
+      callback = cursor;
+      cursor = null;
+    }
+    cursor = cursor || {};
+    cursor.count = cursor.count || 20;
+    var max_id = cursor.max_id;
+    var self = this;
+    return self.api_dispatch(user)[method](user, cursor, function (err, result) {
+      if (err || !max_id) {
+        return callback(err, result);
+      }
+      max_id = String(max_id);
+      // ignore the max_id status
+      var needs = [];
+      var statuses = result.items || [];
+      for (var i = 0, l = statuses.length; i < l; i++) {
+        var status = statuses[i];
+        if (status.id === max_id) {
+          continue;
+        }
+        needs.push(status);
+      }
+      result.items = needs;
+      callback(null, result);
+    });
+  },
+
+  /**
+   * Status
+   */
 
   /**
    * Post a status
@@ -569,35 +623,6 @@ var TAPI = module.exports = {
     return this.api_dispatch(user).show(user, String(id), callback);
   },
 
-  _timeline: function (method, user, cursor, callback) {
-    if (typeof cursor === 'function') {
-      callback = cursor;
-      cursor = null;
-    }
-    cursor = cursor || {};
-    cursor.count = cursor.count || 20;
-    var max_id = cursor.max_id;
-    var self = this;
-    return self.api_dispatch(user)[method](user, cursor, function (err, result) {
-      if (err || !max_id) {
-        return callback(err, result);
-      }
-      max_id = String(max_id);
-      // ignore the max_id status
-      var needs = [];
-      var statuses = result.items || [];
-      for (var i = 0, l = statuses.length; i < l; i++) {
-        var status = statuses[i];
-        if (status.id === max_id) {
-          continue;
-        }
-        needs.push(status);
-      }
-      result.items = needs;
-      callback(null, result);
-    });
-  },
-
   /**
    * List home timeline statuses.
    * 
@@ -687,6 +712,69 @@ var TAPI = module.exports = {
   mentions: function (user, cursor, callback) {
     return this._timeline('mentions', user, cursor, callback);
   },
+
+  /**
+   * List one status's reposted statuses
+   * 
+   * @param {User} user
+   * @param {String} id, status's id
+   * @param {Cursor} [cursor]
+   *  - {String} since_id
+   *  - {String} max_id
+   *  - {String} [since_time], only for tqq
+   *  - {String} [max_time], only for tqq
+   *  - {Number} count, default is `20`
+   *  - {Number} page
+   *  - {Number} [filter_by_author], only support by `weibo`;
+   *    Filter statuses by author type, 0: all, 1: only I following、2: stranger, default is `0`.
+   * @param {Function(err, result)} callback
+   *  {Object} result:
+   *   - {Array} items, [Status, ...]
+   *   - {Cursor} cursor
+   *   - ...
+   * @return {Context} this
+   */
+  repost_timeline: function (user, id, cursor, callback) {
+    if (typeof cursor === 'function') {
+      callback = cursor;
+      cursor = null;
+    }
+    cursor = cursor || {};
+    cursor.id = id;
+    return this._timeline('repost_timeline', user, cursor, callback);
+  },
+
+  /**
+   * Search statuses by query.
+   * 
+   * @param {AccessToken} user
+   * @param {String|Object} query
+   *  - {String} q, query keyword
+   *  - {String} [long], longitude
+   *  - {String} [lat], latitude
+   *  - {String} [radius], radius for longitude and latitude.
+   * @param {Cursor} [cursor]
+   *  - {Number} [count], default is `20`
+   *  - {Number} [page], default is the first page.
+   * @param {Function(err, result)} callback
+   * @return {Context} this
+   */
+  search: function (user, query, cursor, callback) {
+    if (typeof query === 'string') {
+      query = {
+        q: query
+      };
+    }
+    if (typeof cursor === 'function') {
+      callback = cursor;
+      cursor = null;
+    }
+    return this.api_dispatch(user).search(user, query, cursor, callback);
+  },
+
+  /**
+   * Comment
+   */
   
   /**
    * List comments to my statues
@@ -709,35 +797,71 @@ var TAPI = module.exports = {
   comments_timeline: function (user, cursor, callback) {
     return this._timeline('comments_timeline', user, cursor, callback);
   },
-  
+
   /**
-   * List one status's reposted statuses
+   * List @me comments
    * 
    * @param {User} user
-   * @param {String} id, status's id
    * @param {Cursor} [cursor]
    *  - {String} since_id
    *  - {String} max_id
-   *  - {String} [since_time], only for tqq
-   *  - {String} [max_time], only for tqq
    *  - {Number} count, default is `20`
    *  - {Number} page
-   *  - {Number} [filter_by_author], 0: all, 1: only I following、2: stranger, default is `0`.
    * @param {Function(err, result)} callback
    *  {Object} result:
-   *   - {Array} items, [Status, ...]
+   *   - {Array} items, [Comment, ...]
    *   - {Cursor} cursor
    *   - ...
    * @return {Context} this
    */
-  repost_timeline: function (user, id, cursor, callback) {
-    if (typeof cursor === 'function') {
-      callback = cursor;
-      cursor = null;
-    }
-    cursor = cursor || {};
-    cursor.id = id;
-    return this._timeline('repost_timeline', user, cursor, callback);
+  comments_mentions: function (user, cursor, callback) {
+    return this._timeline('comments_mentions', user, cursor, callback);
+  },
+
+  /**
+   * List comments post by me
+   * 
+   * @param {User} user
+   * @param {Cursor} [cursor]
+   *  - {String} since_id
+   *  - {String} max_id
+   *  - {Number} count, default is `20`
+   *  - {Number} page
+   *  - {Number} [filter_by_source], only support by `weibo`;
+   *    Filter comments by source type, 0: all, 1: come from weibo, 2: come from weiqun, default is `0`.
+   * @param {Function(err, result)} callback
+   *  {Object} result:
+   *   - {Array} items, [Comment, ...]
+   *   - {Cursor} cursor
+   *   - ...
+   * @return {Context} this
+   */
+  comments_by_me: function (user, cursor, callback) {
+    return this._timeline('comments_by_me', user, cursor, callback);
+  },
+
+  /**
+   * List comments to me
+   * 
+   * @param {User} user
+   * @param {Cursor} [cursor]
+   *  - {String} [since_id]
+   *  - {String} [max_id]
+   *  - {Number} [count], default is `20`
+   *  - {Number} [page]
+   *  - {Number} [filter_by_author], only support by `weibo`;
+   *    Filter comments by author type, 0: all, 1: I following, 2: stranger, default is `0`.
+   *  - {Number} [filter_by_source], only support by `weibo`;
+   *    Filter comments by source type, 0: all, 1: come from weibo, 2: come from weiqun, default is `0`.
+   * @param {Function(err, result)} callback
+   *  {Object} result:
+   *   - {Array} items, [Comment, ...]
+   *   - {Cursor} cursor
+   *   - ...
+   * @return {Context} this
+   */
+  comments_to_me: function (user, cursor, callback) {
+    return this._timeline('comments_to_me', user, cursor, callback);
   },
   
   /**
@@ -752,7 +876,8 @@ var TAPI = module.exports = {
    *  - {String} [max_time], only for tqq
    *  - {Number} count, default is `20`
    *  - {Number} page
-   *  - {Number} [filter_by_author], 0: all, 1: only I following、2: stranger, default is `0`.
+   *  - {Number} [filter_by_author], only support by `weibo`;
+   *    Filter comments by author type, 0: all, 1: only I following、2: stranger, default is `0`.
    * @param {Function(err, result)} callback
    *  {Object} result:
    *   - {Array} items, [Comment, ...]
@@ -768,85 +893,6 @@ var TAPI = module.exports = {
     cursor = cursor || {};
     cursor.id = id;
     return this._timeline('comments', user, cursor, callback);
-  },
-
-  /* 返回与关键字相匹配的微博。未新浪合作key只能返回第一页
-   * q  true  string  搜索的关键字。必须进行URL Encode
-   * page false int 页码，从1开始，默认为1。
-   * rpp  false int 每页返回的微博数。（默认返回10条，最大200条）
-   * geocode  false string  返回指定经纬度附近的信息。经纬度参数格式是“纬度，经度，半径”，半径支持km（公里），m（米），mi（英里）。格式需要URL Encode编码
-   */
-  search: function (data, callback, context) {
-    return this.api_dispatch(data).search(data, callback, context);
-  },
-  
-  /**
-   * Get authorization token and login url.
-   * 
-   * @param {Object} user
-   *  - {String} blogtype, 'weibo' or other blog type,
-   *  - {String} oauth_callback, 'login callback url' or 'oob'
-   * @param {Function(err, auth_info)} callback
-   *  - {Object} auth_info
-   *   - {String} auth_url: 'http://xxxx/auth?xxx',
-   *   - {String} oauth_token: $oauth_token,
-   *   - {String} oauth_token_secret: $oauth_token_secret
-   * @return {Context} this, blogType api.
-   */
-  get_authorization_url: function (user, callback) {
-    return this.api_dispatch(user).get_authorization_url(user, callback);
-  },
-  
-  /**
-   * Get access token.
-   * 
-   * @param {Object} user
-   *  - {String} blogtype
-   *  - {String} oauth_token, authorization `oauth_token`
-   *  - {String} oauth_verifier, authorization `oauth_verifier`
-   *  - {String} oauth_token_secret, request token secret
-   * @param {Function(err, token)} callback
-   *  - {Object} token
-   *   - {String} oauth_token
-   *   - {String} oauth_token_secret
-   * @return {Context} this
-   */
-  get_access_token: function (user, callback) {
-    return this.api_dispatch(user).get_access_token(user, callback);
-  },
-  
-  /**
-   * Get user profile infomation by access token.
-   * 
-   * @param {Object} user
-   *  - {String} blogtype
-   *  - {String} oauth_token, access oauth token
-   *  - {String} [oauth_token_secret], access oauth token secret, oauth v2 don't need this param.
-   * @param {Function(err, User)} callback
-   * @return {Context} this
-   */
-  verify_credentials: function (user, callback) {
-    return this.api_dispatch(user).verify_credentials(user, callback);
-  },
-
-  /**
-   * Get user profile infomation by uid.
-   * @param {Object} user
-   *  - {String} blogtype
-   *  - {String} oauth_token, access token
-   *  - {String} [oauth_token_secret], access oauth token secret, oauth v2 don't need this param.
-   * @param {String} [uid], user id
-   * @param {String} [screen_name], user screen_name
-   *   uid and screen_name MUST set one.
-   * @param {Function(err, User)} callback
-   * @return {Context} this
-   */
-  user_show: function (user, uid, screen_name, callback) {
-    if (typeof screen_name === 'function') {
-      callback = screen_name;
-      screen_name = null;
-    }
-    return this.api_dispatch(user).user_show(user, uid, screen_name, callback);
   },
 
   /**
@@ -902,13 +948,88 @@ var TAPI = module.exports = {
     return this.api_dispatch(user).comment_destroy(user, cid, callback);
   },
 
+  /**
+   * OAuth
+   */
+  
+  /**
+   * Get authorization token and login url.
+   * 
+   * @param {Object} user
+   *  - {String} blogtype, 'weibo' or other blog type,
+   *  - {String} oauth_callback, 'login callback url' or 'oob'
+   * @param {Function(err, auth_info)} callback
+   *  - {Object} auth_info
+   *   - {String} auth_url: 'http://xxxx/auth?xxx',
+   *   - {String} oauth_token: $oauth_token,
+   *   - {String} oauth_token_secret: $oauth_token_secret
+   * @return {Context} this, blogType api.
+   */
+  get_authorization_url: function (user, callback) {
+    return this.api_dispatch(user).get_authorization_url(user, callback);
+  },
+  
+  /**
+   * Get access token.
+   * 
+   * @param {Object} user
+   *  - {String} blogtype
+   *  - {String} oauth_token, authorization `oauth_token`
+   *  - {String} oauth_verifier, authorization `oauth_verifier`
+   *  - {String} oauth_token_secret, request token secret
+   * @param {Function(err, token)} callback
+   *  - {Object} token
+   *   - {String} oauth_token
+   *   - {String} oauth_token_secret
+   * @return {Context} this
+   */
+  get_access_token: function (user, callback) {
+    return this.api_dispatch(user).get_access_token(user, callback);
+  },
+
+  /**
+   * User
+   */
+  
+  /**
+   * Get user profile infomation by access token.
+   * 
+   * @param {Object} user
+   *  - {String} blogtype
+   *  - {String} oauth_token, access oauth token
+   *  - {String} [oauth_token_secret], access oauth token secret, oauth v2 don't need this param.
+   * @param {Function(err, User)} callback
+   * @return {Context} this
+   */
+  verify_credentials: function (user, callback) {
+    return this.api_dispatch(user).verify_credentials(user, callback);
+  },
+
+  /**
+   * Get user profile infomation by uid.
+   * @param {Object} user
+   *  - {String} blogtype
+   *  - {String} oauth_token, access token
+   *  - {String} [oauth_token_secret], access oauth token secret, oauth v2 don't need this param.
+   * @param {String} [uid], user id
+   * @param {String} [screen_name], user screen_name
+   *   uid and screen_name MUST set one.
+   * @param {Function(err, User)} callback
+   * @return {Context} this
+   */
+  user_show: function (user, uid, screen_name, callback) {
+    if (typeof screen_name === 'function') {
+      callback = screen_name;
+      screen_name = null;
+    }
+    return this.api_dispatch(user).user_show(user, uid, screen_name, callback);
+  },
+
   /* 获取API的访问频率限制。返回当前小时内还能访问的次数。
    */
   rate_limit_status: function (data, callback) {
     return this.api_dispatch(data).rate_limit_status(data, callback);
   },
-  
-  
   
   /*
    * id false int64/string  用户ID(int64)或者昵称(string)。该参数为一个REST风格参数。调用示例见注意事项
@@ -3351,6 +3472,9 @@ var utils = require('./utils');
 var OAuth = require('./oauth');
 var mime = require('mime');
 
+/**
+ * TAPI Base class, support OAuth v1.0
+ */
 function TBase() {
   this.config = {
     host: 'api start url',
@@ -3396,6 +3520,8 @@ function TBase() {
     mentions:             '/statuses/mentions',
     comments_timeline:    '/comments/timeline',
     comments_mentions:    '/comments/mentions',
+    comments_to_me:       '/comments/to_me',
+    comments_by_me:       '/comments/by_me',
 
     repost_timeline:      '/statuses/repost_timeline',
     comments:             '/statuses/comments',
@@ -3455,6 +3581,28 @@ TBase.prototype.init = function (config) {
   for (var k in config) {
     this.config[k] = config[k];
   }
+};
+
+/**
+ * Utils methods
+ */
+
+TBase.prototype.url_encode = function (text) {
+  return encodeURIComponent(text);
+};
+
+TBase.prototype._timeline = function (request_method, user, cursor, callback, playload) {
+  cursor = this.convert_cursor(cursor);
+  var params = {
+    type: 'GET',
+    playload: playload || 'status[]',
+    user: user,
+    data: cursor,
+    request_method: request_method
+  };
+  var url = this.config[request_method];
+  this.send_request(url, params, callback);
+  return this;
 };
 
 TBase.prototype.errorname = function (name) {
@@ -3564,16 +3712,101 @@ TBase.prototype.send_request = function (url, params, callback) {
   this.request(url, args, callback);
 };
 
-// 设置认证头
-// user: {username, password, authtype}
-// oauth 过程简介: 
-// 1. 使用app的token获取request token；
-// 2. 用户授权给此request token；
-// 3. 使用授权后的request token获取access token
-TBase.prototype.apply_auth = function (url, args, user) {
-  if (!user) {
-    return;
+/**
+ * OAuth
+ */
+
+TBase.prototype.format_authorization_url = function (params) {
+  var login_url = (this.config.oauth_host || this.config.host) + this.config.oauth_authorize;
+  return OAuth.addToURL(login_url, params);
+};
+
+TBase.prototype.get_authorization_url = function (user, callback) {
+  var self = this;
+  self.get_request_token(user, function (err, token) {
+    var info = null;
+    if (err) {
+      return callback(err);
+    }
+    if (token) {
+      var params = {
+        oauth_token: token.oauth_token,
+        oauth_callback: user.oauth_callback || self.config.oauth_callback
+      };
+      info = token;
+      info.blogtype = user.blogtype;
+      info.auth_url = self.format_authorization_url(params);
+    }
+    callback(err, info);
+  });
+  return this;
+};
+
+TBase.prototype.get_request_token = function (user, callback) {
+  var self = this;
+  var url = self.config.oauth_request_token;
+  var params = {
+    type: 'GET',
+    user: user,
+    playload: 'string',
+    data: {
+      oauth_callback: user.oauth_callback || self.config.oauth_callback
+    },
+    api_host: self.config.oauth_host,
+    request_method: 'get_request_token'
+  };
+  if (self.config.oauth_request_params) {
+    utils.extend(params.data, self.config.oauth_request_params);
   }
+  self.send_request(url, params, function (err, token) {
+    if (err) {
+      return callback(err);
+    }
+    token = self.format_access_token(token);
+    token.blogtype = user.blogtype;
+    callback(null, token);
+  });
+  return this;
+},
+
+// user must contain oauth_pin or oauth_verifier
+TBase.prototype.get_access_token = function (user, callback) {
+  if (!user.authtype) {
+    user.authtype = 'oauth';
+  }
+  var url = this.config.oauth_access_token;
+  var data = {};
+  var params = {
+    type: 'GET',
+    user: user,
+    playload: 'string',
+    data: data,
+    api_host: this.config.oauth_host,
+    request_method: 'get_access_token'
+  };
+  var oauth_verifier = user.oauth_pin || user.oauth_verifier || 'no_verifier';
+  if (oauth_verifier) {
+    data.oauth_verifier = oauth_verifier;
+    delete user.oauth_pin;
+    delete user.oauth_verifier;
+  }
+  if (user.authtype === 'xauth') {
+    data.x_auth_username = user.username;
+    data.x_auth_password = user.password;
+    data.x_auth_mode = "client_auth";
+  }
+  this.send_request(url, params, function (err, token) {
+    if (err) {
+      return callback(err);
+    }
+    token = querystring.parse(token);
+    token.blogtype = user.blogtype;
+    callback(null, token);
+  });
+  return this;
+};
+
+TBase.prototype.apply_auth = function (url, args, user) {
   user.authtype = user.authtype || 'oauth';
   args.headers = args.headers || {};
   if (user.authtype === 'baseauth') {
@@ -3623,139 +3856,11 @@ TBase.prototype.apply_auth = function (url, args, user) {
       args.headers.Authorization = OAuth.getAuthorizationHeader(this.config.oauth_realm, message.parameters);
     }
   }
-},
-
-TBase.prototype.format_authorization_url = function (params) {
-  var login_url = (this.config.oauth_host || this.config.host) + this.config.oauth_authorize;
-  return OAuth.addToURL(login_url, params);
 };
 
-TBase.prototype.get_authorization_url = function (user, callback) {
-  var self = this;
-  self.get_request_token(user, function (err, token) {
-    var info = null;
-    if (err) {
-      return callback(err);
-    }
-    if (token) {
-      var params = {
-        oauth_token: token.oauth_token,
-        oauth_callback: user.oauth_callback || self.config.oauth_callback
-      };
-      info = token;
-      info.blogtype = user.blogtype;
-      info.auth_url = self.format_authorization_url(params);
-    }
-    callback(err, info);
-  });
-  return this;
-};
-
-TBase.prototype.get_request_token = function (user, callback) {
-  var self = this;
-  var url = self.config.oauth_request_token;
-  var params = {
-    type: 'GET',
-    user: user,
-    playload: 'string',
-    data: {
-      oauth_callback: user.oauth_callback || self.config.oauth_callback
-    },
-    api_host: self.config.oauth_host,
-    request_method: 'get_request_token'
-  };
-  if (self.config.oauth_request_params) {
-    utils.extend(params.data, self.config.oauth_request_params);
-  }
-  self.send_request(url, params, function (err, token) {
-    if (err) {
-      return callback(err);
-    }
-    token = querystring.parse(token);
-    token.blogtype = user.blogtype;
-    callback(null, token);
-  });
-  return this;
-},
-  
-// user must contain oauth_pin or oauth_verifier
-TBase.prototype.get_access_token = function (user, callback) {
-  if (!user.authtype) {
-    user.authtype = 'oauth';
-  }
-  var url = this.config.oauth_access_token;
-  var data = {};
-  var params = {
-    type: 'GET',
-    user: user,
-    playload: 'string',
-    data: data,
-    api_host: this.config.oauth_host,
-    request_method: 'get_access_token'
-  };
-  var oauth_verifier = user.oauth_pin || user.oauth_verifier || 'no_verifier';
-  if (oauth_verifier) {
-    data.oauth_verifier = oauth_verifier;
-    delete user.oauth_pin;
-    delete user.oauth_verifier;
-  }
-  if (user.authtype === 'xauth') {
-    data.x_auth_username = user.username;
-    data.x_auth_password = user.password;
-    data.x_auth_mode = "client_auth";
-  }
-  this.send_request(url, params, function (err, token) {
-    if (err) {
-      return callback(err);
-    }
-    token = querystring.parse(token);
-    token.blogtype = user.blogtype;
-    callback(null, token);
-  });
-  return this;
-};
-
-TBase.prototype.verify_credentials = function (user, callback) {
-  var params = {
-    type: 'GET',
-    user: user,
-    playload: 'user',
-    request_method: 'verify_credentials'
-  };
-  var url = this.config.verify_credentials;
-  this.send_request(url, params, callback);
-  return this;
-};
-
-TBase.prototype.convert_user = function (data) {
-  return data;
-};
-
-TBase.prototype.user_show = function (user, uid, screen_name, callback) {
-  var data = {};
-  if (uid) {
-    data.uid = uid;
-  }
-  if (screen_name) {
-    data.screen_name = screen_name;
-    delete data.uid; // only support one
-  }
-  data = this.convert_user(data);
-  var params = {
-    type: 'GET',
-    user: user,
-    data: data,
-    playload: 'user',
-    request_method: 'user_show'
-  };
-  var url = this.config.user_show;
-  this.send_request(url, params, callback);
-  return this;
-};
-
-TBase.prototype.url_encode = function (text) {
-  return encodeURIComponent(text);
-};
+/**
+ * Result getters
+ */
 
 TBase.prototype.get_result_items = function (data, playload, args) {
   throw new Error('Must override this method');
@@ -3768,6 +3873,10 @@ TBase.prototype.get_result_item = function (data, playload, args) {
 TBase.prototype.get_pagging_cursor = function (data, playload, args) {
   return {};
 };
+
+/**
+ * Result formaters
+ */
 
 TBase.prototype.format_result = function (data, playload, args) {
   // status[]: need Array and item type is `status`
@@ -3820,9 +3929,17 @@ TBase.prototype.format_emotion = function (emotion, args) {
   throw new Error('Must override this method.');
 };
 
+TBase.prototype.format_access_token = function (token) {
+  return querystring.parse(token);
+};
+
 /**
- * Status APIs
+ * Params converters
  */
+
+TBase.prototype.convert_cursor = function (cursor) {
+  return cursor;
+};
 
 TBase.prototype.convert_status = function (status) {
   return status;
@@ -3831,6 +3948,52 @@ TBase.prototype.convert_status = function (status) {
 TBase.prototype.convert_comment = function (comment) {
   return comment;
 };
+
+TBase.prototype.convert_user = function (data) {
+  return data;
+};
+
+/**
+ * User
+ */
+
+TBase.prototype.verify_credentials = function (user, callback) {
+  var params = {
+    type: 'GET',
+    user: user,
+    playload: 'user',
+    request_method: 'verify_credentials'
+  };
+  var url = this.config.verify_credentials;
+  this.send_request(url, params, callback);
+  return this;
+};
+
+TBase.prototype.user_show = function (user, uid, screen_name, callback) {
+  var data = {};
+  if (uid) {
+    data.uid = uid;
+  }
+  if (screen_name) {
+    data.screen_name = screen_name;
+    delete data.uid; // only support one
+  }
+  data = this.convert_user(data);
+  var params = {
+    type: 'GET',
+    user: user,
+    data: data,
+    playload: 'user',
+    request_method: 'user_show'
+  };
+  var url = this.config.user_show;
+  this.send_request(url, params, callback);
+  return this;
+};
+
+/**
+ * Status APIs
+ */
 
 TBase.prototype.update = function (user, status, callback) {
   status = this.convert_status(status);
@@ -4002,24 +4165,6 @@ TBase.prototype.show = function (user, id, callback) {
   return this;
 };
 
-TBase.prototype.convert_cursor = function (cursor) {
-  return cursor;
-};
-
-TBase.prototype._timeline = function (request_method, user, cursor, callback, playload) {
-  cursor = this.convert_cursor(cursor);
-  var params = {
-    type: 'GET',
-    playload: playload || 'status[]',
-    user: user,
-    data: cursor,
-    request_method: request_method
-  };
-  var url = this.config[request_method];
-  this.send_request(url, params, callback);
-  return this;
-};
-
 TBase.prototype.home_timeline = function (user, cursor, callback) {
   return this._timeline('home_timeline', user, cursor, callback);
 };
@@ -4036,21 +4181,50 @@ TBase.prototype.mentions = function (user, cursor, callback) {
   return this._timeline('mentions', user, cursor, callback);
 };
 
-TBase.prototype.comments_timeline = function (user, cursor, callback) {
-  return this._timeline('comments_timeline', user, cursor, callback, 'comment[]');
-};
-
 TBase.prototype.repost_timeline = function (user, cursor, callback) {
   return this._timeline('repost_timeline', user, cursor, callback);
 };
 
-TBase.prototype.comments = function (user, cursor, callback) {
-  return this._timeline('comments', user, cursor, callback, 'comment[]');
+TBase.prototype.search = function (user, query, cursor, callback) {
+  cursor = cursor || {};
+  cursor.count = cursor.count || 20;
+  cursor = this.convert_cursor(cursor);
+  query = utils.extend(query, cursor);
+  var params = {
+    type: 'GET',
+    playload: 'status[]',
+    user: user,
+    data: query,
+    request_method: 'search'
+  };
+  var url = this.config.search;
+  this.send_request(url, params, callback);
+  return this;
 };
 
 /**
  * Comment
  */
+
+TBase.prototype.comments = function (user, cursor, callback) {
+  return this._timeline('comments', user, cursor, callback, 'comment[]');
+};
+
+TBase.prototype.comments_timeline = function (user, cursor, callback) {
+  return this._timeline('comments_timeline', user, cursor, callback, 'comment[]');
+};
+
+TBase.prototype.comments_mentions = function (user, cursor, callback) {
+  return this._timeline('comments_mentions', user, cursor, callback, 'comment[]');
+};
+
+TBase.prototype.comments_to_me = function (user, cursor, callback) {
+  return this._timeline('comments_to_me', user, cursor, callback, 'comment[]');
+};
+
+TBase.prototype.comments_by_me = function (user, cursor, callback) {
+  return this._timeline('comments_by_me', user, cursor, callback, 'comment[]');
+};
 
 TBase.prototype.comment_create = function (user, id, comment, callback) {
   comment.id = id;
@@ -6365,6 +6539,9 @@ function TQQAPI(options) {
 
     // support apis
     support_comment_destroy: false,
+    support_comments_mentions: false,
+    support_comments_to_me: false,
+    support_comments_by_me: false,
   });
 
   this.init(config);
@@ -6373,6 +6550,10 @@ function TQQAPI(options) {
 inherits(TQQAPI, TBase);
 module.exports = TQQAPI;
 
+/**
+ * Utils methods
+ */
+
 TQQAPI.prototype.detect_error = function (method, res, playload, data) {
   var headers = res.headers;
   var err;
@@ -6380,13 +6561,27 @@ TQQAPI.prototype.detect_error = function (method, res, playload, data) {
     err = new Error(headers.status);
   } else if (data.errcode && data.msg) {
     err = new Error(data.msg);
+  } else if (!data.data && data.msg && data.msg !== 'ok') {
+    err = new Error(data.msg);
   }
   if (err) {
     err.name = this.errorname(method);
     err.data = data;
     return err;
   }
-  TQQAPI.super_.prototype.detect_error.call(this, method, res, playload, data);
+  return TQQAPI.super_.prototype.detect_error.call(this, method, res, playload, data);
+};
+
+TQQAPI.prototype.url_encode = function (text) {
+  return text;
+};
+
+/**
+ * Result getters
+ */
+
+TQQAPI.prototype.get_result_items = function (data, playload, args) {
+  return data.info;
 };
 
 /**
@@ -6408,9 +6603,9 @@ TQQAPI.prototype.detect_error = function (method, res, playload, data) {
 //   return {};
 // };
 
-TQQAPI.prototype.get_result_items = function (data, playload, args) {
-  return data.info;
-};
+/**
+ * Result formatters
+ */
 
 TQQAPI.prototype.format_result = function (data, playload, args) {
   data = data.data;
@@ -6694,6 +6889,10 @@ TQQAPI.prototype.format_emotion = function (emotion, args) {
   throw new Error('Must override this method.');
 };
 
+/**
+ * Params converters
+ */
+
 TQQAPI.prototype.convert_comment = function (comment) {
   // http://wiki.open.t.qq.com/index.php/%E5%BE%AE%E5%8D%9A%E7%9B%B8%E5%85%B3/%E7%82%B9%E8%AF%84%E4%B8%80%E6%9D%A1%E5%BE%AE%E5%8D%9A
   var data = {
@@ -6769,23 +6968,9 @@ TQQAPI.prototype.convert_cursor = function (cursor) {
   return data;
 };
 
-TQQAPI.prototype.user_timeline = function (user, cursor, callback) {
-  cursor.callback = function (data) {
-    if (cursor.uid || cursor.screen_name) {
-      data.name = cursor.uid || cursor.screen_name;
-    }
-    return data;
-  };
-  return TQQAPI.super_.prototype.user_timeline.call(this, user, cursor, callback);
-};
-
-TQQAPI.prototype.comments_timeline = function (user, cursor, callback) {
-  cursor.callback = function (data) {
-    data.type = String(0x40);
-    return data;
-  };
-  return TQQAPI.super_.prototype.comments_timeline.call(this, user, cursor, callback);
-};
+/**
+ * Status
+ */
 
 TQQAPI.prototype.repost_timeline = function (user, cursor, callback) {
   cursor.callback = function (data) {
@@ -6799,6 +6984,45 @@ TQQAPI.prototype.repost_timeline = function (user, cursor, callback) {
     return data;
   };
   return TQQAPI.super_.prototype.repost_timeline.call(this, user, cursor, callback);
+};
+
+TQQAPI.prototype.user_timeline = function (user, cursor, callback) {
+  cursor.callback = function (data) {
+    if (cursor.uid || cursor.screen_name) {
+      data.name = cursor.uid || cursor.screen_name;
+    }
+    return data;
+  };
+  return TQQAPI.super_.prototype.user_timeline.call(this, user, cursor, callback);
+};
+
+TQQAPI.prototype.search = function (user, query, cursor, callback) {
+  cursor = cursor || {};
+  var q = {
+    keyword: query.q
+  };
+  if (query.long && query.lat && query.radius) {
+    q.longitude = query.long;
+    q.latitude = query.lat;
+    q.radius = query.radius;
+  }
+  cursor.callback = function (data) {
+    data.pagesize = data.reqnum || 20;
+    return data;
+  };
+  return TQQAPI.super_.prototype.search.call(this, user, q, cursor, callback);
+};
+
+/**
+ * Comment
+ */
+
+TQQAPI.prototype.comments_timeline = function (user, cursor, callback) {
+  cursor.callback = function (data) {
+    data.type = String(0x40);
+    return data;
+  };
+  return TQQAPI.super_.prototype.comments_timeline.call(this, user, cursor, callback);
 };
 
 TQQAPI.prototype.comments = function (user, cursor, callback) {
@@ -6816,10 +7040,6 @@ TQQAPI.prototype.comments = function (user, cursor, callback) {
 
 TQQAPI.prototype.comment_destroy = function (user, cid, callback) {
   callback(new TypeError('comment_destroy not support.'));
-};
-
-TQQAPI.prototype.url_encode = function (text) {
-  return text;
 };
 
 
@@ -6857,6 +7077,8 @@ function WeiboAPI(options) {
     comment_create:       '/comments/create',
     comment_reply:        '/comments/reply',
     comment_destroy:      '/comments/destroy',
+
+    support_search: false,
   });
 
   this.init(config);
@@ -6864,6 +7086,18 @@ function WeiboAPI(options) {
 
 inherits(WeiboAPI, TBaseOauthV2);
 module.exports = WeiboAPI;
+
+/**
+ * Result getters
+ */
+
+WeiboAPI.prototype.get_result_items = function (data, playload, args) {
+  return data.statuses || data.comments || data.reposts || data.messages || data;
+};
+
+/**
+ * Result formatters
+ */
 
 WeiboAPI.prototype.format_search_status = function (status, args) {
   return status;
@@ -6909,10 +7143,6 @@ WeiboAPI.prototype.format_user = function (user, args) {
   return user;
 };
 
-WeiboAPI.prototype.get_result_items = function (data, playload, args) {
-  return data.statuses || data.comments || data.reposts || data.messages || data;
-};
-
 WeiboAPI.prototype.format_comment = function (comment, args) {
   comment.id = comment.idstr;
   comment.created_at = new Date(comment.created_at);
@@ -6936,6 +7166,15 @@ WeiboAPI.prototype.format_emotion = function (emotion, args) {
   return emotion;
 };
 
+/**
+ * User
+ */
+
+WeiboAPI.prototype.verify_credentials = function (user, callback) {
+  var uid = user.uid || user.id;
+  return this.user_show(user, uid, null, callback);
+};
+
 
 });
 
@@ -6956,7 +7195,9 @@ var inherits = require('util').inherits;
 var utils = require('./utils');
 var querystring = require('querystring');
 
-
+/**
+ * TAPI Base class, support OAuth v2.0
+ */
 function TBaseOauthV2() {
   TBaseOauthV2.super_.call(this);
   this.config.oauth_version = '2.0';
@@ -6965,16 +7206,42 @@ function TBaseOauthV2() {
 inherits(TBaseOauthV2, TBase);
 module.exports = TBaseOauthV2;
 
-TBaseOauthV2.prototype.get_authorization_url = function (user, callback) {
+/**
+ * Result formatters
+ */
+
+TBaseOauthV2.prototype.format_access_token = function (token) {
+  token = JSON.parse(token);
+  return token;
+};
+
+/**
+ * OAuth
+ */
+
+TBaseOauthV2.prototype.convert_token = function (user) {
   var params = {
     redirect_uri: user.oauth_callback || this.config.oauth_callback,
     client_id: this.config.appkey,
     response_type: 'code',
   };
-  params = utils.extend(params, this.config.oauth_params);
+  var oauth_scope = user.oauth_scope || this.config.oauth_scope;
+  if (oauth_scope) {
+    params.oauth_scope = oauth_scope;
+  }
+  if (user.state) {
+    // An unguessable random string. It is used to protect against cross-site request forgery attacks.
+    params.state = user.state;
+  }
+  return params;
+};
+
+TBaseOauthV2.prototype.get_authorization_url = function (user, callback) {
+  var data = this.convert_token(user);
+  data.response_type = 'code';
   var info = {
     blogtype: user.blogtype,
-    auth_url: this.format_authorization_url(params)
+    auth_url: this.format_authorization_url(data)
   };
   process.nextTick(function () {
     callback(null, info);
@@ -6982,12 +7249,7 @@ TBaseOauthV2.prototype.get_authorization_url = function (user, callback) {
   return this;
 };
 
-// http://localhost.nodeweibo.com/oauth/callback?code=0a80cb1382594e49a467b6c1e19473ec
 TBaseOauthV2.prototype.get_access_token = function (user, callback) {
-  var oauth_verifier = user.code || user.oauth_pin || user.oauth_verifier || 'no_verifier';
-  // $oauth_host/$access_token?client_id=YOUR_CLIENT_ID
-  //  &client_secret=YOUR_CLIENT_SECRET&grant_type=authorization_code
-  //  &redirect_uri=YOUR_REGISTERED_REDIRECT_URI&code=CODE
   var params = {
     type: 'POST',
     user: user,
@@ -6995,16 +7257,18 @@ TBaseOauthV2.prototype.get_access_token = function (user, callback) {
     api_host: this.config.oauth_host,
     request_method: 'get_access_token'
   };
-  var data = {
-    redirect_uri: user.oauth_callback || this.config.oauth_callback,
-    client_id: this.config.appkey,
-    client_secret: this.config.secret,
-    grant_type: 'authorization_code',
-    code: oauth_verifier,
-  };
+  var data = this.convert_token(user);
+  data.grant_type = 'authorization_code';
+  data.client_secret = this.config.secret;
+  var code = user.code || user.oauth_verifier || user.oauth_pin;
+  if (code) {
+    data.code = code;
+  }
+
   params.data = data;
-  var url = this.config.oauth_access_token;
-  this.send_request(url, params, function (err, token) {
+  var self = this;
+  var url = self.config.oauth_access_token;
+  self.send_request(url, params, function (err, token) {
     if (err) {
       return callback(err);
     }
@@ -7012,22 +7276,142 @@ TBaseOauthV2.prototype.get_access_token = function (user, callback) {
     // remind_in: '633971',
     // expires_in: 633971,
     // uid: '1827455832' }
-    token = JSON.parse(token);
-    token.oauth_token = token.access_token;
+    token = self.format_access_token(token);
+    if (!token.access_token) {
+      var message = token.error || JSON.stringify(token);
+      err = new Error(message);
+      err.data = token;
+      err.name = self.errorname('get_access_token');
+      return callback(err);
+    }
     token.blogtype = user.blogtype;
     callback(null, token);
   });
+  return this;
 };
 
 TBaseOauthV2.prototype.apply_auth = function (url, args, user) {
   args.data = args.data || {};
-  args.data.access_token = user.oauth_token || user.access_token;
+  args.data.access_token = user.access_token;
 };
 
-TBaseOauthV2.prototype.verify_credentials = function (user, callback) {
-  var uid = user.uid || user.id;
-  this.user_show(user, uid, null, callback);
+
+});
+
+require.define("/lib/github.js",function(require,module,exports,__dirname,__filename,process,global){/*!
+ * node-weibo - lib/github.js
+ * Copyright(c) 2012 fengmk2 <fengmk2@gmail.com>
+ * MIT Licensed
+ */
+
+"use strict";
+
+/**
+ * Module dependencies.
+ */
+
+var TBaseOauthV2 = require('./tbase_oauth_v2');
+var inherits = require('util').inherits;
+var TSinaAPI = require('./tsina');
+var utils = require('./utils');
+var querystring = require('querystring');
+
+
+function GithubAPI(options) {
+  GithubAPI.super_.call(this);
+   var config = utils.extend({}, options, {
+    host: 'https://api.github.com',
+    result_format: '',
+    oauth_key: '',
+    oauth_secret: '',
+    oauth_host: 'https://github.com',
+    oauth_authorize: '/login/oauth/authorize',
+    oauth_access_token: '/login/oauth/access_token',
+        
+    verify_credentials: '/user',
+    user_show: '/users/{{uid}}',
+  });
+  this.init(config);
+}
+
+inherits(GithubAPI, TBaseOauthV2);
+module.exports = GithubAPI;
+
+/**
+ * Utils methods
+ */
+
+GithubAPI.prototype.url_encode = function (text) {
+  return text;
 };
+
+/**
+ * OAuth
+ */
+
+GithubAPI.prototype.convert_token = function (user) {
+  var data = GithubAPI.super_.prototype.convert_token.call(this, user);
+  data.state = Date.now();
+  return data;
+};
+
+/**
+ * Result formatters
+ */
+
+GithubAPI.prototype.format_access_token = function (token) {
+  token = querystring.parse(token);
+  return token;
+};
+
+/**
+ *
+{ 
+  public_repos: 67,
+  following: 84,
+  created_at: '2009-11-21T08:07:35Z',
+  type: 'User',
+  email: 'fengmk2@gmail.com',
+  bio: 'nodejs',
+  blog: 'http://fengmk2.github.com',
+  location: 'Hangzhou, China',
+  gravatar_id: '95b9d41231617a05ced5604d242c9670',
+  avatar_url: 'https://secure.gravatar.com/avatar/95b9d41231617a05ced5604d242c9670?d=https://a248.e.akamai.net/assets.github.com%2Fimages%2Fgravatars%2Fgravatar-user-420.png',
+  public_gists: 21,
+  followers: 293,
+  login: 'fengmk2',
+  name: 'fengmk2',
+  company: 'http://www.taobao.com/',
+  id: 156269,
+  html_url: 'https://github.com/fengmk2',
+  hireable: false,
+  url: 'https://api.github.com/users/fengmk2'
+}
+ */
+GithubAPI.prototype.format_user = function (data) {
+  var user = {
+    id: data.login,
+    t_url: data.html_url,
+    screen_name: data.name,
+    name: data.login,
+    location: data.location,
+    url: data.blog || data.url,
+    profile_image_url: data.avatar_url + '&s=50',
+    avatar_large: data.avatar_url + '&s=180',
+    gender: 'n',
+    following: false,
+    verified: false,
+    follow_me: false,
+    followers_count: data.followers,
+    friends_count: data.following,
+    statuses_count: data.public_repos,
+    favourites_count: 0,
+    created_at: new Date(data.created_at),
+    email: data.email,
+  };
+  return user;
+};
+
 
 
 });
@@ -7059,6 +7443,10 @@ function redirect(res, url) {
   res.end();
 }
 
+function getAuthCallback(options) {
+  return options.homeUrl + options.callbackPath;
+}
+
 function login(req, res, next, options) {
   var blogtypeField = options.blogtypeField;
   var blogtype = req.query[blogtypeField];
@@ -7066,8 +7454,7 @@ function login(req, res, next, options) {
   if (!options.homeUrl) {
     options.homeUrl = 'http://' + req.headers.host;
   }
-  var authCallback = options.homeUrl + options.callbackPath +
-    '?' + blogtypeField + '=' + blogtype;
+  var authCallback = getAuthCallback(options);
   var user = {
     blogtype: blogtype,
     oauth_callback: authCallback
@@ -7100,21 +7487,10 @@ function oauthCallback(req, res, next, options) {
   req.session.oauthInfo = null;
   var token = req.query;
   token.blogtype = blogtype;
+  token.oauth_callback = getAuthCallback(options);
   if (oauthInfo.oauth_token_secret) {
     token.oauth_token_secret = oauthInfo.oauth_token_secret;
   }
-  // var oauth_token = req.query.oauth_token;
-  // var oauth_verifier = req.query.oauth_verifier || req.query.code || req.query.oauth_pin;
-  // var user = {
-  //   blogtype: blogtype,
-  //   oauth_token: oauth_token,
-  //   oauth_verifier: oauth_verifier,
-  //   oauth_token_secret: oauthInfo.oauth_token_secret,
-  //   state: req.query.state,
-  // };
-  // if (req.query.state) {
-  //   user.state = req.query.state;
-  // }
   var referer = oauthInfo.referer;
   tapi.get_access_token(token, function (err, accessToken) {
     if (err) {

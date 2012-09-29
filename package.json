@@ -5,10 +5,6 @@
   "repository": "git://github.com/fengmk2/node-weibo.git",
   "author": "fengmk2<fengmk2@gmail.com> (http://fengmk2.github.com)",
   "main": "index",
-  "contributors": [
-    { "name": "fengmk2", "email": "fengmk2@gmail.com" },
-    { "name": "hpf1908", "email": "hpf1908@gmail.com" }
-  ],
   "scripts": {
     "test": "make test"
   },
