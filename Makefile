@@ -2,11 +2,18 @@ TESTS = test/*.js
 REPORTER = spec
 TIMEOUT = 10000
 MOCHA_OPTS =
+G =
 
 test:
 	@NODE_ENV=test ./node_modules/mocha/bin/mocha \
 		--reporter $(REPORTER) \
 		--timeout $(TIMEOUT) $(MOCHA_OPTS) \
+		$(TESTS)
+
+test-g:
+	@NODE_ENV=test ./node_modules/mocha/bin/mocha \
+		--reporter $(REPORTER) \
+		--timeout $(TIMEOUT) -g "$(G)" \
 		$(TESTS)
 
 test-cov:

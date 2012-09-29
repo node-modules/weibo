@@ -7,12 +7,12 @@ Please see the [API Documents](https://github.com/fengmk2/node-weibo/blob/master
 ## Supports APIs
 
  * weibo: [http://t.sina.com.cn/](http://weibo.com/)
+ * tqq: [http://t.qq.com/](http://t.qq.com/)
  * github: [http://github.com](http://github.com), only `oauth` for now.
  * twitter(unavailable): [http://twitter.com/](http://twitter.com/)
  * facebook(unavailable): [http://facebook.com/](http://facebook.com/)
  * fanfou(unavailable): [http://fanfou.com/](http://fanfou.com/)
  * digu(unavailable): [http://digu.com/](http://digu.com/)
- * tqq: [http://t.qq.com/](http://t.qq.com/)
  * tsohu(unavailable): [http://t.sohu.com/](http://t.sohu.com/)
  * t163(unavailable): [http://t.163.com/](http://t.163.com/)
  * plurk(unavailable): [http://plurk.com/](http://plurk.com/)

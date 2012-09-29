@@ -36,13 +36,13 @@ All apis and data in `node-weibo` will convert to this unity format.
 | Read |||
 | **[User] APIs** |||
 | Read |||
-|  * [verify_credentials](#verify_credentials)(user, callback)|get oauth user profile infomation|[weibo], [tqq]|
-|  * [user_show](#user_show)(user, uid[, screen_name], callback)|get user profile infomation by uid|[weibo], [tqq]|
+|  * [verify_credentials](#verify_credentials)(user, callback)|get oauth user profile infomation|[weibo], [tqq], [github]|
+|  * [user_show](#user_show)(user, uid[, screen_name], callback)|get user profile infomation by uid|[weibo], [tqq], [github]|
 | Write |||
 | **[OAuth](#oauth) APIs** |||
 | Read |||
-|  * [get_authorization_url](#get_authorization_url)(user, callback)|get the user oauth login url|[weibo], [tqq]|
-|  * [get_access_token](#get_access_token)(user, callback)|get oauth access token|[weibo], [tqq]|
+|  * [get_authorization_url](#get_authorization_url)(user, callback)|get the user oauth login url|[weibo], [tqq], [github]|
+|  * [get_access_token](#get_access_token)(user, callback)|get oauth access token|[weibo], [tqq], [github]|
 
 |Data Structure|
 |--------------|

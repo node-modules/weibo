@@ -18,7 +18,7 @@ exports.checkComment = checkComment;
 
 function checkUser(user) {
   user.id.should.match(/^[\w\-]+$/).with.be.a('string');
-  user.t_url.should.match(/^http:\/\//);
+  user.t_url.should.match(/^https?:\/\//);
   user.screen_name.should.be.a('string');
   user.should.have.property('name').with.be.a('string');
   user.should.have.property('location').with.be.a('string');
@@ -28,8 +28,8 @@ function checkUser(user) {
   if (user.url) {
     user.url.should.be.a('string');
   }
-  user.profile_image_url.should.match(/^http:\/\//);
-  user.should.have.property('avatar_large').with.match(/^http:\/\//);
+  user.profile_image_url.should.match(/^https?:\/\//);
+  user.should.have.property('avatar_large').with.match(/^https?:\/\//);
   user.should.have.property('gender').with.match(/[mfn]/);
   user.should.have.property('followers_count').with.be.a('number');
   user.should.have.property('friends_count').with.be.a('number');
@@ -78,7 +78,7 @@ function checkStatus(status) {
   if (status.deleted) {
     return;
   }
-  status.t_url.should.match(/^http:\/\//);
+  status.t_url.should.match(/^https?:\/\//);
   status.should.have.property('created_at').with.be.an.instanceof(Date);
   should.ok(status.created_at);
   status.text.should.be.a('string');

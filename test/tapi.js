@@ -23,6 +23,7 @@ types.forEach(function (blogtype) {
 var userIDs = {
   tqq: {id: 'fengmk2', screen_name: 'Python发烧友'},
   weibo: {id: '1640328892', screen_name: 'Python发烧友'},
+  github: {id: 'fengmk2', screen_name: 'fengmk2'},
 };
 
 describe('tapi.js ' + blogtype + ' API', function () {
@@ -56,6 +57,7 @@ describe('tapi.js ' + blogtype + ' API', function () {
       tapi.get_authorization_url(user, function (err, info) {
         should.not.exist(err);
         if (info.oauth_token) {
+          // oauth v1.0
           info.oauth_token.should.length(32);
           info.oauth_token_secret.should.length(32);
         }
@@ -77,6 +79,8 @@ describe('tapi.js ' + blogtype + ' API', function () {
     it('should get current user info', function (done) {
       tapi.verify_credentials(currentUser, function (err, user) {
         should.not.exist(err);
+        user.should.have.property('id', currentUser.id);
+        user.should.have.property('screen_name', currentUser.screen_name);
         // console.log(user)
         check.checkUser(user);
         done();
@@ -91,6 +95,8 @@ describe('tapi.js ' + blogtype + ' API', function () {
       var uid = 'aichidemao2013';
       if (blogtype === 'weibo') {
         uid = '1640328892';
+      } else if (blogtype === 'github') {
+        uid = 'substack';
       }
       tapi.user_show(currentUser, uid, function (err, user) {
         should.not.exist(err);
@@ -115,6 +121,10 @@ describe('tapi.js ' + blogtype + ' API', function () {
   });
 
   describe('update()', function () {
+
+    if (blogtype === 'github') {
+      return;
+    }
 
     it('should post a status and check the text', function (done) {
       var text = '这是 update(user, status, callback) ++!--% &amp; \\!@#$%^&*() + _ | / ? 的单元测试，当前时间 ' + new Date();
@@ -151,6 +161,10 @@ describe('tapi.js ' + blogtype + ' API', function () {
   });
 
   describe('upload()', function () {
+
+    if (blogtype === 'github') {
+      return;
+    }
 
     var picpath = path.join(__dirname, 'snake.jpg');
 
@@ -219,6 +233,11 @@ describe('tapi.js ' + blogtype + ' API', function () {
   });
 
   describe('repost()', function () {
+
+    if (blogtype === 'github') {
+      return;
+    }
+
     var newStatus;
     before(function (done) {
       tapi.update(currentUser, 'must be repost soon ' + new Date(), function (err, status) {
@@ -279,6 +298,11 @@ describe('tapi.js ' + blogtype + ' API', function () {
   });
 
   describe('destroy()', function () {
+
+    if (blogtype === 'github') {
+      return;
+    }
+
     var newStatus;
     before(function (done) {
       tapi.update(currentUser, 'must be destroy soon ' + new Date(), function (err, status) {
@@ -344,6 +368,11 @@ describe('tapi.js ' + blogtype + ' API', function () {
   });
 
   describe('show()', function () {
+
+    if (blogtype === 'github') {
+      return;
+    }
+
     it('should get a status by id', function (done) {
       var id = '164652015311097';
       if (blogtype === 'weibo') {
@@ -360,6 +389,11 @@ describe('tapi.js ' + blogtype + ' API', function () {
   });
 
   describe('home_timeline()', function () {
+
+    if (blogtype === 'github') {
+      return;
+    }
+
     it('should list recent 20 home timeline statuses with no cursor', function (done) {
       tapi.home_timeline(currentUser, function (err, result) {
         should.not.exist(err);
@@ -395,6 +429,11 @@ describe('tapi.js ' + blogtype + ' API', function () {
   });
 
   describe('public_timeline()', function () {
+
+    if (blogtype === 'github') {
+      return;
+    }
+
     it('should list recent 20 public timeline statuses with no cursor', function (done) {
       tapi.public_timeline(currentUser, function (err, result) {
         should.not.exist(err);
@@ -428,6 +467,11 @@ describe('tapi.js ' + blogtype + ' API', function () {
   });
 
   describe('user_timeline()', function () {
+
+    if (blogtype === 'github') {
+      return;
+    }
+
     it('should list recent 20 current user timeline statuses with no cursor', function (done) {
       tapi.user_timeline(currentUser, function (err, result) {
         should.not.exist(err);
@@ -468,6 +512,11 @@ describe('tapi.js ' + blogtype + ' API', function () {
   });
 
   describe('mentions()', function () {
+
+    if (blogtype === 'github') {
+      return;
+    }
+
     it('should list recent 20 @me statuses with no cursor', function (done) {
       tapi.mentions(currentUser, function (err, result) {
         should.not.exist(err);
@@ -502,6 +551,10 @@ describe('tapi.js ' + blogtype + ' API', function () {
 
   describe('search()', function () {
 
+    if (blogtype === 'github') {
+      return;
+    }
+
     var test = xit;
     if (tapi.support(currentUser, 'search')) {
       test = it;
@@ -524,6 +577,10 @@ describe('tapi.js ' + blogtype + ' API', function () {
   });
 
   describe('comments_timeline()', function () {
+
+    if (blogtype === 'github') {
+      return;
+    }
 
     it('should list recent 20 comments to my statuses with no cursor', function (done) {
       tapi.comments_timeline(currentUser, function (err, result) {
@@ -558,6 +615,11 @@ describe('tapi.js ' + blogtype + ' API', function () {
   });
   
   describe('comments_mentions()', function () {
+
+    if (blogtype === 'github') {
+      return;
+    }
+
     var test = xit;
     if (tapi.support(currentUser, 'comments_mentions')) {
       test = it;
@@ -596,6 +658,11 @@ describe('tapi.js ' + blogtype + ' API', function () {
   });
 
   describe('comments_to_me()', function () {
+
+    if (blogtype === 'github') {
+      return;
+    }
+
     var test = xit;
     if (tapi.support(currentUser, 'comments_to_me')) {
       test = it;
@@ -634,6 +701,11 @@ describe('tapi.js ' + blogtype + ' API', function () {
   });
 
   describe('comments_by_me()', function () {
+
+    if (blogtype === 'github') {
+      return;
+    }
+
     var test = xit;
     if (tapi.support(currentUser, 'comments_by_me')) {
       test = it;
@@ -672,6 +744,11 @@ describe('tapi.js ' + blogtype + ' API', function () {
   });
 
   describe('repost_timeline()', function () {
+
+    if (blogtype === 'github') {
+      return;
+    }
+
     var id = '164652015311097';
     if (blogtype === 'weibo') {
       id = '2830347985';
@@ -693,6 +770,10 @@ describe('tapi.js ' + blogtype + ' API', function () {
   });
 
   describe('comments()', function () {
+    if (blogtype === 'github') {
+      return;
+    }
+    
     var id = '164652015311097';
     if (blogtype === 'weibo') {
       id = '2830347985';
@@ -715,6 +796,11 @@ describe('tapi.js ' + blogtype + ' API', function () {
   });
 
   describe('comment_create()', function () {
+
+    if (blogtype === 'github') {
+      return;
+    }
+
     var id = '70997003338788';
     if (blogtype === 'weibo') {
       id = '2830347985';
@@ -781,6 +867,11 @@ describe('tapi.js ' + blogtype + ' API', function () {
   });
 
   describe('comment_reply()', function () {
+
+    if (blogtype === 'github') {
+      return;
+    }
+
     var cid = '83231031553455';
     var id = '70997003338788';
     if (blogtype === 'weibo') {
@@ -852,6 +943,10 @@ describe('tapi.js ' + blogtype + ' API', function () {
   });
 
   describe('comment_destroy()', function () {
+
+    if (blogtype === 'github') {
+      return;
+    }
 
     var test = xit;
     var newComment;

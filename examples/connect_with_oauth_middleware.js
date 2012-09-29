@@ -16,7 +16,7 @@ var weibo = require('../');
  */ 
 
 weibo.init('weibo', '1122960051', 'e678e06f627ffe0e60e2ba48abe3a1e3');
-// weibo.init('github', '8e14edfda73a71f1f226', '1796ac639a8ada0dff6acfee2d63390440ca0f3b');
+weibo.init('github', '8e14edfda73a71f1f226', '1796ac639a8ada0dff6acfee2d63390440ca0f3b');
 weibo.init('tqq', '801196838', '9f1a88caa8709de7dccbe3cae4bdc962');
 
 /**
@@ -35,11 +35,11 @@ var app = connect(
     callbackPath: '/oauth/callback',
     blogtypeField: 'type',
     afterLogin: function (req, res, callback) {
-      console.log(req.session.oauthUser.screen_name, 'login success');
+      console.log(req.session.oauthUser && req.session.oauthUser.screen_name, 'login success');
       process.nextTick(callback);
     },
     beforeLogout: function (req, res, callback) {
-      console.log(req.session.oauthUser.screen_name, 'loging out');
+      console.log(req.session.oauthUser && req.session.oauthUser.screen_name, 'loging out');
       process.nextTick(callback);
     }
   })
@@ -57,8 +57,8 @@ app.use('/', function (req, res, next) {
   res.end('Hello, <img src="' + user.profile_image_url + '" />\
     <a href="' + user.t_url + 
     '" target="_blank">@' + user.screen_name + '</a>. ' + 
-    '<a href="/logout">Logout</a>');
+    '<a href="/logout">Logout</a><hr/><pre><code>' + JSON.stringify(user, null, '  ') + '</code></pre>');
 });
 
 app.listen(8088);
-console.log('Server start on http://localhost:8088/');
+console.log('Server start on http://localhost.nodeweibo.com:8088/');
