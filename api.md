@@ -18,6 +18,7 @@ All apis and data in `node-weibo` will convert to this unity format.
 |  * [mentions](#mentions)(user[, cursor], callback)|List @me timeline statuses|[weibo], [tqq]|
 |  * [repost_timeline](#repost_timeline)(user, id[, cursor], callback)|List one status's reposted statuses|[weibo], [tqq]|
 |  * [search](#search-statuses)(user, query, cursor, callback)|Search statues|[tqq]|
+|  * [process_text](#process_text)(user, status)|Process text to display html format.|[weibo]|
 | **[Comment](#comment) APIs** |||
 | Write |||
 |  * [comment_create](#comment_create)(user, id, comment, callback)|post a comment to a status|[weibo], [tqq]|
@@ -286,6 +287,19 @@ repost_timeline(user, id[, cursor], callback)
  * @return {Context} this
  */
 search: function (user, query, cursor, callback)
+```
+
+### process_text
+
+```js
+/**
+ * Process text to display format.
+ * 
+ * @param {User} user
+ * @param {Status} status
+ * @return {String}
+ */
+process_text: function (user, status)
 ```
 
 ## OAuth APIs

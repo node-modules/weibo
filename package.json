@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "eventproxy": ">=0.1.2",
+    "emoji": ">=0.1.1",
     "urllib": ">=0.2.9"
   },
   "keywords": [
