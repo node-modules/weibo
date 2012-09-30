@@ -165,6 +165,15 @@ app.listen(8088);
 console.log('Server start on http://localhost:8088/');
 ```
 
+## Test
+
+```bash
+$ npm install
+$ npm test
+```
+
+jscoverage: [79%](http://fengmk2.github.com/coverage/node-weibo.html)
+
 ## Authors
 
 Below is the output from `git-summary`.

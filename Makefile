@@ -19,6 +19,7 @@ test-g:
 test-cov:
 	@rm -rf ./lib-cov
 	@$(MAKE) lib-cov
+	@WEIBO_COV=1 $(MAKE) test REPORTER=dot
 	@WEIBO_COV=1 $(MAKE) test REPORTER=html-cov > coverage.html
 
 lib-cov:

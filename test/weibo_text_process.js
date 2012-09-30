@@ -10,8 +10,9 @@
  * Module dependencies.
  */
 
-var WeiboAPI = require('../lib/weibo');
-var weibo = require('../');
+var libpath = process.env.WEIBO_COV ? '../lib-cov' : '../lib';
+var WeiboAPI = require(libpath + '/weibo');
+var weibo = require(libpath + '/tapi');
 
 describe('text_process.js', function () {
 

@@ -1021,6 +1021,29 @@ describe('tapi.js ' + blogtype + ' API', function () {
 
   });
 
+  describe('favorites()', function () {
+
+    if (!tapi.support(currentUser, 'favorites')) {
+      return;
+    }
+
+    it('should return recently top 20 favorites items', function (done) {
+      tapi.favorites(currentUser, function (err, result) {
+        should.not.exist(err);
+        should.exist(result);
+        result.should.have.property('items').with.be.an.instanceof(Array);
+        result.items.length.should.above(18);
+        for (var i = 0; i < result.items.length; i++) {
+          var item = result.items[i];
+          // console.log(item);
+          check.checkFavorite(item);
+        } 
+        done();
+      });
+    });
+
+  });
+
 });
 
 });

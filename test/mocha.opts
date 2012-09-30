@@ -1,3 +1,2 @@
 --require should
---require ./test/proxy.js
---require ./test/config.js
+--require test/config.js

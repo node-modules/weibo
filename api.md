@@ -31,6 +31,13 @@ All apis and data in `node-weibo` will convert to this unity format.
 |  * [comments_timeline](#comments_timeline)(user[, cursor], callback)|List comments to my statues|[weibo], [tqq]|
 |  * [comments_to_me](#comments_to_me)(user[, cursor], callback)|List comments to me|[weibo]|
 |  * [comments_by_me](#comments_by_me)(user[, cursor], callback)|List comments by me|[weibo]|
+| **[Favorite](#favorite) APIs** |||
+| Write |||
+|  * [favorite_create](#favorite_create)(user, id, callback)|Add a status to favorites|[weibo], [tqq]|
+|  * [favorite_destroy](#favorite_destroy)(user, id, callback)|Remove the status from favorites|[weibo], [tqq]|
+| Read |||
+|  * [favorites](#favorites)(user[, cursor], callback)|List favorites|[weibo], [tqq]|
+|  * [favorite_show](#favorite_show)(user, id, callback)|Show a favorite item|[weibo], [tqq]|
 | **[Message](#message) APIs** |||
 | Write |||
 |  * [message_create](#message_create)(user, text, id, callback)|post a message to some one|-|
@@ -578,6 +585,80 @@ comment_reply: function (user, cid, id, comment, callback)
 comment_destroy: function (user, cid, callback) {
 ```
 
+## Favorite APIs
+
+### favorites
+
+```js
+/**
+ * List favorites.
+ * 
+ * @param {User} user
+ * @param {Cursor} [cursor]
+ *  - {String} since_id
+ *  - {String} max_id
+ *  - {String} [since_time], only for tqq
+ *  - {String} [max_time], only for tqq
+ *  - {Number} count, default is `20`
+ *  - {Number} page
+ * @param {Function(err, result)} callback
+ *  {Object} result:
+ *   - {Array} items, [Favorite, ...]
+ *   - {Cursor} cursor
+ *   - ...
+ * @return {Context} this
+ */
+favorites: function (user, cursor, callback)
+```
+
+### favorite_show
+
+```js
+/**
+ * Show a favorite item by item id.
+ * 
+ * @param {User} user
+ * @param {String} id, favorite item's id.
+ * @param {Function(err, favorite)} callback
+ * @return {Context} this
+ */
+favorite_show: function (user, id, callback)
+```
+
+### favorite_create
+
+```js
+/**
+ * Add a status to favorites.
+ * 
+ * @param {User} user
+ * @param {String} id, status's id.
+ * @param {Function(err, result)} callback
+ *  - {Object} result
+ *   - {String} id, relation item's id.
+ *   - addtional infomation maybe.
+ * @return {Context} this
+ */
+favorite_create: function (user, id, callback)
+```
+
+### favorite_destroy
+
+```js
+/**
+ * Remove the status from favorites.
+ * 
+ * @param {User} user
+ * @param {String} id, the favorite item's id.
+ * @param {Function(err, result)} callback
+ *  - {Object} result
+ *   - {String} id, relation item's id.
+ *   - addtional infomation maybe.
+ * @return {Context} this
+ */
+favorite_destroy: function (user, id, callback)
+```
+
 ## Data Structure
 
 ### Status
@@ -940,6 +1021,34 @@ Demo:
   },
  ...
 ]
+```
+
+### Favorite
+
+|Field name|Data Type|Description|Demo|
+|----------|---------|-----------|----|
+|status|[Status]|Status detail infomation|`{id: "123123", text: "foo", ...}`|
+|[tags]|Array|Favorite item's tag list|`[{id: '123', tag: 'funny'}, ...]`|
+|[created_at]|Date|favorite item create time|`new Date("Thu Jun 02 15:16:16 +0800 2011")`|
+
+Demo:
+
+```js
+{
+  "status": {
+    "id": "11488058246",
+    "text": "求关注。"，
+    // ...
+  },
+  "tags": [
+    {
+      "id": 23,
+      "tag": "80后"
+    },
+    // ...
+  ],
+  "favorited_time": new Date("Thu Jun 02 15:16:16 +0800 2011")
+}
 ```
 
 ## OAuth

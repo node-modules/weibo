@@ -2,7 +2,8 @@
  * Module dependencies.
  */
 
-var weibo = require('../');
+var libpath = process.env.WEIBO_COV ? '../lib-cov' : '../lib';
+var weibo = require(libpath + '/tapi');
 
 var oauth_callback = 'http://localhost.nodeweibo.com:8088/oauth/callback';
 

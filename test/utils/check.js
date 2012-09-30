@@ -16,6 +16,7 @@ exports.checkUser = checkUser;
 exports.checkStatus = checkStatus;
 exports.checkComment = checkComment;
 exports.checkCount = checkCount;
+exports.checkFavorite = checkFavorite;
 
 function checkUser(user) {
   user.id.should.match(/^[\w\-]+$/).with.be.a('string');
@@ -127,6 +128,18 @@ function checkGEO(geo) {
   }
   if ('province_name' in geo) {
     geo.province_name.should.be.a('string');
+  }
+}
+
+function checkFavorite(favorite) {
+  favorite.should.have.property('status');
+  checkStatus(favorite.status);
+  favorite.should.have.property('created_at').with.be.an.instanceof(Date);
+  if (favorite.tags) {
+    for (var i = 0; i < favorite.tags.length; i++) {
+      var tag = favorite.tags[i];
+      tag.should.have.keys('id', 'tag');
+    }
   }
 }
 

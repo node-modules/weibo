@@ -8,7 +8,8 @@
  * Module dependencies.
  */
 
-var oauth = require('../lib/oauth');
+var libpath = process.env.WEIBO_COV ? '../lib-cov' : '../lib';
+var oauth = require(libpath + '/oauth');
 
 describe('oauth test', function () {
 
