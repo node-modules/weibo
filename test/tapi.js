@@ -388,6 +388,51 @@ describe('tapi.js ' + blogtype + ' API', function () {
     });
   });
 
+  describe('count()', function () {
+
+    if (blogtype === 'github') {
+      return;
+    }
+
+    it('should get statuses counts by ids', function (done) {
+      var ids = '131214014527619,141401129216965';
+      if (blogtype === 'weibo') {
+        ids = '3495319633461422,3496092735702068';
+      }
+      tapi.count(currentUser, ids, function (err, counts) {
+        should.not.exist(err);
+        should.exist(counts);
+        counts.should.length(2);
+        // console.log(counts)
+        for (var i = 0; i < counts.length; i++) {
+          var count = counts[i];
+          check.checkCount(count);
+        }
+        done();
+      });
+    });
+
+    it('should error when ids is empty', function (done) {
+      var ids = '';
+      tapi.count(currentUser, ids, function (err, counts) {
+        should.exist(err);
+        should.not.exist(counts);
+        err.should.have.property('name', 'CountError');
+        if (blogtype === 'tqq') {
+          err.should.have.property('message', 'error ids len');
+          err.data.should.have.property('errcode', 16);
+          err.data.should.have.property('ret', 1);
+        } else if (blogtype === 'weibo') {
+          err.should.have.property('message', 'parameter (ids)\'s value invalid,expect (str[str length：1~-1]), but get (), see doc for more info.');
+          err.data.should.have.property('error_code', 10017);
+          err.data.should.have.property('request', '/2/statuses/count.json');
+        }
+        done();
+      });
+    });
+
+  });
+
   describe('home_timeline()', function () {
 
     if (blogtype === 'github') {

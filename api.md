@@ -12,6 +12,7 @@ All apis and data in `node-weibo` will convert to this unity format.
 |  * [destroy](#destroy)(user, id, callback)|Remove a status by id|[weibo], [tqq]|
 | Read |||
 |  * [show](#show)(user, id, callback)|Get a status by id|[weibo], [tqq]|
+|  * [count](#status_count)(user, ids, callback)|Get statuses comment count and repost count by ids|[weibo], [tqq]|
 |  * [home_timeline](#home_timeline)(user[, cursor], callback)|List user home timeline statuses|[weibo], [tqq]|
 |  * [user_timeline](#user_timeline)(user[, cursor], callback)|List user personal timeline statuses|[weibo], [tqq]|
 |  * [public_timeline](#public_timeline)(user[, cursor], callback)|List public timeline statuses|[weibo], [tqq]|
@@ -53,6 +54,7 @@ All apis and data in `node-weibo` will convert to this unity format.
 |[Message]|
 |[GEO]|
 |[Cursor]|
+|[Count]|
 
 ## Status APIs
 
@@ -141,6 +143,24 @@ destroy(user, id, callback)
 * @return {Context} this
 */
 show(user, id, callback)
+```
+
+<a name="status_count"/>
+### count
+
+```js
+/**
+ * Get statuses comment count and repost count by ids.
+ * 
+ * @param {User} user
+ * @param {String|Array} ids, separate by comma.
+ * @param {Function(err, counts)} callback
+ *   - {String} id
+ *   - {Number} comments
+ *   - {Number} reposts
+ * @return {Context} this
+ */
+count: function (user, ids, callback)
 ```
 
 ### home_timeline
@@ -898,6 +918,30 @@ Demo:
 }
 ```
 
+<a name="count_structure" />
+### Count
+
+|Field name|Data Type|Description|Demo|
+|----------|---------|-----------|----|
+|id|string|Status's id|`"32817222"`|
+|comments|Number|Comment's count|`16`|
+|reposts|Number|Repost statuses's count|`38`|
+|[attitudes]|Number|attitudes's count, only [weibo] support now.|`10`|
+
+Demo:
+
+```js
+[
+  {
+    "id": "32817222",
+    "comments": 16,
+    "reposts": 38,
+    "attitudes": 10
+  },
+ ...
+]
+```
+
 ## OAuth
 
 ### RequestToken
@@ -931,6 +975,7 @@ Demo:
   [Message]: #message
   [GEO]: #geo
   [Cursor]: #cursor
+  [Count]: #count_structure
   [weibo]: http://open.weibo.com
   [tqq]: http://dev.t.qq.com
   [t163]: http://open.t.163.com

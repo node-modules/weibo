@@ -15,6 +15,7 @@ var should = require('should');
 exports.checkUser = checkUser;
 exports.checkStatus = checkStatus;
 exports.checkComment = checkComment;
+exports.checkCount = checkCount;
 
 function checkUser(user) {
   user.id.should.match(/^[\w\-]+$/).with.be.a('string');
@@ -129,3 +130,12 @@ function checkGEO(geo) {
   }
 }
 
+function checkCount(count) {
+  count.should.have.property('id').with.be.a('string');
+  count.id.should.match(/^\d+$/);
+  count.should.have.property('comments').with.be.a('number');
+  count.should.have.property('reposts').with.be.a('number');
+  if (count.attitudes) {
+    count.attitudes.should.be.a('number');
+  }
+}
