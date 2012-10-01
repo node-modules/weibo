@@ -1044,6 +1044,130 @@ describe('tapi.js ' + blogtype + ' API', function () {
 
   });
 
+  describe('favorite_show()', function () {
+
+    if (!tapi.support(currentUser, 'favorite_show')) {
+      return;
+    }
+
+    var id = '130714030326029';
+    if (blogtype === 'weibo') {
+      id = '3496082502085667';
+    }
+
+    it('should get the favorie item', function (done) {
+      tapi.favorite_show(currentUser, id, function (err, item) {
+        should.not.exist(err);
+        should.exist(item);
+        check.checkFavorite(item);
+        done();
+      });
+    });
+
+  });
+
+  describe('favorite_create()', function () {
+
+    if (!tapi.support(currentUser, 'favorite_create')) {
+      return;
+    }
+
+    var id = '27933112527179';
+    if (blogtype === 'weibo') {
+      id = '3496055356589436';
+    }
+
+    before(function (done) {
+      tapi.favorite_destroy(currentUser, id, function () {
+        done();
+      });
+    });
+
+    it('should favorie the status by id', function (done) {
+      tapi.favorite_create(currentUser, id, function (err, item) {
+        should.not.exist(err);
+        // console.log(item)
+        should.exist(item);
+        check.checkFavorite(item);
+        done();
+      });
+    });
+
+    it('should favorie the same status', function (done) {
+      tapi.favorite_create(currentUser, id, function (err, item) {
+        if (blogtype === 'tqq') {
+          // will success
+          should.not.exist(err);
+          should.exist(item);
+          check.checkFavorite(item);
+          return done();
+        }
+        should.exist(err);
+        should.not.exist(item);
+        err.should.have.property('name', 'FavoriteCreateError');
+        if (blogtype === 'weibo') {
+          err.should.have.property('message', 'you have collected this status!');
+          err.should.have.property('data').with.be.a('object');
+          err.data.should.have.property('error_code', 20704);
+          err.data.should.have.property('request', '/2/favorites/create.json');
+        }
+        done();
+      });
+    });
+
+  });
+
+  describe('favorite_destroy()', function () {
+
+    if (!tapi.support(currentUser, 'favorite_destroy')) {
+      return;
+    }
+
+    var id = '27933112527179';
+    if (blogtype === 'weibo') {
+      id = '3496055356589436';
+    }
+
+    before(function (done) {
+      tapi.favorite_create(currentUser, id, function () {
+        done();
+      });
+    });
+
+    it('should remove a favorite item by id', function (done) {
+      tapi.favorite_destroy(currentUser, id, function (err, item) {
+        should.not.exist(err);
+        // console.log(item)
+        should.exist(item);
+        check.checkFavorite(item);
+        done();
+      });
+    });
+
+    it('should remove the same favorite item', function (done) {
+      tapi.favorite_destroy(currentUser, id, function (err, item) {
+        if (blogtype === 'tqq') {
+          // will success
+          should.not.exist(err);
+          should.exist(item);
+          check.checkFavorite(item);
+          return done();
+        }
+        should.exist(err);
+        should.not.exist(item);
+        err.should.have.property('name', 'FavoriteDestroyError');
+        if (blogtype === 'weibo') {
+          err.should.have.property('message', 'not your collection!');
+          err.should.have.property('data').with.be.a('object');
+          err.data.should.have.property('error_code', 20705);
+          err.data.should.have.property('request', '/2/favorites/destroy.json');
+        }
+        done();
+      });
+    });
+
+  });
+
 });
 
 });

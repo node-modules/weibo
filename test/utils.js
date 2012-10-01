@@ -16,13 +16,19 @@ var sha1 = require(libpath + '/sha1');
 
 describe('utils.js', function () {
 
-  describe('String.format()', function () {
+  describe('utils.format(tpl, params)', function () {
     it('should format success', function () {
-      '{{hello}}, {{foo}}!!!'.format({
+      utils.format('{{hello}}, {{foo}}!!!', {
         hello: '你好',
         foo: 'foolish',
         bar: 'bar'
       }).should.equal('你好, foolish!!!');
+    });
+
+    it('should format with match callback', function () {
+      utils.format('{{hello}}, {{foo}}!!!', function (m, k) {
+        return k + '哈哈';
+      }).should.equal('hello哈哈, foo哈哈!!!');
     });
   });
 

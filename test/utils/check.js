@@ -77,7 +77,7 @@ function checkUser(user) {
 
 function checkStatus(status) {
   status.should.have.property('id').with.match(/^\d+$/);
-  if (status.deleted) {
+  if (status.deleted || !status.created_at) {
     return;
   }
   status.t_url.should.match(/^https?:\/\//);
