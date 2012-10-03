@@ -12,6 +12,7 @@
     "after",
     "should",
     "jQuery",
+    "window",
     "weibo"
   ],
 

@@ -412,6 +412,20 @@ describe('tapi.js ' + blogtype + ' API', function () {
       });
     });
 
+    it('should get many ids counts', function (done) {
+      var ids = ["111318005835652","104417044624881","116318010008931","41994132913658","82177066854856","132656061790828","26982128953962","3990127024926","66445025297060","93432007200508","80669000906359","141647121347584","26973086189917","21869046756098","53441070691757","91904115047948","87933092979645","122306078212487","69434055308055","142144126035696","111305100574676","112801084258174","102393050096034","74879089594916","29472011805270","12977059235230","48445109483234","25473012801479","67429009192876","110301000953825","54935021681316","25966123739832"];
+      tapi.count(currentUser, ids, function (err, counts) {
+        should.not.exist(err);
+        should.exist(counts);
+        counts.should.length(ids.length);
+        for (var i = 0; i < counts.length; i++) {
+          var count = counts[i];
+          check.checkCount(count);
+        }
+        done();
+      });
+    });
+
     it('should error when ids is empty', function (done) {
       var ids = '';
       tapi.count(currentUser, ids, function (err, counts) {
@@ -864,8 +878,10 @@ describe('tapi.js ' + blogtype + ' API', function () {
     }
     
     var id = '164652015311097';
+    var sinceParams = { id: 150161002336620, params: {count: 10 } };
     if (blogtype === 'weibo') {
       id = '2830347985';
+      sinceParams = { id: 3497138228866132, params: {count: 10 } };
     }
     it('should list recent 9 status:' + id + ' comments', function (done) {
       tapi.comments(currentUser, id, {count: 9}, function (err, result) {
@@ -880,6 +896,27 @@ describe('tapi.js ' + blogtype + ' API', function () {
           check.checkComment(result.items[i]);
         }
         done();
+      });
+    });
+
+    it('should list be since_id and not include the since_id', function (done) {
+      tapi.comments(currentUser, sinceParams.id, sinceParams.params, function (err, result) {
+        should.not.exist(err);
+        var comments = result.items;
+        comments.length.should.above(0);
+        var first = comments[0];
+        sinceParams.params.since_id = first.id;
+        if (first.timestamp) {
+          sinceParams.params.since_time = first.timestamp;
+        }
+        tapi.comments(currentUser, sinceParams.id, sinceParams.params, function (err, result) {
+          should.not.exist(err);
+          var comments = result.items;
+          if (comments.length) {
+            comments[comments.length - 1].id.should.not.equal(first.id);
+          }
+          done();
+        });
       });
     });
   });
