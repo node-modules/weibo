@@ -5,7 +5,7 @@
 var libpath = process.env.WEIBO_COV ? '../lib-cov' : '../lib';
 var weibo = require(libpath + '/tapi');
 
-var oauth_callback = 'http://localhost.nodeweibo.com:8088/oauth/callback';
+var oauth_callback = 'http://nodeweibo.org/oauth/callback';
 
 // init appkey
 weibo.init('tqq', '801196838', '9f1a88caa8709de7dccbe3cae4bdc962', 'oob');
@@ -33,7 +33,7 @@ var users = exports.users = {
 };
 
 // var user = users.tqq;
-// var user = users.weibo;
+var user = users.weibo;
 // var user = users.github;
 // weibo.get_authorization_url(user, function (err, auth_info) {
 //   console.log(err, auth_info);
@@ -46,12 +46,13 @@ var users = exports.users = {
 // http://localhost.nodeweibo.com:8088/oauth/callback?code=70c616ef260be1304e12&state=1348901925953
 // weibo.get_access_token({ 
 //   blogtype: user.blogtype,
-//   oauth_verifier: '70c616ef260be1304e12',
-//   state: '1348901925953',
+//   oauth_verifier: '168c90094e41d2ec882504a45ba0caeb',
+//   // state: '1348901925953',
 // }, function (err, auth_user) {
 //   console.log(err, auth_user);
 // });
 
-// tapi.user_timeline({ user: user }, function (error, data) {
-//   console.log(data[0]);
+// weibo.user_timeline(user, function (err, data) {
+//   console.log(data.items[0]);
 // });
+

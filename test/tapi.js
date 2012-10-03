@@ -439,6 +439,8 @@ describe('tapi.js ' + blogtype + ' API', function () {
       return;
     }
 
+    var since_time, since_id, max_time, max_id;
+
     it('should list recent 20 home timeline statuses with no cursor', function (done) {
       tapi.home_timeline(currentUser, function (err, result) {
         should.not.exist(err);
@@ -451,6 +453,47 @@ describe('tapi.js ' + blogtype + ' API', function () {
           // console.log(result.items[i])
           check.checkStatus(result.items[i]);
         }
+        var first = result.items[0];
+        var last = result.items[result.items.length - 1];
+        max_id = last.id;
+        max_time = last.timestamp;
+        since_id = first.id;
+        since_time = first.timestamp;
+        done();
+      });
+    });
+
+    it('should list prev 20 home timeline statuses with {since_id, since_time}', function (done) {
+      tapi.home_timeline(currentUser, {since_id: since_id, since_time: since_time}, 
+      function (err, result) {
+        should.not.exist(err);
+        should.exist(result);
+        result.should.have.property('items').with.be.an.instanceof(Array);
+        result.items.should.be.an.instanceof(Array);
+        result.should.have.property('cursor').with.be.a('object');
+        // result.items.length.should.above(0);
+        for (var i = 0; i < result.items.length; i++) {
+          check.checkStatus(result.items[i]);
+        }
+        done();
+      });
+    });
+
+    it('should list next 20 home timeline statuses with {max_id, max_time}', function (done) {
+      tapi.home_timeline(currentUser, {max_id: max_id, max_time: max_time}, 
+      function (err, result) {
+        should.not.exist(err);
+        should.exist(result);
+        result.should.have.property('items').with.be.an.instanceof(Array);
+        result.items.should.be.an.instanceof(Array);
+        result.should.have.property('cursor').with.be.a('object');
+        result.items.length.should.above(0);
+        for (var i = 0; i < result.items.length; i++) {
+          check.checkStatus(result.items[i]);
+        }
+        var first = result.items[0];
+        first.timestamp.should.below(max_time);
+        // first.id.should.below(max_id);
         done();
       });
     });
@@ -471,6 +514,7 @@ describe('tapi.js ' + blogtype + ' API', function () {
         done();
       });
     });
+
   });
 
   describe('public_timeline()', function () {
