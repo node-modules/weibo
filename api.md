@@ -99,6 +99,8 @@ update(user, status, callback)
  *  - {Buffer|ReadStream} data
  *  - {String} [name], image file name
  *  - {String} [content_type], data content type
+ *  - {Function(info)} [progress], upload progress callback.
+ *   - {Object} info: {total: total Size, loaded: upload Size}.
  * @param {Function(Error, Status)} callback
  * @return {Context} this
  */
