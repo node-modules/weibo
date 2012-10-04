@@ -109,10 +109,24 @@ describe('tapi.js ' + blogtype + ' API', function () {
 
     if (blogtype === 'weibo') {
       it('should get a user info by screen_name', function (done) {
-        tapi.user_show(currentUser, '123', 'Python发烧友', function (err, user) {
+        tapi.user_show(currentUser, null, 'Python发烧友', function (err, user) {
           should.not.exist(err);
           should.exist(user);
           user.should.have.property('screen_name', 'Python发烧友');
+          check.checkUser(user);
+          done();
+        });
+      });
+
+      var uid = '1828485392';
+      var screen_name = 'nodejs发烧友';
+
+      it('should get user with uid and screen_name', function (done) {
+        tapi.user_show(currentUser, uid, screen_name, function (err, user) {
+          should.not.exist(err);
+          should.exist(user);
+          user.should.have.property('screen_name', screen_name);
+          user.should.have.property('id', uid);
           check.checkUser(user);
           done();
         });
@@ -1251,6 +1265,26 @@ describe('tapi.js ' + blogtype + ' API', function () {
           err.data.should.have.property('error_code', 20705);
           err.data.should.have.property('request', '/2/favorites/destroy.json');
         }
+        done();
+      });
+    });
+
+  });
+
+  describe('friendship_show()', function () {
+
+    var source_id = '1828485392';
+    var target_id = '1827455832';
+    var source_screen_name = 'nodejs发烧友';
+    var target_screen_name = 'node微博';
+
+    it('should get relation with source_id and target_id', function (done) {
+      tapi.friendship_show(currentUser, { source_id: source_id, target_id: target_id },
+      function (err, friendship) {
+        // console.log(friendship)
+        should.not.exist(err);
+        should.exist(friendship);
+        friendship.should.have.keys('target', 'source');
         done();
       });
     });

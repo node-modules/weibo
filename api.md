@@ -564,8 +564,8 @@ comment_create: function (user, id, comment, callback)
  * @param {String} id, status's id
  * @param {String|Object} comment
  *  - {String} comment
- *  - {Number} without_mention, don't auto add `'reply@username'` to comment text or not,
- *    0: yes, 1: no, default is `0`, won't auto add.
+ *  - {Number} [without_mention], auto add `'reply@username'` to comment text or not,
+ *    0: yes, 1: no, default is `1`, won't auto add.
  *  - {Number} [comment_ori], same comment to the original status when comment on a repost status,
  *    0: no, 1: yes, default is `0`.
  * @param {Function(err, result)} callback

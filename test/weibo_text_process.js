@@ -67,4 +67,22 @@ describe('weibo_text_process.js', function () {
 
   });
 
+  describe('process_emotional()', function () {
+    it('should show emotionurl', function () {
+
+      var cases = [
+        ["[ok]", '<img title="[ok]" src="http://timg.sjs.sinajs.cn/t35/style/images/common/face/ext/normal/d6/ok_org.gif" />'],
+        ["[呵呵]", '<img title="[呵呵]" src="http://timg.sjs.sinajs.cn/t35/style/images/common/face/ext/normal/ac/smilea_org.gif" />'],
+        ['[哼]', '<img title="[哼]" src="http://timg.sjs.sinajs.cn/t35/style/images/common/face/ext/normal/49/hatea_org.gif" />'],
+      ];
+
+      cases.forEach(function (item) {
+        weibo.process_text({blogtype: 'weibo'}, {text: item[0]}).should.equal(item[1]);
+      });
+
+    });
+  });
+  
+
+
 });
