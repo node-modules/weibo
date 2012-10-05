@@ -17,6 +17,7 @@ exports.checkStatus = checkStatus;
 exports.checkComment = checkComment;
 exports.checkCount = checkCount;
 exports.checkFavorite = checkFavorite;
+exports.checkMessage = checkMessage;
 
 function checkUser(user) {
   user.id.should.match(/^[\w\-]+$/).with.be.a('string');
@@ -151,4 +152,14 @@ function checkCount(count) {
   if (count.attitudes) {
     count.attitudes.should.be.a('number');
   }
+}
+
+function checkMessage(message) {
+  message.should.have.property('id').with.be.a('string');
+  message.id.should.match(/^\d+$/);
+  message.should.have.property('text').with.be.a('string');
+  message.should.have.property('sender');
+  checkUser(message.sender);
+  message.recipient && checkUser(message.recipient);
+  message.should.have.property('created_at').with.be.an.instanceof(Date);
 }

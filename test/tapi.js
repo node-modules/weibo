@@ -1291,6 +1291,75 @@ describe('tapi.js ' + blogtype + ' API', function () {
 
   });
 
+  describe('direct_messages()', function () {
+
+    if (!tapi.support(currentUser, 'direct_messages')) {
+      return;
+    }
+
+    it('should return recent message sent to me', function (done) {
+      tapi.direct_messages(currentUser, function (err, result) {
+        should.not.exist(err);
+        // console.log(result);
+        should.exist(result);
+        result.should.have.property('items').with.be.an.instanceof(Array);
+        result.items.length.should.above(0);
+        for (var i = 0; i < result.items.length; i++) {
+          var item = result.items[i];
+          check.checkMessage(item);
+        }
+        done();
+      });
+    });
+
+  });
+
+  describe('direct_messages_sent()', function () {
+
+    if (!tapi.support(currentUser, 'direct_messages_sent')) {
+      return;
+    }
+
+    it('should return recent message sent by me', function (done) {
+      tapi.direct_messages_sent(currentUser, function (err, result) {
+        should.not.exist(err);
+        // console.log(result.items[0]);
+        should.exist(result);
+        result.should.have.property('items').with.be.an.instanceof(Array);
+        result.items.length.should.above(0);
+        for (var i = 0; i < result.items.length; i++) {
+          var item = result.items[i];
+          check.checkMessage(item);
+        }
+        done();
+      });
+    });
+
+  });
+
+  describe('direct_messages_both()', function () {
+
+    if (!tapi.support(currentUser, 'direct_messages_both')) {
+      return;
+    }
+
+    it('should return recent message sent to and sent by me', function (done) {
+      tapi.direct_messages_both(currentUser, function (err, result) {
+        should.not.exist(err);
+        // console.log(result.items);
+        should.exist(result);
+        result.should.have.property('items').with.be.an.instanceof(Array);
+        result.items.length.should.above(0);
+        for (var i = 0; i < result.items.length; i++) {
+          var item = result.items[i];
+          check.checkMessage(item);
+        }
+        done();
+      });
+    });
+
+  });
+
 });
 
 });

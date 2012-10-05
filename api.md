@@ -950,7 +950,8 @@ Demo:
 |text|string|content text|`"this is a message."`|
 |created_at|Date|message sent datetime|`new Date("Tue May 24 18:04:53 +0800 2011")`|
 |sender|[User]|message sender|`{screen_name: "fengmk2", ...}`|
-|recipient|[User]|message recipient|`{id: "1233", ...}`|
+|[recipient]|[User]|message recipient|`{id: "1233", ...}`|
+|[source]|string|message source|`'<a href="http://github.com/fengmk2/node-weibo">node-weibo</a>'`|
 
 Demo:
 
