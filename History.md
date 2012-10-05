@@ -1,4 +1,17 @@
 
+0.6.4 / 2012-10-05 
+==================
+
+  * fixed direct_messages_both duplite bug.
+  * add direct_messages() apis
+  * add tqq friendship_show()
+  * follow and unfollow
+  * add friend ship
+  * add emotions and @user text process.
+  * fixed since_id include in timeline api; fixed count() dont not suppport many ids problem.
+  * fixed tqq timeline pagging problem.
+  * upload support progress callback.
+
 0.6.3 / 2012-10-01 
 ==================
 
