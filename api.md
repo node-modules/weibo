@@ -38,6 +38,12 @@ All apis and data in `node-weibo` will convert to this unity format.
 | Read |||
 |  * [favorites](#favorites)(user[, cursor], callback)|List favorites|[weibo], [tqq]|
 |  * [favorite_show](#favorite_show)(user, id, callback)|Show a favorite item|[weibo], [tqq]|
+| **[Friendship](#friendship) APIs** |||
+| Write |||
+|  * [friendship_create](#friendship_create)(user, uid, screen_name, callback)|Follow a user.|[weibo], [tqq]|
+|  * [friendship_destroy](#friendship_destroy)(user, uid, screen_name, callback)|Unfollow a user.|[weibo], [tqq]|
+| Read |||
+|  * [friendship_show](#friendship_show)(user, id, callback)|Get relation between two users. [tqq] only support current user with others relation.|[weibo], [tqq]|
 | **[Message](#message) APIs** |||
 | Write |||
 |  * [message_create](#message_create)(user, text, id, callback)|post a message to some one|-|
@@ -62,6 +68,7 @@ All apis and data in `node-weibo` will convert to this unity format.
 |[GEO]|
 |[Cursor]|
 |[Count]|
+|[Friendship]|
 
 ## Status APIs
 
@@ -1053,6 +1060,34 @@ Demo:
 }
 ```
 
+### Friendship
+
+|Field name|Data Type|Description|Demo|
+|----------|---------|-----------|----|
+|target|Object|Target user follow source user detail|`{id: "123123", followed_by: true, ...}`|
+|source|Object|Source user follow target user detail|`{id: "999", following: true, ...}`|
+
+Demo:
+
+```js
+{
+  "target": {
+    "id": 1418348195,
+    "screen_name": "zaku",
+    "followed_by": false, // followed by source
+    "following": false, // following the source
+    "notifications_enabled": false
+  },
+  "source": {
+    "id": 1734528095,
+    "screen_name": "檀木幻想",
+    "followed_by": false, // followed by target
+    "following": false, // following the target
+    "notifications_enabled": false
+  }
+}
+```
+
 ## OAuth
 
 ### RequestToken
@@ -1087,10 +1122,12 @@ Demo:
   [GEO]: #geo
   [Cursor]: #cursor
   [Count]: #count_structure
+  [Friendship]: #friendship
   [weibo]: http://open.weibo.com
   [tqq]: http://dev.t.qq.com
   [t163]: http://open.t.163.com
   [tsohu]: http://open.t.sohu.com
   [github]: http://dev.github.com
+  [twitter]: https://dev.twitter.com
 
 

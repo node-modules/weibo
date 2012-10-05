@@ -92,7 +92,7 @@ describe('tapi.js ' + blogtype + ' API', function () {
   describe('user_show()', function () {
 
     it('should get a user info by uid', function (done) {
-      var uid = 'aichidemao2013';
+      var uid = 'kaifulee';
       if (blogtype === 'weibo') {
         uid = '1640328892';
       } else if (blogtype === 'github') {
