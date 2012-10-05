@@ -1343,6 +1343,8 @@ describe('tapi.js ' + blogtype + ' API', function () {
       return;
     }
 
+    var since_id, since_time;
+
     it('should return recent message sent to and sent by me', function (done) {
       tapi.direct_messages_both(currentUser, function (err, result) {
         should.not.exist(err);
@@ -1354,6 +1356,21 @@ describe('tapi.js ' + blogtype + ' API', function () {
           var item = result.items[i];
           check.checkMessage(item);
         }
+        var first = result.items[0];
+        since_id = first.id;
+        since_time = first.timestamp;
+        done();
+      });
+    });
+
+    it('should get 0 messages when set newest since_id', function (done) {
+      var params = {since_id: since_id, since_time: since_time};
+      tapi.direct_messages_both(currentUser, params, function (err, result) {
+        should.not.exist(err);
+        // console.log(result.items);
+        should.exist(result);
+        result.should.have.property('items').with.be.an.instanceof(Array);
+        result.items.should.length(0);
         done();
       });
     });
