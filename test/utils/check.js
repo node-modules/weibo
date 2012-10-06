@@ -20,6 +20,7 @@ exports.checkFavorite = checkFavorite;
 exports.checkMessage = checkMessage;
 
 function checkUser(user) {
+  user.should.have.property('id');
   user.id.should.match(/^[\w\-]+$/).with.be.a('string');
   user.t_url.should.match(/^https?:\/\//);
   user.screen_name.should.be.a('string');

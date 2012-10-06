@@ -721,6 +721,52 @@ describe('tapi.js ' + blogtype + ' API', function () {
 
   });
 
+  describe('search_suggestions_at_users()', function () {
+
+    if (!tapi.support(currentUser, 'search_suggestions_at_users')) {
+      return;
+    }
+
+    it('should return suggestion users with "an" query', function (done) {
+      tapi.search_suggestions_at_users(currentUser, 'an', function (err, result) {
+        should.not.exist(err);
+        should.exist(result);
+        result.should.have.property('items');
+        result.items.length.should.above(0);
+        for (var i = 0; i < result.items.length; i++) {
+          var item = result.items[i];
+          item.should.have.property('id').with.be.a('string');
+          item.should.have.property('screen_name').with.be.a('string');
+          item.should.have.property('remark');
+        }
+        done();
+      });
+    });
+
+  });
+
+  describe('user_search()', function () {
+
+    if (!tapi.support(currentUser, 'user_search')) {
+      return;
+    }
+
+    it('should return 10 users', function (done) {
+      tapi.user_search(currentUser, 'python', { count: 10 }, function (err, result) {
+        should.not.exist(err);
+        should.exist(result);
+        result.should.have.property('items').with.length(10);
+        for (var i = 0; i < result.items.length; i++) {
+          var item = result.items[i];
+          // console.log(item)
+          check.checkUser(item);
+        }
+        done();
+      });
+    });
+
+  });
+
   describe('comments_timeline()', function () {
 
     if (blogtype === 'github') {
@@ -1393,23 +1439,6 @@ describe('tapi.js ' + blogtype + ' API', function () {
         should.exist(result);
         result.should.have.property('items').with.be.an.instanceof(Array);
         result.items.should.length(0);
-        done();
-      });
-    });
-
-  });
-
-  describe('search_suggestions_at_users()', function () {
-
-    if (!tapi.support(currentUser, 'search_suggestions_at_users')) {
-      return;
-    }
-
-    it('should return 10 users', function (done) {
-      tapi.search_suggestions_at_users(currentUser, 'an', function (err, result) {
-        should.not.exist(err);
-        console.log(result);
-        should.exist(result);
         done();
       });
     });
