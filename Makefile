@@ -2,7 +2,7 @@ TESTS = test/*.js
 REPORTER = spec
 TIMEOUT = 10000
 MOCHA_OPTS =
-G = "tqq API"
+G = 
 
 test:
 	@NODE_ENV=test ./node_modules/mocha/bin/mocha \

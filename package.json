@@ -6,7 +6,7 @@
   "author": "fengmk2<fengmk2@gmail.com> (http://fengmk2.github.com)",
   "main": "index",
   "scripts": {
-    "test": "make test"
+    "test": "make test-g G='tqq API'"
   },
   "devDependencies": {
     "browserify": ">=1.16.1",
