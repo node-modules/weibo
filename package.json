@@ -16,7 +16,7 @@
     "mocha": "*"
   },
   "dependencies": {
-    "eventproxy": ">=0.1.2",
+    "eventproxy": "0.1.3",
     "emoji": ">=0.1.2",
     "urllib": ">=0.2.9"
   },

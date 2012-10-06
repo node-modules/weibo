@@ -978,8 +978,8 @@ describe('tapi.js ' + blogtype + ' API', function () {
         result.should.have.property('items').with.be.an.instanceof(Array);
         result.items.should.be.an.instanceof(Array);
         result.should.have.property('cursor').with.be.a('object');
-        console.log(result.users)
-        console.log(result.items[0])
+        // console.log(result.users)
+        // console.log(result.items[0])
         result.items.length.should.above(0);
         for (var i = 0; i < result.items.length; i++) {
           // console.log(result.items[i])
@@ -1345,6 +1345,10 @@ describe('tapi.js ' + blogtype + ' API', function () {
     var target_id = '1827455832';
     var source_screen_name = 'nodejs发烧友';
     var target_screen_name = 'node微博';
+    if (blogtype === 'tqq') {
+      source_id = 'fengmk2';
+      target_id = 'qleelulu';
+    }
 
     it('should get relation with source_id and target_id', function (done) {
       tapi.friendship_show(currentUser, { source_id: source_id, target_id: target_id },
