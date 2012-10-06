@@ -684,7 +684,11 @@ describe('tapi.js ' + blogtype + ' API', function () {
     }
 
     test('should search with keyword:fawave', function (done) {
-      tapi.search(currentUser, 'fawave', function (err, result) {
+      var cursor = {
+        count: 20,
+        page: 1
+      };
+      tapi.search(currentUser, 'fawave', cursor, function (err, result) {
         should.not.exist(err);
         should.exist(result);
         result.should.have.property('items').with.be.an.instanceof(Array);
@@ -693,7 +697,25 @@ describe('tapi.js ' + blogtype + ' API', function () {
           check.checkStatus(result.items[i]);
         }
         result.should.have.property('cursor').with.be.a('object');
-        done();
+        var first = result.items[0];
+        var last = result.items[result.items.length - 1];
+        // next page
+        var cursor2 = {
+          count: 20,
+          page: 2
+        };
+        tapi.search(currentUser, 'fawave', cursor2, function (err, result) {
+          should.not.exist(err);
+          should.exist(result);
+          result.should.have.property('items').with.be.an.instanceof(Array);
+          result.items.should.be.an.instanceof(Array).with.length(20);
+          for (var i = 0; i < result.items.length; i++) {
+            check.checkStatus(result.items[i]);
+          }
+          result.items[0].id.should.not.equal(first.id);
+          result.items[0].created_at.should.below(last.created_at);
+          done();
+        });
       });
     });
 
@@ -1371,6 +1393,23 @@ describe('tapi.js ' + blogtype + ' API', function () {
         should.exist(result);
         result.should.have.property('items').with.be.an.instanceof(Array);
         result.items.should.length(0);
+        done();
+      });
+    });
+
+  });
+
+  describe('search_suggestions_at_users()', function () {
+
+    if (!tapi.support(currentUser, 'search_suggestions_at_users')) {
+      return;
+    }
+
+    it('should return 10 users', function (done) {
+      tapi.search_suggestions_at_users(currentUser, 'an', function (err, result) {
+        should.not.exist(err);
+        console.log(result);
+        should.exist(result);
         done();
       });
     });
