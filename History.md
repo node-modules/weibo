@@ -1,4 +1,10 @@
 
+0.6.5 / 2012-10-07 
+==================
+
+  * add search_suggestions_at_users()
+  * remove _blank for alink
+
 0.6.4 / 2012-10-05 
 ==================
 
