@@ -29,7 +29,7 @@ All apis and data in `node-weibo` will convert to this unity format.
 |  * [comments](#comments)(user, id[, cursor], callback)|List one status's comments|[weibo], [tqq]|
 |  * [comments_mentions](#comments_mentions)(user[, cursor], callback)|List @me comments|[weibo]|
 |  * [comments_timeline](#comments_timeline)(user[, cursor], callback)|List comments to my statues|[weibo], [tqq]|
-|  * [comments_to_me](#comments_to_me)(user[, cursor], callback)|List comments to me|[weibo]|
+|  * [comments_to_me](#comments_to_me)(user[, cursor], callback)|List comments to me|[weibo], [tqq]|
 |  * [comments_by_me](#comments_by_me)(user[, cursor], callback)|List comments by me|[weibo]|
 | **[Favorite](#favorite) APIs** |||
 | Write |||
@@ -53,7 +53,10 @@ All apis and data in `node-weibo` will convert to this unity format.
 | Read |||
 |  * [verify_credentials](#verify_credentials)(user, callback)|get oauth user profile infomation|[weibo], [tqq], [github]|
 |  * [user_show](#user_show)(user, uid[, screen_name], callback)|get user profile infomation by uid|[weibo], [tqq], [github]|
-| Write |||
+|  * [user_search](#user_search)(user, query, cursor, callback)|Search users by query|[tqq]|
+| **[Suggestion] APIs** |||
+| Read |||
+|  * [search_suggestions_at_users](#search_suggestions_at_users)(user, q, cursor, callback)|Search suggestion users when @somebody|[weibo], [tqq]|
 | **[OAuth](#oauth) APIs** |||
 | Read |||
 |  * [get_authorization_url](#get_authorization_url)(user, callback)|get the user oauth login url|[weibo], [tqq], [github]|
@@ -338,6 +341,28 @@ search: function (user, query, cursor, callback)
 process_text: function (user, status)
 ```
 
+## Suggestion APIs
+
+### search_suggestions_at_users
+
+```js
+/**
+ * Search suggestion users when @somebody.
+ * 
+ * @param {User} user
+ * @param {String} q, search keyword
+ * @param {Object} [cursor]
+ *  - {Number} [count], return records number, default is `10`.
+ *  - {Number} [type], suggestion type, 0: I following, 1: My followers. default is `0`.
+ *  - {Number} [range], suggestion search range, 0: only screen_name, 1: only remark, 2: both. default is `2`.
+ * @param {Function(err, result)} callback
+ *  - {Object} result:
+ *   - {Array} items: [ SuggetionUser, ... ]
+ *    - {SuggetionUser} { id: '123123', screen_name: 'QLeeLulu', remark: '' }
+ */
+search_suggestions_at_users: function (user, q, cursor, callback)
+```
+
 ## OAuth APIs
 
 ### get_authorization_url
@@ -401,20 +426,33 @@ verify_credentials: function (user, callback)
 
 ```js
 /**
-* Get user profile infomation by uid or screen_name.
-*
-* @param {Object} user
-*  - {String} blogtype
-*  - {String} oauth_token, access token
-*  - {String} [oauth_token_secret], access oauth token secret, oauth v2 don't need this param.
-* @param {String} [uid], user id
-* @param {String} [screen_name], user screen_name
-*   uid and screen_name MUST set one. If set both, will use `screen_name`.
-*   `tqq` do not support `screen_name`.
-* @param {Function(err, User)} callback
-* @return {Context} this
-*/
+  * Get user profile infomation by uid or screen_name.
+  *
+  * @param {Object} user
+  *  - {String} blogtype
+  *  - {String} oauth_token, access token
+  *  - {String} [oauth_token_secret], access oauth token secret, oauth v2 don't need this param.
+  * @param {String} [uid], user id
+  * @param {String} [screen_name], user screen_name
+  *   uid and screen_name MUST set one. If set both, will use `screen_name`.
+  *   `tqq` do not support `screen_name`.
+  * @param {Function(err, User)} callback
+  * @return {Context} this
+  */
 user_show: function (user, uid, screen_name, callback)
+```
+
+### user_search
+
+```js
+/**
+ * Search users by query.
+ * @param {User} user
+ * @param {String} query
+ * @param {Object} cursor
+ * @param {Function(err, result)} callback
+ */
+user_search: function (user, query, cursor, callback)
 ```
 
 ## Comment APIs
@@ -1089,6 +1127,22 @@ Demo:
 }
 ```
 
+## Suggestion
+
+### SuggestionUser
+
+|Field name|Data Type|Description|Demo|
+|----------|---------|-----------|----|
+|id|String|User id|`"123123"`|
+|screen_name|String|User screen display name|`"QLeeLulu"`|
+|remark|String|Remark infomation|`"Some guy I meeting in github."`|
+
+Demo:
+
+```js
+{ id: '123123', screen_name: 'QLeeLulu', remark: '' }
+```
+
 ## OAuth
 
 ### RequestToken
@@ -1124,6 +1178,7 @@ Demo:
   [Cursor]: #cursor
   [Count]: #count_structure
   [Friendship]: #friendship
+  [Suggestion]: #suggestion
   [weibo]: http://open.weibo.com
   [tqq]: http://dev.t.qq.com
   [t163]: http://open.t.163.com
