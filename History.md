@@ -1,4 +1,13 @@
 
+0.6.6 / 2012-10-08 
+==================
+
+  * let tqq support comments_to_me.
+  * let TQQAPI.prototype.comments_to_me equal comments_timeline on tqq.
+  * only test with tqq now.
+  * fixed ep 0.1.3 not export EventProxy problem.
+  * let tqq support user_search and at user suggestions.
+
 0.6.5 / 2012-10-07 
 ==================
 
