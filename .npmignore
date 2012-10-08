@@ -1,4 +1,6 @@
 .git*
+logo.png
+lib-cov/
 examples/
 test/
 support/
