@@ -1,5 +1,7 @@
 # node-weibo [![Build Status](https://secure.travis-ci.org/fengmk2/node-weibo.png)](http://travis-ci.org/fengmk2/node-weibo)
 
+![logo](https://raw.github.com/fengmk2/node-weibo/master/logo.png)
+
 A [weibo](http://weibo.com)(like [twitter](http://twitter.com)) API SDK, use on browser client and nodejs server.
 
 Please see the [API Documents](https://github.com/fengmk2/node-weibo/blob/master/api.md) first.

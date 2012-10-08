@@ -32,4 +32,4 @@ build:
 publish: build
 	npm publish
 
-.PHONY: test-cov test test-cov build test-g publish
+.PHONY: test-cov test build test-g publish lib-cov
