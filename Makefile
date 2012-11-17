@@ -3,8 +3,12 @@ REPORTER = spec
 TIMEOUT = 10000
 MOCHA_OPTS =
 G = 
+JSCOVERAGE = ./node_modules/jscover/bin/jscover
 
-test:
+install:
+	@npm install
+
+test: install
 	@NODE_ENV=test ./node_modules/mocha/bin/mocha \
 		--reporter $(REPORTER) \
 		--timeout $(TIMEOUT) $(MOCHA_OPTS) \
@@ -16,14 +20,13 @@ test-g:
 		--timeout $(TIMEOUT) -g "$(G)" \
 		$(TESTS)
 
-test-cov:
-	@rm -rf ./lib-cov
-	@$(MAKE) lib-cov
-	@WEIBO_COV=1 $(MAKE) test
+test-cov: lib-cov
+	@WEIBO_COV=1 $(MAKE) test REPORTER=dot
 	@WEIBO_COV=1 $(MAKE) test REPORTER=html-cov > coverage.html
 
-lib-cov:
-	@jscoverage lib $@
+lib-cov: install
+	@rm -rf $@
+	@$(JSCOVERAGE) lib $@
 
 build:
 	./node_modules/browserify/bin/cmd.js examples/browser/entry.js -o examples/browser/bundle.js
@@ -32,4 +35,4 @@ build:
 publish: build
 	npm publish
 
-.PHONY: test-cov test build test-g publish lib-cov
+.PHONY: test test-g test-cov lib-cov build publish

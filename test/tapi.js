@@ -1364,7 +1364,6 @@ describe('tapi.js ' + blogtype + ' API', function () {
   });
 
   describe('direct_messages()', function () {
-
     if (!tapi.support(currentUser, 'direct_messages')) {
       return;
     }
@@ -1372,7 +1371,6 @@ describe('tapi.js ' + blogtype + ' API', function () {
     it('should return recent message sent to me', function (done) {
       tapi.direct_messages(currentUser, function (err, result) {
         should.not.exist(err);
-        // console.log(result);
         should.exist(result);
         result.should.have.property('items').with.be.an.instanceof(Array);
         result.items.length.should.above(0);
@@ -1444,6 +1442,38 @@ describe('tapi.js ' + blogtype + ' API', function () {
         result.should.have.property('items').with.be.an.instanceof(Array);
         result.items.should.length(0);
         done();
+      });
+    });
+
+  });
+
+  describe.skip('direct_message_create()', function () {
+
+    if (!tapi.support(currentUser, 'direct_message_create')) {
+      return;
+    }
+
+    var blogUser = userIDs[blogtype];
+
+    it('should send a message to myself with both uid and screen_name', function (done) {
+      var toUser = {
+        uid: blogUser.id,
+        screen_name: blogUser.screen_name
+      };
+      var text = '你好，这是来自node-weibo的 direct_message_create() 测试信息' + new Date();
+      tapi.direct_message_create(currentUser, toUser, text, function (err, message) {
+        should.not.exist(err);
+        should.exist(message);
+        message.should.have.keys('id', 't_url');
+        message.id.should.match(/^\d+$/);
+        tapi.direct_message_destroy(currentUser, message.id, function (err, destroyMessage) {
+          should.not.exist(err);
+          should.exist(destroyMessage);
+          destroyMessage.should.have.keys('id', 't_url');
+          destroyMessage.id.should.equal(message.id);
+          destroyMessage.t_url.should.equal(message.t_url);
+          done();
+        });
       });
     });
 

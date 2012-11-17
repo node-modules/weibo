@@ -46,9 +46,13 @@ All apis and data in `node-weibo` will convert to this unity format.
 |  * [friendship_show](#friendship_show)(user, id, callback)|Get relation between two users. [tqq] only support current user with others relation.|[weibo], [tqq]|
 | **[Message](#message) APIs** |||
 | Write |||
-|  * [message_create](#message_create)(user, text, id, callback)|post a message to some one|-|
-|  * [message_destroy](#message_destroy)(user, text, id, callback)|remove a message|-|
+|  * [direct_message_create](#direct_message_create)(user, toUser, text, callback)|Sends a new direct message to the specified user from the authenticating user.|[tqq]|
+|  * [direct_message_destroy](#direct_message_destroy)(user, id, callback)|Destroys the direct message specified in the required ID parameter.|[tqq]|
 | Read |||
+|  * [direct_messages_both](#direct_messages_both)(user, cursor, callback)|Returns the direct messages, sent to and sent by the authenticating user.|[tqq]|
+|  * [direct_messages](#direct_messages)(user, cursor, callback)|Returns the 20 most recent direct messages sent to the authenticating user.|[tqq]|
+|  * [direct_messages_sent](#direct_messages_sent)(user, cursor, callback)|Returns the 20 most recent direct messages sent by the authenticating user.|[tqq]|
+|  * [direct_message_show](#direct_message_show)(user, id, callback)|Returns a single direct message, specified by an id parameter.|-|
 | **[User] APIs** |||
 | Read |||
 |  * [verify_credentials](#verify_credentials)(user, callback)|get oauth user profile infomation|[weibo], [tqq], [github]|
@@ -704,6 +708,109 @@ favorite_create: function (user, id, callback)
  * @return {Context} this
  */
 favorite_destroy: function (user, id, callback)
+```
+
+## Message APIs
+
+### direct_messages_both
+
+```js
+/**
+ * Returns the direct messages, sent to and sent by the authenticating user.
+ * 
+ * @param {User} user
+ * @param {Object} cursor, pagging params.
+ *  - {Number} [count], Specifies the number of records to retrieve.
+ *  - {String} [since_id], Returns results with an ID greater than (that is, more recent than) the specified ID.
+ *  - {String} [since_time], only for tqq
+ *  - {String} [max_id], Returns results with an ID less than (that is, older than) the specified ID.
+ *  - {String} [max_time], only for tqq
+ *  - {Number} [page], Specifies the page of results to retrieve.
+ *  - {Boolean} [include_entities], The entities node will not be included when set to `false`.
+ *  - {Boolean} [skip_status], When set to either true, t or 1 statuses will not be included in the returned user objects.
+ * @param {Function(err, result)} callback
+ */
+direct_messages_both: function (user, cursor, callback)
+```
+
+### direct_messages
+
+```js
+/**
+ * Returns the 20 most recent direct messages sent to the authenticating user.
+ * 
+ * @param {User} user
+ * @param {Object} cursor, pagging params.
+ *  - {Number} [count], Specifies the number of records to retrieve.
+ *  - {String} [since_id], Returns results with an ID greater than (that is, more recent than) the specified ID.
+ *  - {String} [since_time], only for tqq
+ *  - {String} [max_id], Returns results with an ID less than (that is, older than) the specified ID.
+ *  - {String} [max_time], only for tqq
+ *  - {Number} [page], Specifies the page of results to retrieve.
+ *  - {Boolean} [include_entities], The entities node will not be included when set to `false`.
+ *  - {Boolean} [skip_status], When set to either true, t or 1 statuses will not be included in the returned user objects.
+ * @param {Function(err, result)} callback
+ */
+direct_messages: function (user, cursor, callback)
+```
+
+### direct_messages_sent
+
+```js
+/**
+ * Returns the 20 most recent direct messages sent by the authenticating user.
+ * 
+ * @param {User} user
+ * @param {Object} cursor, pagging params.
+ *  - {Number} [count], Specifies the number of records to retrieve.
+ *  - {String} [since_id], Returns results with an ID greater than (that is, more recent than) the specified ID.
+ *  - {String} [since_time], only for tqq
+ *  - {String} [max_id], Returns results with an ID less than (that is, older than) the specified ID.
+ *  - {String} [max_time], only for tqq
+ *  - {Number} [page], Specifies the page of results to retrieve.
+ *  - {Boolean} [include_entities], The entities node will not be included when set to `false`.
+ * @param {Function(err, result)} callback
+ */
+direct_messages_sent: function (user, cursor, callback)
+```
+
+### direct_message_show
+
+```js
+/**
+ * Returns a single direct message, specified by an id parameter.
+ * @param {User} user
+ * @param {String} id, The ID of the direct message.
+ * @param {Function(err, message)} callback
+ */
+direct_message_show: function (user, id, callback)
+```
+
+### direct_message_create
+
+```js
+/**
+ * Sends a new direct message to the specified user from the authenticating user.
+ * @param {User} user
+ * @param {Object} toUser, One of uid or screen_name are required.
+ *  - {String} uid, The ID of the user who should receive the direct message.
+ *  - {String} screen_name, The screen name of the user who should receive the direct message.
+ * @param {String} text, The text of your direct message. Be sure to URL encode as necessary.
+ * @param {Function(err, result)} callback
+ */
+direct_message_create: function (user, toUser, text, callback)
+```
+
+### direct_message_destroy
+
+```js
+/**
+ * Destroys the direct message specified in the required ID parameter.
+ * @param {User} user
+ * @param {String} id, The ID of the direct message to delete.
+ * @param {Function(err, result)} callback
+ */
+direct_message_destroy: function (user, id, callback)
 ```
 
 ## Data Structure
