@@ -1,4 +1,11 @@
 
+0.6.7 / 2012-11-17 
+==================
+
+  * fixed #26 support direct_message_create and destroy
+  * npm ignore logo.png
+  * add logo
+
 0.6.6 / 2012-10-08 
 ==================
 
