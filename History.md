@@ -1,4 +1,10 @@
 
+0.6.8 / 2013-02-04 
+==================
+
+  * Merge pull request #28 from im007boy/master
+  * Update lib/tapi.js
+
 0.6.7 / 2012-11-17 
 ==================
 
