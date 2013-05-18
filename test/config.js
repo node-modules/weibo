@@ -21,15 +21,15 @@ var users = exports.users = {
     oauth_token_secret: '2bec75e9ddad6b27067e384a84550e38',
     name: 'node-weibo'
   },
-  weibo: { 
-    blogtype: 'weibo',
-    access_token: '2.00EkofzBtMpzNBb9bc3108d8MwDTTE',
-    uid: 1827455832,
-  },
-  github: { 
-    blogtype: 'github',
-    access_token: '23c53f2f70977a0a2c15c77c840c2a65247f9299',
-  }
+  // weibo: { 
+  //   blogtype: 'weibo',
+  //   access_token: '2.00EkofzBtMpzNBb9bc3108d8MwDTTE',
+  //   uid: 1827455832,
+  // },
+  // github: { 
+  //   blogtype: 'github',
+  //   access_token: '23c53f2f70977a0a2c15c77c840c2a65247f9299',
+  // }
 };
 
 // var user = users.tqq;

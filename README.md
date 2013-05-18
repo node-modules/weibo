@@ -180,24 +180,29 @@ jscoverage: [79%](http://fengmk2.github.com/coverage/node-weibo.html)
 
 Below is the output from `git-summary`.
 
-```
- project: node-weibo
- commits: 119
- active : 55 days
- files  : 46
- authors: 
-   108  fengmk2                 90.8%
-     7  hpf1908                 5.9%
-     2  QLeelulu                1.7%
-     1  mk2                     0.8%
-     1  xydudu                  0.8%
+```bash
+$ git summary 
+
+ project  : node-weibo
+ repo age : 2 years, 3 months
+ active   : 67 days
+ commits  : 163
+ files    : 53
+ authors  : 
+   150  fengmk2                 92.0%
+     7  hpf1908                 4.3%
+     2  QLeelulu                1.2%
+     1  hbbalfred               0.6%
+     1  im007boy                0.6%
+     1  mk2                     0.6%
+     1  xydudu                  0.6%
 ```
 
 ## License 
 
 (The MIT License)
 
-Copyright (c) 2011-2012 fengmk2 &lt;fengmk2@gmail.com&gt;
+Copyright (c) 2011-2013 fengmk2 &lt;fengmk2@gmail.com&gt;
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the

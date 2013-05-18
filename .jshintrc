@@ -10,7 +10,6 @@
     "describe",
     "before",
     "after",
-    "should",
     "jQuery",
     "window",
     "weibo"

@@ -38,9 +38,9 @@ describe('weibo_text_process.js', function () {
 
     it('should convert #hash tag# to search url', function () {
       var cases = [
-        ['#沪js#', '<a target="_blank" href="http://s.weibo.com/weibo/%E6%B2%AAjs" title="Search #沪js#">#沪js#</a>'],
-        ['#沪js##123#', '<a target="_blank" href="http://s.weibo.com/weibo/%E6%B2%AAjs" title="Search #沪js#">#沪js#</a><a target="_blank" href="http://s.weibo.com/weibo/123" title="Search #123#">#123#</a>'],
-        ['#foo bar 123#123123', '<a target="_blank" href="http://s.weibo.com/weibo/foo%20bar%20123" title="Search #foo bar 123#">#foo bar 123#</a>123123'],
+        ['#沪js#', '<a href="http://s.weibo.com/weibo/%E6%B2%AAjs" class="status_hash_link" title="Search #沪js#">#沪js#</a>'],
+        ['#沪js##123#', '<a href="http://s.weibo.com/weibo/%E6%B2%AAjs" class="status_hash_link" title="Search #沪js#">#沪js#</a><a href="http://s.weibo.com/weibo/123" class="status_hash_link" title="Search #123#">#123#</a>'],
+        ['#foo bar 123#123123', '<a href="http://s.weibo.com/weibo/foo%20bar%20123" class="status_hash_link" title="Search #foo bar 123#">#foo bar 123#</a>123123'],
       ];
       cases.forEach(function (item) {
         weiboapi.process_search(item[0]).should.equal(item[1]);
@@ -53,9 +53,9 @@ describe('weibo_text_process.js', function () {
 
     it('should process url, @user, #hash#', function () {
       var cases = [
-        ['http://t.cn/zlcThPG @user#沪js#', '<a target="_blank" class="link" href="http://t.cn/zlcThPG">http://t.cn/zlcThPG</a> <a class="at_user_link" href="http://weibo.com/n/user">@user</a><a target="_blank" href="http://s.weibo.com/weibo/%E6%B2%AAjs" title="Search #沪js#">#沪js#</a>'],
-        ['#沪js##123#www.baidu.com', '<a target="_blank" href="http://s.weibo.com/weibo/%E6%B2%AAjs" title="Search #沪js#">#沪js#</a><a target="_blank" href="http://s.weibo.com/weibo/123" title="Search #123#">#123#</a><a target="_blank" class="link" href="http://www.baidu.com">www.baidu.com</a>'],
-        ['#foo bar 123#123123', '<a target="_blank" href="http://s.weibo.com/weibo/foo%20bar%20123" title="Search #foo bar 123#">#foo bar 123#</a>123123'],
+        ['http://t.cn/zlcThPG @user#沪js#', '<a class="status_text_link" href="http://t.cn/zlcThPG">http://t.cn/zlcThPG</a> <a class="at_user_link" href="http://weibo.com/n/user">@user</a><a href="http://s.weibo.com/weibo/%E6%B2%AAjs" class="status_hash_link" title="Search #沪js#">#沪js#</a>'],
+        ['#沪js##123#www.baidu.com', '<a href="http://s.weibo.com/weibo/%E6%B2%AAjs" class="status_hash_link" title="Search #沪js#">#沪js#</a><a href="http://s.weibo.com/weibo/123" class="status_hash_link" title="Search #123#">#123#</a><a class="status_text_link" href="http://www.baidu.com">www.baidu.com</a>'],
+        ['#foo bar 123#123123', '<a href="http://s.weibo.com/weibo/foo%20bar%20123" class="status_hash_link" title="Search #foo bar 123#">#foo bar 123#</a>123123'],
         ['', '&nbsp;'],
         [null, '&nbsp;'],
         [undefined, '&nbsp;'],
