@@ -1,5 +1,7 @@
 # node-weibo [![Build Status](https://secure.travis-ci.org/fengmk2/node-weibo.png)](http://travis-ci.org/fengmk2/node-weibo)
 
+[![NPM](https://nodei.co/npm/weibo.png?downloads=true&stars=true)](https://nodei.co/npm/weibo/)
+
 ![logo](https://raw.github.com/fengmk2/node-weibo/master/logo.png)
 
 A [weibo](http://weibo.com)(like [twitter](http://twitter.com)) API SDK, use on browser client and nodejs server.
@@ -77,7 +79,7 @@ Include `bundle.js` to your html.
   </body>
 </html>
 ```
-    
+
 ### Use `weibo.oauth` middleware
 
 handler oauth login middleware, use on connect, express.
@@ -96,18 +98,18 @@ handler oauth login middleware, use on connect, express.
  *  );
  *
  * @param {Object} [options]
- *   - {String} [homeUrl], use to create login success oauth_callback url with referer header, 
+ *   - {String} [homeUrl], use to create login success oauth_callback url with referer header,
  *     default is `'http://' + req.headers.host`;
  *   - {String} [loginPath], login url, default is '/oauth'
  *   - {String} [logoutPath], default is '/oauth/logout'
  *   - {String} [callbackPath], default is login_path + '/callback'
- *   - {String} [blogtypeField], default is 'type', 
+ *   - {String} [blogtypeField], default is 'type',
  *       if you want to connect weibo, login url should be '/oauth?type=weibo'
  *   - {Function(req, res, callback)} [afterLogin], when oauth login success, will call this function.
  *   - {Function(req, res, callback)} [beforeLogout], will call this function before user logout.
  */
 ```
-    
+
 Example: A simple web with oauth login.
 
 ```js
@@ -116,7 +118,7 @@ var weibo = require('../');
 
 /**
  * init weibo api settings
- */ 
+ */
 
 weibo.init('weibo', '$appkey', '$secret');
 weibo.init('tqq', '$appkey', '$secret');
@@ -158,8 +160,8 @@ app.use('/', function (req, res, next) {
     return;
   }
   res.end('Hello, <img src="' + user.profile_image_url + '" />\
-    <a href="' + user.t_url + 
-    '" target="_blank">@' + user.screen_name + '</a>. ' + 
+    <a href="' + user.t_url +
+    '" target="_blank">@' + user.screen_name + '</a>. ' +
     '<a href="/logout">Logout</a>');
 });
 
@@ -181,16 +183,17 @@ jscoverage: [79%](http://fengmk2.github.com/coverage/node-weibo.html)
 Below is the output from `git-summary`.
 
 ```bash
-$ git summary 
+$ git summary
 
  project  : node-weibo
- repo age : 2 years, 3 months
- active   : 67 days
- commits  : 163
+ repo age : 2 years, 10 months
+ active   : 71 days
+ commits  : 170
  files    : 53
- authors  : 
-   150  fengmk2                 92.0%
-     7  hpf1908                 4.3%
+ authors  :
+   154  fengmk2                 90.6%
+     7  hpf1908                 4.1%
+     3  chemzqm                 1.8%
      2  QLeelulu                1.2%
      1  hbbalfred               0.6%
      1  im007boy                0.6%
@@ -198,7 +201,7 @@ $ git summary
      1  xydudu                  0.6%
 ```
 
-## License 
+## License
 
 (The MIT License)
 

@@ -2,11 +2,11 @@ TESTS = test/*.js
 REPORTER = spec
 TIMEOUT = 10000
 MOCHA_OPTS =
-G = 
+G =
 JSCOVERAGE = ./node_modules/jscover/bin/jscover
 
 install:
-	@npm install
+	@npm install --registry=http://registry.cnpmjs.org --cache=${HOME}/.npm/.cache/cnpm
 
 test: install
 	@NODE_ENV=test ./node_modules/mocha/bin/mocha \
