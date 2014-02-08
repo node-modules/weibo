@@ -186,17 +186,18 @@ Below is the output from `git-summary`.
 $ git summary
 
  project  : node-weibo
- repo age : 2 years, 10 months
- active   : 71 days
- commits  : 170
+ repo age : 3 years
+ active   : 73 days
+ commits  : 173
  files    : 53
  authors  :
-   154  fengmk2                 90.6%
-     7  hpf1908                 4.1%
-     3  chemzqm                 1.8%
+   156  fengmk2                 90.2%
+     7  hpf1908                 4.0%
+     3  chemzqm                 1.7%
      2  QLeelulu                1.2%
      1  hbbalfred               0.6%
      1  im007boy                0.6%
+     1  iwillwen                0.6%
      1  mk2                     0.6%
      1  xydudu                  0.6%
 ```
@@ -205,7 +206,7 @@ $ git summary
 
 (The MIT License)
 
-Copyright (c) 2011-2013 fengmk2 &lt;fengmk2@gmail.com&gt;
+Copyright (c) 2011-2014 fengmk2 &lt;fengmk2@gmail.com&gt;
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the

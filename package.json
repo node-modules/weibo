@@ -1,6 +1,6 @@
 {
   "name": "weibo",
-  "version": "0.6.10",
+  "version": "0.6.11",
   "description": "Weibo SDK, base on node. Now support weibo, tqq, tsohu, twitter and github.",
   "repository": "git://github.com/fengmk2/node-weibo.git",
   "homepage": "http://github.com/fengmk2/node-weibo",
@@ -15,7 +15,8 @@
     "connect": ">=1.8.0",
     "jscover": "*",
     "should": "*",
-    "mocha": "*"
+    "mocha": "*",
+    "contributors": "*"
   },
   "dependencies": {
     "eventproxy": "0.2.6",

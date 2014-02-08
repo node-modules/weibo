@@ -35,4 +35,7 @@ build:
 publish: build
 	npm publish
 
-.PHONY: test test-g test-cov lib-cov build publish
+contributors: install
+	@./node_modules/.bin/contributors -f plain -o AUTHORS
+
+.PHONY: test
