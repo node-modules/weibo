@@ -434,7 +434,9 @@ verify_credentials: function (user, callback)
   *
   * @param {Object} user
   *  - {String} blogtype
-  *  - {String} oauth_token, access token
+  *  - {String} id, source uid
+  *  - {String} source, appkey
+  *  - {String} access_token, access token
   *  - {String} [oauth_token_secret], access oauth token secret, oauth v2 don't need this param.
   * @param {String} [uid], user id
   * @param {String} [screen_name], user screen_name
