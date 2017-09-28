@@ -19,15 +19,28 @@
     "contributors": "*"
   },
   "dependencies": {
-    "eventproxy": "0.2.6",
+    "eventproxy": "1.0.0",
     "emoji": ">=0.2.1",
     "urllib": ">=0.5.5"
   },
   "keywords": [
-    "framework", "web", "rest", "restful",
-    "weibo", "qq", "open", "github", "twitter", "facebook",
-    "sohu", "163", "sina", "oauth",
+    "framework",
+    "web",
+    "rest",
+    "restful",
+    "weibo",
+    "qq",
+    "open",
+    "github",
+    "twitter",
+    "facebook",
+    "sohu",
+    "163",
+    "sina",
+    "oauth",
     "sdk"
   ],
-  "engines": { "node": ">= 0.8.0" }
+  "engines": {
+    "node": ">= 0.8.0"
+  }
 }
