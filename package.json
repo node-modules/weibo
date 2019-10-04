@@ -7,7 +7,9 @@
   "author": "fengmk2<fengmk2@gmail.com> (http://fengmk2.github.com)",
   "main": "index",
   "scripts": {
-    "test": "make test-g G='tqq API'"
+    "test": "make test-g G='tqq API'",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
   },
   "devDependencies": {
     "browserify": ">=1.16.1",
@@ -21,13 +23,28 @@
   "dependencies": {
     "eventproxy": "0.2.6",
     "emoji": ">=0.2.1",
-    "urllib": ">=0.5.5"
+    "urllib": ">=0.5.5",
+    "snyk": "^1.230.5"
   },
   "keywords": [
-    "framework", "web", "rest", "restful",
-    "weibo", "qq", "open", "github", "twitter", "facebook",
-    "sohu", "163", "sina", "oauth",
+    "framework",
+    "web",
+    "rest",
+    "restful",
+    "weibo",
+    "qq",
+    "open",
+    "github",
+    "twitter",
+    "facebook",
+    "sohu",
+    "163",
+    "sina",
+    "oauth",
     "sdk"
   ],
-  "engines": { "node": ">= 0.8.0" }
+  "engines": {
+    "node": ">= 0.8.0"
+  },
+  "snyk": true
 }
